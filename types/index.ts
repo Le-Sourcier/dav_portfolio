@@ -1,10 +1,13 @@
 
+export type AdminRole = 'SUPER_ADMIN' | 'EDITOR' | 'VIEWER';
+
 export interface Project {
   title: string;
   description: string;
   stack: string[];
   demoUrl?: string;
   githubUrl?: string;
+  image?: string;
   category: 'Professional' | 'Personal' | 'Open Source';
   featured?: boolean;
 }

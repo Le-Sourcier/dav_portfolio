@@ -1,67 +1,77 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Sun, Moon, Search, Terminal, BookOpen, Cpu, ChevronRight, Command } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Menu, X, Sun, Moon, Search, Terminal, BookOpen, Cpu, ChevronRight } from 'lucide-react';
 import { PortfolioData } from '../types/index';
 
 interface NavbarProps {
-  currentView: string;
-  setView: (v: any) => void;
   isScrolled: boolean;
   isDark: boolean;
   toggleTheme: () => void;
   data: PortfolioData;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isScrolled, isDark, toggleTheme, data }) => {
+export const Navbar: React.FC<NavbarProps> = ({ isScrolled, isDark, toggleTheme, data }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
-    { label: 'Projets', view: 'home', hash: '#projects' },
-    { label: 'Expérience', view: 'home', hash: '#experience' },
-    { label: 'Blog', view: 'blog', hash: '' }
+    { label: 'Accueil', path: '/' },
+    { label: 'Blog', path: '/blog' },
+    { label: 'Projets', path: '/#projects' },
+    { label: 'Expérience', path: '/#experience' },
   ];
 
-  const handleNav = (link: typeof navLinks[0]) => {
+  const handleHashLink = (path: string) => {
     setMobileMenuOpen(false);
-    if (link.view !== currentView) {
-      setView(link.view);
-      if (link.hash) setTimeout(() => document.querySelector(link.hash)?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } else if (link.hash) {
-      document.querySelector(link.hash)?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (path.includes('#')) {
+      const [base, hash] = path.split('#');
+      if (location.pathname === base) {
+        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-black/5 dark:border-white/5' : 'py-6 bg-transparent'}`}>
       <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-        <button onClick={() => { setView('home'); window.scrollTo(0,0); }} className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg transition-all">DL</div>
           <span className="font-bold text-lg dark:text-white uppercase tracking-tight hidden sm:block">David Logan</span>
-        </button>
+        </Link>
         
         <div className="hidden md:flex gap-8 items-center text-sm font-semibold">
           {navLinks.map((link) => (
-            <button 
-              key={link.label} 
-              onClick={() => handleNav(link)}
-              className={`transition-colors ${currentView === link.view ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}
-            >
-              {link.label}
-            </button>
+            link.path.includes('#') ? (
+              <Link 
+                key={link.label}
+                to={link.path}
+                onClick={() => handleHashLink(link.path)}
+                className="text-gray-500 hover:text-blue-500 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <NavLink 
+                key={link.label} 
+                to={link.path}
+                className={({ isActive }) => `transition-colors ${isActive ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}
+              >
+                {link.label}
+              </NavLink>
+            )
           ))}
           <div className="h-4 w-px bg-black/10 dark:bg-white/10 mx-2" />
           <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500">
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
-          <button 
-            onClick={() => { setView('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 50); }}
+          <Link 
+            to="/#contact"
+            onClick={() => handleHashLink('/#contact')}
             className="px-5 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/10"
           >
             Contact
-          </button>
+          </Link>
         </div>
 
         <div className="md:hidden flex items-center gap-4">
@@ -79,9 +89,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isScrolled
         <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-black border-b border-black/5 dark:border-white/5 py-8 px-6 animate-in slide-in-from-top-2">
           <div className="flex flex-col gap-6 items-center">
             {navLinks.map((link) => (
-              <button key={link.label} onClick={() => handleNav(link)} className="text-xl font-bold dark:text-white">
+              <Link 
+                key={link.label} 
+                to={link.path} 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (link.path.includes('#')) handleHashLink(link.path);
+                }}
+                className="text-xl font-bold dark:text-white"
+              >
                 {link.label}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { portfolioData as initialData } from './data/portfolio';
-import { BlogPost, Comment, PortfolioData } from './types/index';
+import { PortfolioData, Comment } from './types/index';
 import { Navbar } from './components/Navbar';
 import { Hero, ProjectsSection, ExperienceSection, ContactSection, SkillsSection, PackagesSection } from './components/HomeSections';
 import { BlogList, BlogDetail } from './components/BlogComponents';
@@ -9,37 +10,70 @@ import { Footer } from './components/Footer';
 import { AIAssistant } from './components/AIAssistant';
 import { AdminDashboard } from './components/AdminDashboard';
 
-const App: React.FC = () => {
-  const [view, setView] = useState<'home' | 'blog' | 'blog-detail' | 'admin'>('home');
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
-  
-  // Persistence des données du portfolio
-  const [data, setData] = useState<PortfolioData>(() => {
-    const saved = localStorage.getItem('portfolio_data');
-    return saved ? JSON.parse(saved) : initialData;
-  });
-
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
   useEffect(() => {
-    localStorage.setItem('portfolio_data', JSON.stringify(data));
-  }, [data]);
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
-  // Thème
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) return savedTheme === 'dark';
-      return document.documentElement.classList.contains('dark');
-    }
-    return true;
-  });
+const PublicLayout: React.FC<{ data: PortfolioData; isDark: boolean; toggleTheme: () => void; comments: Comment[]; onAddComment: (c: any) => void }> = ({ data, isDark, toggleTheme, comments, onAddComment }) => {
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  return (
+    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#030712] text-white' : 'bg-[#f8fafc] text-gray-900'}`}>
+      <Navbar 
+        isScrolled={isScrolled} 
+        isDark={isDark} 
+        toggleTheme={toggleTheme} 
+        data={data} 
+      />
+      
+      <main className="pt-20">
+        <Routes>
+          <Route path="/" element={
+            <div className="animate-in fade-in duration-500">
+              <Hero data={data} />
+              <SkillsSection skills={data.skills} />
+              <ProjectsSection projects={data.projects} />
+              <PackagesSection packages={data.npmPackages} />
+              <ExperienceSection experiences={data.experiences} />
+              <ContactSection contact={data.contact} />
+            </div>
+          } />
+          <Route path="/blog" element={<BlogList blogs={data.blogs} />} />
+          <Route path="/blog/:id" element={<BlogDetail allBlogs={data.blogs} comments={comments} onAddComment={onAddComment} />} />
+          {/* Redirection vers l'accueil pour les routes inconnues hors admin */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      <Footer />
+      <AIAssistant data={data} />
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  const [data, setData] = useState<PortfolioData>(() => {
+    const saved = localStorage.getItem('portfolio_data');
+    return saved ? JSON.parse(saved) : initialData;
+  });
+
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) return savedTheme === 'dark';
+    return true;
+  });
+
+  const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     if (isDark) {
@@ -51,12 +85,6 @@ const App: React.FC = () => {
     }
   }, [isDark]);
 
-  const handlePostClick = (post: BlogPost) => {
-    setSelectedPost(post);
-    setView('blog-detail');
-    window.scrollTo(0, 0);
-  };
-
   const handleAddComment = (newComment: Omit<Comment, 'id' | 'date'>) => {
     const comment: Comment = {
       ...newComment,
@@ -66,60 +94,30 @@ const App: React.FC = () => {
     setComments(prev => [comment, ...prev]);
   };
 
-  const isAdminView = view === 'admin';
+  const handleUpdateData = (newData: PortfolioData) => {
+    setData(newData);
+    localStorage.setItem('portfolio_data', JSON.stringify(newData));
+  };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#030712] text-white' : 'bg-[#f8fafc] text-gray-900'}`}>
-      {!isAdminView && (
-        <Navbar 
-          currentView={view} 
-          setView={setView} 
-          isScrolled={isScrolled} 
-          isDark={isDark} 
-          toggleTheme={() => setIsDark(!isDark)} 
-          data={data} 
-        />
-      )}
-      
-      <main className={isAdminView ? "" : "pt-20"}>
-        {view === 'home' && (
-          <div className="animate-in fade-in duration-500">
-            <Hero data={data} />
-            <SkillsSection skills={data.skills} />
-            <ProjectsSection projects={data.projects} />
-            <PackagesSection packages={data.npmPackages} />
-            <ExperienceSection experiences={data.experiences} />
-            <ContactSection contact={data.contact} />
-          </div>
-        )}
-        {view === 'blog' && (
-          <div className="animate-in fade-in duration-500">
-            <BlogList blogs={data.blogs} onPostClick={handlePostClick} />
-          </div>
-        )}
-        {view === 'blog-detail' && selectedPost && (
-          <div className="animate-in fade-in duration-500">
-            <BlogDetail 
-              post={selectedPost} 
-              allBlogs={data.blogs}
-              onBack={() => setView('blog')} 
-              onPostClick={handlePostClick}
-              comments={comments.filter(c => c.postId === selectedPost.id)}
-              onAddComment={handleAddComment}
-            />
-          </div>
-        )}
-        {view === 'admin' && (
-          <div className="animate-in fade-in duration-500">
-            <AdminDashboard data={data} onUpdate={setData} onExit={() => setView('home')} />
-          </div>
-        )}
-      </main>
-
-      {!isAdminView && <Footer setView={setView} />}
-      
-      {!isAdminView && <AIAssistant data={data} />}
-    </div>
+    <Router>
+      <ScrollToTop />
+      <Routes>
+        {/* Route Admin prioritaire */}
+        <Route path="/admin/*" element={<AdminDashboard data={data} onUpdate={handleUpdateData} />} />
+        
+        {/* Toutes les autres routes passent par le PublicLayout */}
+        <Route path="/*" element={
+          <PublicLayout 
+            data={data} 
+            isDark={isDark} 
+            toggleTheme={() => setIsDark(!isDark)} 
+            comments={comments}
+            onAddComment={handleAddComment}
+          />
+        } />
+      </Routes>
+    </Router>
   );
 };
 

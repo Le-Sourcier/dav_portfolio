@@ -77,6 +77,7 @@ export const portfolioData: PortfolioData = {
       description: "Plateforme de prospection B2B IA avec stack Next.js, Python et IA avancée.",
       stack: ["Next.js", "TypeScript", "Python", "PostgreSQL", "OpenAI"],
       category: "Professional",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
       demoUrl: "https://prospect-pro-sgrq.vercel.app",
       featured: true
     },
@@ -85,6 +86,7 @@ export const portfolioData: PortfolioData = {
       description: "Framework Backend Node.js Professionnel avec support natif RBAC et logs d'audit.",
       stack: ["TypeScript", "Fastify", "Prisma", "PostgreSQL"],
       category: "Open Source",
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=800&q=80",
       githubUrl: "https://github.com/Le-Sourcier/servcraft",
       featured: true
     },
@@ -93,6 +95,7 @@ export const portfolioData: PortfolioData = {
       description: "Plateforme de suivi sportif connecté avec intégration Garmin, Apple Watch, Samsung et Xiaomi.",
       stack: ["React", "Node.js", "IoT API"],
       category: "Personal",
+      image: "https://images.unsplash.com/photo-1502904585520-fb451a0f2be3?w=800&q=80",
       demoUrl: "https://runweek.vercel.app"
     }
   ],

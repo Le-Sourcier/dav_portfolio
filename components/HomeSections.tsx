@@ -220,12 +220,17 @@ export const ProjectsSection: React.FC<{ projects: PortfolioData['projects'] }> 
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {filtered.map((project, i) => (
-          <div key={i} className="group bg-white dark:bg-white/5 rounded-[48px] border border-black/5 dark:border-white/5 overflow-hidden hover:border-blue-500/30 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5">
-            <div className="aspect-[16/10] bg-gray-100 dark:bg-gray-900 p-10 flex flex-col justify-end relative overflow-hidden">
-               <div className="absolute top-8 right-8 text-white/5 group-hover:text-blue-500/10 group-hover:scale-110 transition-all duration-700">
-                  <Code className="w-32 h-32" />
-               </div>
-               <div className="relative z-10">
+          <div key={i} className="group bg-white dark:bg-white/5 rounded-[48px] border border-black/5 dark:border-white/5 overflow-hidden hover:border-blue-500/30 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+            <div className="aspect-[16/10] bg-gray-100 dark:bg-gray-900 flex flex-col justify-end relative overflow-hidden">
+               {project.image ? (
+                 <img src={project.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={project.title} />
+               ) : (
+                 <div className="absolute top-8 right-8 text-white/5 group-hover:text-blue-500/10 group-hover:scale-110 transition-all duration-700">
+                    <Code className="w-32 h-32" />
+                 </div>
+               )}
+               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+               <div className="relative z-10 p-10">
                  <div className="flex flex-wrap gap-2.5 mb-5">
                    {project.stack.map(s => <span key={s} className="px-3 py-1.5 bg-black/50 text-[9px] font-black text-white rounded-xl uppercase backdrop-blur-md border border-white/10 tracking-widest">{s}</span>)}
                  </div>
@@ -236,20 +241,29 @@ export const ProjectsSection: React.FC<{ projects: PortfolioData['projects'] }> 
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed line-clamp-3 font-medium">{project.description}</p>
               <div className="flex gap-8">
                 {project.demoUrl && (
-                  <a href={project.demoUrl} className="text-[11px] font-black text-blue-600 uppercase flex items-center gap-2 hover:translate-x-1 transition-transform group/link">
-                    Live Demo <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                  <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-blue-600 uppercase flex items-center gap-2 hover:translate-x-1 transition-transform group/link">
+                    Live Demo <ExternalLink className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                   </a>
                 )}
                 {project.githubUrl && (
-                  <a href={project.githubUrl} className="text-[11px] font-black text-gray-400 uppercase flex items-center gap-2 hover:text-white transition-colors">
+                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-gray-400 uppercase flex items-center gap-2 hover:text-white transition-colors">
                     GitHub Repo <Github className="w-4 h-4" />
                   </a>
+                )}
+                {!project.demoUrl && !project.githubUrl && (
+                  <span className="text-[11px] font-black text-gray-400 uppercase opacity-50">Détails confidentiels</span>
                 )}
               </div>
             </div>
           </div>
         ))}
       </div>
+      {filtered.length === 0 && (
+        <div className="py-32 text-center bg-gray-50 dark:bg-white/[0.01] rounded-[48px] border border-dashed border-black/5 dark:border-white/5">
+           <Layers className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+           <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Aucun projet dans cette catégorie pour le moment.</p>
+        </div>
+      )}
     </section>
   );
 };

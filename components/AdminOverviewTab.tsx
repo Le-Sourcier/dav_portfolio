@@ -1,17 +1,42 @@
 
 import React from 'react';
-import { BookOpen, Layers, Briefcase, Sparkles, Download, ChevronRight, Clock } from 'lucide-react';
-import { PortfolioData } from '../types/index';
+import { BookOpen, Layers, Briefcase, Sparkles, Download, ChevronRight, Clock, ShieldCheck, UserCog, Eye } from 'lucide-react';
+import { PortfolioData, AdminRole } from '../types/index';
 
 interface AdminOverviewTabProps {
   data: PortfolioData;
   setActiveTab: (tab: any) => void;
   addNotification: (title: string, message: string, type?: 'info' | 'success' | 'warning') => void;
+  role: AdminRole;
 }
 
-export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setActiveTab, addNotification }) => {
+export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setActiveTab, addNotification, role }) => {
+  const roleConfig = {
+    SUPER_ADMIN: { icon: ShieldCheck, label: 'Super Administrateur', desc: 'Contrôle total du système.' },
+    EDITOR: { icon: UserCog, label: 'Éditeur de contenu', desc: 'Gestion des articles et projets.' },
+    VIEWER: { icon: Eye, label: 'Lecteur Invité', desc: 'Consultation uniquement.' }
+  }[role];
+
   return (
     <div className="space-y-10">
+      {/* Role Banner */}
+      <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/5 border border-blue-500/20 p-8 rounded-[2.5rem] flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+            <roleConfig.icon className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-white uppercase tracking-tight">{roleConfig.label}</h3>
+            <p className="text-slate-500 text-xs font-medium">{roleConfig.desc}</p>
+          </div>
+        </div>
+        <div className="hidden md:block">
+           <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest">
+             Session Active <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+           </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           { label: 'Articles Blog', value: data.blogs.length, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
@@ -33,7 +58,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setAct
       <div className="grid lg:grid-cols-2 gap-10">
         <div className="bg-slate-900/50 border border-slate-800 rounded-[3rem] p-10">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-black text-white flex items-center gap-3">
+            <h3 className="text-xl font-black text-white flex items-center gap-3 tracking-tight">
               <Sparkles className="w-6 h-6 text-yellow-500" /> Activité Blog
             </h3>
             <button onClick={() => setActiveTab('blogs')} className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Gérer tout</button>
@@ -58,19 +83,25 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setAct
               <Download className="w-10 h-10 text-blue-500" />
            </div>
            <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Exporter les données</h3>
-           <p className="text-slate-500 text-sm font-medium mb-10 max-w-xs">Générez une sauvegarde complète au format JSON.</p>
-           <button 
-            onClick={() => {
-              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url; a.download = `backup-${Date.now()}.json`; a.click();
-              addNotification('Export', 'Données exportées avec succès.', 'success');
-            }}
-            className="h-14 px-10 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-3"
-           >
-              Télécharger JSON <ChevronRight className="w-4 h-4" />
-           </button>
+           <p className="text-slate-500 text-sm font-medium mb-10 max-w-xs">Générez une sauvegarde complète au format JSON pour archive ou migration.</p>
+           {role === 'VIEWER' ? (
+              <div className="flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest px-6 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                 <ShieldCheck className="w-4 h-4" /> Exportation restreinte au super admin
+              </div>
+           ) : (
+             <button 
+              onClick={() => {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `backup-${Date.now()}.json`; a.click();
+                addNotification('Export', 'Données exportées avec succès.', 'success');
+              }}
+              className="h-14 px-10 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-3"
+             >
+                Télécharger JSON <ChevronRight className="w-4 h-4" />
+             </button>
+           )}
         </div>
       </div>
     </div>

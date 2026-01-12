@@ -1,12 +1,9 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Github, Linkedin, Mail, Heart, Cpu, Lock } from 'lucide-react';
 
-interface FooterProps {
-  setView: (v: any) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ setView }) => {
+export const Footer: React.FC = () => {
   return (
     <footer className="bg-white dark:bg-black border-t border-black/5 dark:border-white/5 pt-16 pb-8 px-6">
       <div className="max-w-6xl mx-auto">
@@ -22,9 +19,9 @@ export const Footer: React.FC<FooterProps> = ({ setView }) => {
             <div>
               <h4 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-widest">Liens</h4>
               <ul className="space-y-3 text-xs font-bold">
-                <li><button onClick={() => setView('home')} className="text-gray-500 hover:text-blue-500 transition-colors">Accueil</button></li>
-                <li><button onClick={() => setView('blog')} className="text-gray-500 hover:text-blue-500 transition-colors">Blog</button></li>
-                <li><button onClick={() => setView('admin')} className="text-gray-500 hover:text-blue-500 transition-colors flex items-center gap-1.5 opacity-40 hover:opacity-100"><Lock className="w-3 h-3" /> Admin</button></li>
+                <li><Link to="/" className="text-gray-500 hover:text-blue-500 transition-colors">Accueil</Link></li>
+                <li><Link to="/blog" className="text-gray-500 hover:text-blue-500 transition-colors">Blog</Link></li>
+                <li><Link to="/admin" className="text-gray-500 hover:text-blue-500 transition-colors flex items-center gap-1.5 opacity-40 hover:opacity-100"><Lock className="w-3 h-3" /> Admin</Link></li>
               </ul>
             </div>
             <div>

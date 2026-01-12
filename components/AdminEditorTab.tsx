@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { ArrowLeft, Save, ImageIcon, Bold, Italic, List, Link as LinkIcon, Video, Code } from 'lucide-react';
+import { ArrowLeft, Save, ImageIcon, Bold, Italic, List, Link as LinkIcon, Video, Code, Globe, Github, Eye } from 'lucide-react';
 
 interface AdminEditorTabProps {
   activeTab: string;
@@ -8,15 +8,16 @@ interface AdminEditorTabProps {
   setEditingItem: (item: any) => void;
   onCancel: () => void;
   onSave: (e: React.FormEvent) => void;
+  readOnly?: boolean;
 }
 
 export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({ 
-  activeTab, editingItem, setEditingItem, onCancel, onSave 
+  activeTab, editingItem, setEditingItem, onCancel, onSave, readOnly = false 
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const insertMarkdown = (prefix: string, suffix: string = '') => {
-    if (!textareaRef.current) return;
+    if (!textareaRef.current || readOnly) return;
     const start = textareaRef.current.selectionStart;
     const end = textareaRef.current.selectionEnd;
     const text = textareaRef.current.value;
@@ -40,11 +41,18 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Annuler et revenir
         </button>
         <div className="flex items-center gap-4">
+           {readOnly && (
+             <div className="flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-full text-[9px] font-black uppercase tracking-widest">
+               <Eye className="w-3 h-3" /> Lecture Seule
+             </div>
+           )}
            <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Mode Édition : {activeTab}</span>
         </div>
       </div>
       
-      <form onSubmit={onSave} className="bg-slate-900/60 border border-slate-800 p-12 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl">
+      <form onSubmit={onSave} className="bg-slate-900/60 border border-slate-800 p-12 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl relative">
+        {readOnly && <div className="absolute inset-0 z-10 bg-transparent cursor-not-allowed" title="Permission insuffisante pour modifier" />}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">
@@ -52,9 +60,10 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
             </label>
             <input 
               type="text" 
+              readOnly={readOnly}
               value={editingItem.title || editingItem.role || ''} 
               onChange={e => setEditingItem({ ...editingItem, [activeTab === 'blogs' || activeTab === 'projects' ? 'title' : 'role']: e.target.value })} 
-              className="w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none focus:ring-1 ring-blue-500 text-white font-bold placeholder:text-slate-800" 
+              className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-bold placeholder:text-slate-800 ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
               placeholder="..."
               required 
             />
@@ -62,10 +71,12 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Classification</label>
             <select 
-              value={editingItem.category || editingItem.company || ''} 
+              disabled={readOnly}
+              value={activeTab === 'experience' ? editingItem.company : (editingItem.category || '')} 
               onChange={e => setEditingItem({ ...editingItem, [activeTab === 'blogs' || activeTab === 'projects' ? 'category' : 'company']: e.target.value })} 
-              className="w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none focus:ring-1 ring-blue-500 text-white font-bold"
+              className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-bold ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`}
             >
+              <option value="" disabled>Sélectionner une catégorie</option>
               {activeTab === 'blogs' && ['Code', 'Architecture', 'Security', 'AI', 'Frontend', 'Backend'].map(c => <option key={c} value={c}>{c}</option>)}
               {activeTab === 'projects' && ['Professional', 'Personal', 'Open Source'].map(c => <option key={c} value={c}>{c}</option>)}
               {activeTab === 'experience' && <option value={editingItem.company}>{editingItem.company || 'Nom entreprise'}</option>}
@@ -73,17 +84,63 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
           </div>
         </div>
 
-        {activeTab === 'blogs' && (
+        {activeTab === 'projects' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1 flex items-center gap-2">
+                <Globe className="w-3 h-3" /> Lien Démo (URL)
+              </label>
+              <input 
+                type="url" 
+                readOnly={readOnly}
+                value={editingItem.demoUrl || ''} 
+                onChange={e => setEditingItem({ ...editingItem, demoUrl: e.target.value })} 
+                className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-medium ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
+                placeholder="https://mon-projet.com"
+              />
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1 flex items-center gap-2">
+                <Github className="w-3 h-3" /> Lien Code Source (GitHub)
+              </label>
+              <input 
+                type="url" 
+                readOnly={readOnly}
+                value={editingItem.githubUrl || ''} 
+                onChange={e => setEditingItem({ ...editingItem, githubUrl: e.target.value })} 
+                className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-medium ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
+                placeholder="https://github.com/mon-username/repo"
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'projects' && (
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Technologies (Stack - séparées par des virgules)</label>
+            <input 
+              type="text" 
+              readOnly={readOnly}
+              value={Array.isArray(editingItem.stack) ? editingItem.stack.join(', ') : editingItem.stack || ''} 
+              onChange={e => setEditingItem({ ...editingItem, stack: e.target.value.split(',').map(s => s.trim()) })} 
+              className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-medium ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
+              placeholder="React, TypeScript, Node.js..."
+            />
+          </div>
+        )}
+
+        {(activeTab === 'blogs' || activeTab === 'projects') && (
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1 flex items-center gap-2">
-              <ImageIcon className="w-3 h-3" /> Image de Couverture (URL)
+              <ImageIcon className="w-3 h-3" /> Image de Couverture (URL - Facultatif)
             </label>
             <div className="relative">
               <input 
                 type="text" 
+                readOnly={readOnly}
                 value={editingItem.image || ''} 
                 onChange={e => setEditingItem({ ...editingItem, image: e.target.value })} 
-                className="w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none focus:ring-1 ring-blue-500 text-white font-medium placeholder:text-slate-800" 
+                className={`w-full h-16 px-6 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none transition-all text-white font-medium placeholder:text-slate-800 ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
                 placeholder="https://images.unsplash.com/..."
               />
               {editingItem.image && (
@@ -98,9 +155,10 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
         <div className="space-y-3">
           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Description / Résumé</label>
           <textarea 
+            readOnly={readOnly}
             value={editingItem.excerpt || editingItem.description || ''} 
             onChange={e => setEditingItem({ ...editingItem, [activeTab === 'blogs' ? 'excerpt' : 'description']: e.target.value })} 
-            className="w-full h-32 p-6 bg-slate-950/50 border border-slate-800 rounded-[2rem] outline-none focus:ring-1 ring-blue-500 text-white font-medium resize-none placeholder:text-slate-800" 
+            className={`w-full h-32 p-6 bg-slate-950/50 border border-slate-800 rounded-[2rem] outline-none transition-all text-white font-medium resize-none placeholder:text-slate-800 ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
             placeholder="..."
             required 
           />
@@ -110,7 +168,7 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between ml-1">
               <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Contenu (Markdown)</label>
-              <div className="flex items-center gap-1.5 p-1 bg-slate-950/50 border border-slate-800 rounded-xl">
+              <div className={`flex items-center gap-1.5 p-1 bg-slate-950/50 border border-slate-800 rounded-xl ${readOnly ? 'opacity-30' : ''}`}>
                 <button type="button" onClick={() => insertMarkdown('**', '**')} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all" title="Gras"><Bold className="w-4 h-4" /></button>
                 <button type="button" onClick={() => insertMarkdown('*', '*')} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all" title="Italique"><Italic className="w-4 h-4" /></button>
                 <button type="button" onClick={() => insertMarkdown('- ')} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all" title="Liste"><List className="w-4 h-4" /></button>
@@ -123,9 +181,10 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
             </div>
             <textarea 
               ref={textareaRef}
+              readOnly={readOnly}
               value={editingItem.content || ''} 
               onChange={e => setEditingItem({ ...editingItem, content: e.target.value })} 
-              className="w-full h-96 p-8 bg-slate-950/50 border border-slate-800 rounded-[2.5rem] outline-none focus:ring-1 ring-blue-500 text-white font-mono text-sm leading-relaxed" 
+              className={`w-full h-96 p-8 bg-slate-950/50 border border-slate-800 rounded-[2.5rem] outline-none transition-all text-white font-mono text-sm leading-relaxed ${readOnly ? 'opacity-50' : 'focus:ring-1 ring-blue-500'}`} 
               placeholder="Rédigez ici..."
               required 
             />
@@ -133,11 +192,17 @@ export const AdminEditorTab: React.FC<AdminEditorTabProps> = ({
         )}
 
         <div className="flex flex-col sm:flex-row gap-5 pt-10 border-t border-slate-800">
-          <button type="submit" className="h-16 px-12 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3">
-            <Save className="w-5 h-5" /> Enregistrer les modifications
-          </button>
+          {!readOnly ? (
+            <button type="submit" className="h-16 px-12 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3">
+              <Save className="w-5 h-5" /> Enregistrer les modifications
+            </button>
+          ) : (
+            <div className="h-16 px-12 bg-slate-800 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 opacity-50 cursor-not-allowed border border-slate-700">
+              <Eye className="w-5 h-5" /> Lecture Seule
+            </div>
+          )}
           <button type="button" onClick={onCancel} className="h-16 px-12 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
-            Abandonner
+            {readOnly ? 'Retourner à la liste' : 'Abandonner'}
           </button>
         </div>
       </form>
