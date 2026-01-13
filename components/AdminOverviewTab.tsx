@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen, Layers, Briefcase, Sparkles, Download, ChevronRight, Clock, ShieldCheck, UserCog, Eye } from 'lucide-react';
+import { BookOpen, Layers, Briefcase, Sparkles, Download, ChevronRight, Clock, ShieldCheck, UserCog, Eye, Inbox } from 'lucide-react';
 import { PortfolioData, AdminRole } from '../types/index';
 
 interface AdminOverviewTabProps {
@@ -16,6 +16,8 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setAct
     EDITOR: { icon: UserCog, label: 'Éditeur de contenu', desc: 'Gestion des articles et projets.' },
     VIEWER: { icon: Eye, label: 'Lecteur Invité', desc: 'Consultation uniquement.' }
   }[role];
+
+  const newRequestsCount = (data.requests || []).filter(r => r.status === 'New').length;
 
   return (
     <div className="space-y-10">
@@ -37,19 +39,20 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ data, setAct
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
+          { label: 'Demandes Neuves', value: newRequestsCount, icon: Inbox, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
           { label: 'Articles Blog', value: data.blogs.length, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-          { label: 'Projets Récents', value: data.projects.length, icon: Layers, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
+          { label: 'Projets', value: data.projects.length, icon: Layers, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
           { label: 'Expériences', value: data.experiences.length, icon: Briefcase, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' }
         ].map((stat, i) => (
-          <div key={i} className={`bg-slate-900/50 border ${stat.border} p-10 rounded-[3rem] flex items-center justify-between group hover:bg-slate-900 transition-all duration-500`}>
+          <div key={i} className={`bg-slate-900/50 border ${stat.border} p-8 rounded-[2.5rem] flex items-center justify-between group hover:bg-slate-900 transition-all duration-500`}>
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{stat.label}</p>
-              <h4 className="text-5xl font-black text-white tracking-tighter">{stat.value}</h4>
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">{stat.label}</p>
+              <h4 className="text-4xl font-black text-white tracking-tighter">{stat.value}</h4>
             </div>
-            <div className={`w-16 h-16 rounded-[2rem] ${stat.bg} ${stat.color} flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500`}>
-              <stat.icon className="w-8 h-8" />
+            <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center group-hover:scale-110 transition-all duration-500`}>
+              <stat.icon className="w-6 h-6" />
             </div>
           </div>
         ))}

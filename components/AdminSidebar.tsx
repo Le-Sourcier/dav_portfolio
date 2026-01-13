@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { LogOut, ChevronRight, ShieldCheck, UserCog, Eye } from 'lucide-react';
+import { LogOut, ChevronRight, ShieldCheck, UserCog, Eye, Inbox } from 'lucide-react';
 import { AdminRole } from '../types/index';
 
 interface MenuItem {

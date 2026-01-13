@@ -1,6 +1,17 @@
 
 export type AdminRole = 'SUPER_ADMIN' | 'EDITOR' | 'VIEWER';
 
+export interface ProjectRequest {
+  id: string;
+  clientName: string;
+  clientEmail: string;
+  category: 'Web Development' | 'Mobile App' | 'AI Integration' | 'Automation' | 'Audit & Consulting';
+  description: string;
+  budget?: string;
+  date: string;
+  status: 'New' | 'Contacted' | 'Archived';
+}
+
 export interface Project {
   title: string;
   description: string;
@@ -63,4 +74,5 @@ export interface PortfolioData {
   projects: Project[];
   npmPackages: { name: string; downloads?: string; version: string }[];
   blogs: BlogPost[];
+  requests?: ProjectRequest[]; // Optionnel pour la compatibilité
 }
