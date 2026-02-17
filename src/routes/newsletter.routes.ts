@@ -9,7 +9,7 @@ import {
 } from '../controllers/newsletter.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
-import { subscribeValidator, unsubscribeValidator } from '../validators/newsletter.validator.js';
+import { subscribeValidator, unsubscribeValidator, sendArticleValidator } from '../validators/newsletter.validator.js';
 import { newsletterLimiter } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
@@ -140,6 +140,6 @@ router.get('/stats', authMiddleware, adminMiddleware, getStats);
  *       200:
  *         description: Newsletter sent
  */
-router.post('/send-article', authMiddleware, adminMiddleware, sendArticle);
+router.post('/send-article', authMiddleware, adminMiddleware, validate(sendArticleValidator), sendArticle);
 
 export default router;

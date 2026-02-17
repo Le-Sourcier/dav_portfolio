@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const createAppointmentValidator = [
   body('name')
@@ -35,6 +35,13 @@ export const createAppointmentValidator = [
     .withMessage('Time is required')
     .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
     .withMessage('Invalid time format (HH:MM)'),
+];
+
+export const availableSlotsValidator = [
+  query('date')
+    .optional()
+    .isDate()
+    .withMessage('Invalid date format (YYYY-MM-DD)'),
 ];
 
 export const appointmentIdValidator = [

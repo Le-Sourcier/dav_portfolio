@@ -13,6 +13,7 @@ import { validate } from '../middlewares/validation.middleware.js';
 import { appointmentLimiter } from '../middlewares/rateLimit.middleware.js';
 import {
   createAppointmentValidator,
+  availableSlotsValidator,
   appointmentIdValidator,
   updateAppointmentStatusValidator,
 } from '../validators/appointment.validator.js';
@@ -36,7 +37,7 @@ const router = Router();
  *       200:
  *         description: Available slots
  */
-router.get('/available', getAvailableSlots);
+router.get('/available', validate(availableSlotsValidator), getAvailableSlots);
 
 /**
  * @swagger

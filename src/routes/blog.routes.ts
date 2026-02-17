@@ -17,6 +17,7 @@ import {
   createBlogPostValidator,
   updateBlogPostValidator,
   blogPostIdValidator,
+  blogSlugValidator,
   createCommentValidator,
 } from '../validators/blog.validator.js';
 import { commentLimiter, trackingLimiter } from '../middlewares/rateLimit.middleware.js';
@@ -59,7 +60,7 @@ router.get('/', getAllPosts);
  *       404:
  *         description: Post not found
  */
-router.get('/slug/:slug', getPostBySlug);
+router.get('/slug/:slug', validate(blogSlugValidator), getPostBySlug);
 
 /**
  * @swagger

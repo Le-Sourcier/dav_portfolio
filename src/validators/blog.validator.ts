@@ -64,6 +64,17 @@ export const blogPostIdValidator = [
     .withMessage('Invalid blog post ID'),
 ];
 
+export const blogSlugValidator = [
+  param('slug')
+    .trim()
+    .notEmpty()
+    .withMessage('Slug is required')
+    .isLength({ max: 300 })
+    .withMessage('Slug too long')
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .withMessage('Invalid slug format'),
+];
+
 export const createCommentValidator = [
   param('id')
     .isUUID()
