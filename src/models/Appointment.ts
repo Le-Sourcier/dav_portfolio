@@ -63,6 +63,10 @@ Appointment.init(
     sequelize,
     modelName: 'Appointment',
     tableName: 'appointments',
+    indexes: [
+      { fields: ['date'] },
+      { fields: ['email'] },
+    ],
   }
 );
 

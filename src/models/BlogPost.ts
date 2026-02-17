@@ -49,6 +49,7 @@ Comment.init(
     modelName: 'Comment',
     tableName: 'comments',
     updatedAt: false,
+    indexes: [{ fields: ['post_id'] }],
   }
 );
 
@@ -196,6 +197,7 @@ BlogView.init(
     modelName: 'BlogView',
     tableName: 'blog_views',
     updatedAt: false,
+    indexes: [{ fields: ['post_id', 'visitor_hash'] }],
   }
 );
 
