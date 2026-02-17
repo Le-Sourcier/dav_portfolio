@@ -49,14 +49,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       className={cn(
         "fixed z-[120] flex flex-col overflow-hidden transition-all duration-300",
         "bg-card/90 backdrop-blur-2xl border border-border/50 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] ring-1 ring-white/10",
-        // Mobile: fullscreen
+        // Mobile: fullscreen with safe area
         "inset-0 sm:inset-auto",
-        // Desktop: positioned bottom-right
-        "sm:bottom-24 md:bottom-32",
+        // Desktop: positioned bottom-right, capped to viewport
+        "sm:bottom-6 md:bottom-8",
         "sm:right-6 md:right-12",
-        "sm:w-[420px] md:w-[480px] lg:w-[520px]",
-        "sm:h-[600px] md:h-[700px] sm:max-h-[85vh]",
-        "rounded-none sm:rounded-[2.5rem]"
+        "sm:w-[400px] md:w-[440px] lg:w-[480px]",
+        "sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)]",
+        "rounded-none sm:rounded-[2rem]"
       )}
     >
       {/* Header */}
@@ -77,7 +77,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm md:text-base tracking-tight">Portfolio Agent</h3>
+              <h3 className="font-bold text-sm md:text-base tracking-tight">Assistant</h3>
               <ShieldCheck className="w-3.5 h-3.5 text-primary" />
             </div>
             <div className="flex items-center gap-2">

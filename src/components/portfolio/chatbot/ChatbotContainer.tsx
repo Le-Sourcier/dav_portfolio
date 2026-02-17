@@ -35,7 +35,7 @@ export const ChatbotContainer: React.FC = () => {
         whileTap={{ scale: 0.95 }}
         onClick={toggleChat}
         className={cn(
-          "fixed bottom-6 right-6 sm:bottom-8 md:bottom-12 md:right-12 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center z-[110] transition-all duration-300 shadow-2xl group overflow-hidden",
+          "fixed bottom-6 right-6 md:right-12 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center z-[110] transition-all duration-300 shadow-2xl group overflow-hidden",
           isOpen
             ? "bg-background border border-border text-foreground hidden sm:flex"
             : "bg-primary text-primary-foreground"
