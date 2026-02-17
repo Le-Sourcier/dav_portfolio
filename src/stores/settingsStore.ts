@@ -11,6 +11,9 @@ export interface ProfileData {
   location: string;
   bio: string;
   avatar: string;
+  brand: string;
+  phone: string;
+  yearsExperience: string;
 }
 
 export interface SocialLinks {
@@ -76,6 +79,9 @@ const defaultProfile: ProfileData = {
   location: envConfig.owner.location,
   bio: envConfig.owner.bio,
   avatar: envConfig.owner.avatar,
+  brand: envConfig.appBrand,
+  phone: envConfig.owner.phone,
+  yearsExperience: '',
 };
 
 const defaultSocialLinks: SocialLinks = {

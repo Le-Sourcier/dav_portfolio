@@ -1,12 +1,16 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { TESTIMONIALS } from '../../data/mockData';
 import { Quote, Star } from 'lucide-react';
+import { useVisibleTestimonials } from '@/hooks/queries';
 
 export function Testimonials() {
+  const { data: testimonials = [], isLoading } = useVisibleTestimonials();
+
+  // Hide section if no testimonials
+  if (!isLoading && testimonials.length === 0) return null;
+  if (isLoading) return null;
+
   return (
     <section className="py-32 px-6 md:px-12 lg:px-24 bg-primary text-primary-foreground relative overflow-hidden">
-      {/* Decorative background circle */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-white/5 rounded-full blur-[150px] -z-0" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -35,9 +39,9 @@ export function Testimonials() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {TESTIMONIALS.map((t, i) => (
+          {testimonials.map((t, i) => (
             <motion.div
-              key={i}
+              key={t.id}
               initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -45,34 +49,26 @@ export function Testimonials() {
               className="p-12 md:p-16 rounded-[3rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group relative"
             >
               <Quote className="absolute top-12 right-12 w-16 h-16 text-white/5 group-hover:text-white/10 transition-colors" />
-              
+
               <p className="text-2xl md:text-3xl font-medium leading-snug mb-12 relative z-10">
                 "{t.content}"
               </p>
-              
+
               <div className="flex items-center gap-6 relative z-10 pt-8 border-t border-white/10">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 group-hover:border-white/50 transition-colors">
-                  <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
-                </div>
+                {t.avatar && (
+                  <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 group-hover:border-white/50 transition-colors">
+                    <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                  </div>
+                )}
                 <div>
                   <h4 className="font-bold text-xl">{t.name}</h4>
-                  <p className="text-primary-foreground/50 font-medium tracking-wide">{t.role}</p>
+                  <p className="text-primary-foreground/50 font-medium tracking-wide">
+                    {t.role}{t.company ? ` - ${t.company}` : ''}
+                  </p>
                 </div>
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Clients Logos Mockup */}
-        <div className="mt-32 pt-20 border-t border-white/10">
-          <p className="text-center text-primary-foreground/30 font-black uppercase tracking-[0.4em] text-xs mb-12">Trusted by industry giants</p>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
-            {['Apple', 'Nike', 'Stripe', 'Airbnb', 'Tesla'].map((brand) => (
-              <span key={brand} className="text-2xl md:text-4xl font-black tracking-tighter cursor-default hover:text-white transition-colors">
-                {brand}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </section>

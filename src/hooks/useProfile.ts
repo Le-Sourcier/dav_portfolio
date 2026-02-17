@@ -30,7 +30,11 @@ export function useProfile() {
     location: pick(apiProfile?.location, storeProfile.location, env.location),
     bio: pick(apiProfile?.bio, storeProfile.bio, env.bio),
     avatar: pick(apiProfile?.avatar, storeProfile.avatar, env.avatar),
-    phone: pick(undefined, '', env.phone),
+    phone: pick(apiProfile?.phone, storeProfile.phone, env.phone),
+    yearsExperience: pick(apiProfile?.yearsExperience, storeProfile.yearsExperience, ''),
+
+    // Brand
+    brand: pick(apiProfile?.brand, storeProfile.brand, envConfig.appBrand),
 
     // Social
     github: pick(apiSocial?.github, storeSocial.github, envConfig.social.github),
@@ -47,9 +51,6 @@ export function useProfile() {
       ogTitle: pick(apiSeo?.ogTitle, storeSeo.ogTitle, envConfig.appName),
       ogType: pick(apiSeo?.ogType, storeSeo.ogType, 'website'),
     },
-
-    // Brand
-    brand: envConfig.appBrand,
 
     // Is loaded from API?
     isFromApi: !!apiSettings,

@@ -18,8 +18,8 @@ export function About() {
       try {
         const data = await api.get('/experiences');
         setExperiences(data);
-      } catch (error) {
-        setExperiences(cvData.experience); // Fallback
+      } catch {
+        setExperiences([]);
       } finally {
         setLoading(false);
       }
@@ -202,20 +202,21 @@ FORMATION
           </div>
         </div>
 
+        {experiences.length > 0 && (
         <div className="mt-48">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-12">
             <div className="max-w-2xl">
               <div className="w-12 h-1 bg-primary mb-8" />
               <div className="flex items-center gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-primary" />
-                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">Dernières Collaborations</span>
+                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">Dernieres Collaborations</span>
               </div>
               <h3 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 uppercase">
-                Expériences <span className="text-primary">Récentes</span>
+                Experiences <span className="text-primary">Recentes</span>
               </h3>
               <p className="text-xl text-muted-foreground font-medium">
-                Un parcours marqué par le développement de solutions innovantes et l'excellence technique. 
-                <span className="text-primary font-bold"> Cliquez sur une expérience pour voir les détails.</span>
+                Un parcours marque par le developpement de solutions innovantes et l'excellence technique.
+                <span className="text-primary font-bold"> Cliquez sur une experience pour voir les details.</span>
               </p>
             </div>
           </div>
@@ -245,6 +246,7 @@ FORMATION
             ))}
           </div>
         </div>
+        )}
       </div>
     </section>
   );

@@ -318,6 +318,18 @@ export function SettingsPage() {
                     <FieldLabel>Localisation</FieldLabel>
                     <FieldInput value={profileForm.location} onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })} />
                   </div>
+                  <div>
+                    <FieldLabel>Nom de la marque (Brand)</FieldLabel>
+                    <FieldInput value={profileForm.brand} onChange={(e) => setProfileForm({ ...profileForm, brand: e.target.value })} placeholder="Ex: CREATIVE" />
+                  </div>
+                  <div>
+                    <FieldLabel>Telephone</FieldLabel>
+                    <FieldInput value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="+228 00000000" />
+                  </div>
+                  <div>
+                    <FieldLabel>Annees d'experience</FieldLabel>
+                    <FieldInput value={profileForm.yearsExperience} onChange={(e) => setProfileForm({ ...profileForm, yearsExperience: e.target.value })} placeholder="Ex: 5+" />
+                  </div>
                 </div>
 
                 <div>

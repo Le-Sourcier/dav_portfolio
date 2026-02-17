@@ -83,7 +83,7 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
             <div className="flex flex-col items-center md:items-start gap-6">
               <Link to="/" className="text-3xl font-black tracking-tighter">
-                {envConfig.appBrand}<span className="text-primary">.</span>
+                {profile.brand}<span className="text-primary">.</span>
               </Link>
               <p className="text-muted-foreground font-medium text-center md:text-left">
                 {profile.title}<br /> base a {profile.location}.

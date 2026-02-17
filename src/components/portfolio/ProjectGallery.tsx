@@ -1,34 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PROJECTS, Project } from '../../data/mockData';
+import { Project } from '../../data/mockData';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { api } from '@/services/api';
-
-const CATEGORIES = ['All', 'UI/UX', 'Branding', 'Web', 'Art', 'Photo'] as const;
+import { useProjects } from '@/hooks/queries';
 
 export function ProjectGallery() {
   const [filter, setFilter] = useState<string>('All');
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: projects = [], isLoading } = useProjects();
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await api.get('/projects');
-        setProjects(data);
-      } catch (error) {
-        setProjects(PROJECTS); // Fallback
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+  const categories = useMemo(() => {
+    const cats = new Set(projects.map((p) => p.category));
+    return ['All', ...Array.from(cats)];
+  }, [projects]);
 
   const filteredProjects = projects.filter(
-    (p) => filter === 'All' || p.category === filter
+    (p: Project) => filter === 'All' || p.category === filter
   );
+
+  // Hide entire section if no projects
+  if (!isLoading && projects.length === 0) return null;
 
   return (
     <section id="work" className="py-32 px-6 md:px-12 lg:px-24 transition-colors duration-500 bg-background text-foreground">
@@ -56,7 +47,7 @@ export function ProjectGallery() {
           </div>
           
           <div className="flex flex-wrap gap-2 md:pb-2">
-            {CATEGORIES.map((cat, i) => (
+            {categories.map((cat, i) => (
               <motion.button
                 key={cat}
                 initial={{ opacity: 0, y: 10 }}
