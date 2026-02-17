@@ -19,8 +19,10 @@ class TestimonialService {
     return testimonials;
   }
 
-  async findById(id: string): Promise<ITestimonial> {
-    const testimonial = await Testimonial.findByPk(id);
+  async findById(id: string, visibleOnly = false): Promise<ITestimonial> {
+    const where: Record<string, unknown> = { id };
+    if (visibleOnly) where.visible = true;
+    const testimonial = await Testimonial.findOne({ where });
     if (!testimonial) {
       throw new AppError('Testimonial not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }

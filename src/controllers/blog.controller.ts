@@ -14,7 +14,9 @@ export const getAllPosts = async (req: Request, res: Response, next: NextFunctio
 
 export const getPostById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const post = await blogService.findById(req.params.id);
+    // Public requests only see published posts; admin (with valid token) sees all
+    const hasAuth = !!req.headers.authorization;
+    const post = await blogService.findById(req.params.id, !hasAuth);
     sendSuccess(res, post, 'Blog post retrieved successfully');
   } catch (error) {
     next(error);

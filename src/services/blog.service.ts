@@ -15,8 +15,11 @@ class BlogService {
     return posts;
   }
 
-  async findById(id: string): Promise<IBlogPost> {
-    const post = await BlogPost.findByPk(id, {
+  async findById(id: string, publishedOnly = false): Promise<IBlogPost> {
+    const where: Record<string, unknown> = { id };
+    if (publishedOnly) where.published = true;
+    const post = await BlogPost.findOne({
+      where,
       include: [{ model: Comment, as: 'comments' }],
     });
     if (!post) {
@@ -27,7 +30,7 @@ class BlogService {
 
   async findBySlug(slug: string): Promise<IBlogPost> {
     const post = await BlogPost.findOne({
-      where: { slug },
+      where: { slug, published: true },
       include: [{ model: Comment, as: 'comments' }],
     });
     if (!post) {

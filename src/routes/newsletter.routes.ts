@@ -10,6 +10,7 @@ import {
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
 import { subscribeValidator, unsubscribeValidator } from '../validators/newsletter.validator.js';
+import { newsletterLimiter } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -37,7 +38,7 @@ const router = Router();
  *       409:
  *         description: Already subscribed
  */
-router.post('/subscribe', validate(subscribeValidator), subscribe);
+router.post('/subscribe', newsletterLimiter, validate(subscribeValidator), subscribe);
 
 /**
  * @swagger
@@ -63,7 +64,7 @@ router.post('/subscribe', validate(subscribeValidator), subscribe);
  *       404:
  *         description: Email not found
  */
-router.post('/unsubscribe', validate(unsubscribeValidator), unsubscribe);
+router.post('/unsubscribe', newsletterLimiter, validate(unsubscribeValidator), unsubscribe);
 
 /**
  * @swagger

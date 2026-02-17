@@ -22,7 +22,8 @@ export const getVisibleTestimonials = async (_req: Request, res: Response, next:
 
 export const getTestimonialById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const testimonial = await testimonialService.findById(req.params.id);
+    const hasAuth = !!req.headers.authorization;
+    const testimonial = await testimonialService.findById(req.params.id, !hasAuth);
     sendSuccess(res, testimonial, 'Testimonial retrieved successfully');
   } catch (error) {
     next(error);

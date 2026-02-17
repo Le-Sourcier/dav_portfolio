@@ -69,8 +69,20 @@ io.on('connection', (socket) => {
     logger.info(`Client disconnected: ${socket.id}`);
   });
 
-  // Chatbot real-time events
+  // Chatbot real-time events (rate limited: 30 msgs/min per socket)
+  const socketRateMap = new Map<string, number[]>();
   socket.on('chatbot:message', async (data) => {
+    const now = Date.now();
+    const key = socket.id;
+    const timestamps = socketRateMap.get(key) || [];
+    const recent = timestamps.filter((t) => now - t < 60_000);
+    if (recent.length >= 30) {
+      socket.emit('chatbot:error', { message: 'Too many messages. Please slow down.' });
+      return;
+    }
+    recent.push(now);
+    socketRateMap.set(key, recent);
+
     try {
       const { chatbotService } = await import('./services/chatbot.service.js');
       const response = await chatbotService.processMessage(data.content);

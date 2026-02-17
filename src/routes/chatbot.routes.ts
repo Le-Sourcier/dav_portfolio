@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { sendMessage, getQuickActions, getInitialMessage } from '../controllers/chatbot.controller.js';
 import { body } from 'express-validator';
 import { validate } from '../middlewares/validation.middleware.js';
+import { chatbotLimiter } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ const messageValidator = [
  *       200:
  *         description: Bot response
  */
-router.post('/message', validate(messageValidator), sendMessage);
+router.post('/message', chatbotLimiter, validate(messageValidator), sendMessage);
 
 /**
  * @swagger

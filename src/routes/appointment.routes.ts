@@ -10,6 +10,7 @@ import {
 } from '../controllers/appointment.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
+import { appointmentLimiter } from '../middlewares/rateLimit.middleware.js';
 import {
   createAppointmentValidator,
   appointmentIdValidator,
@@ -77,7 +78,7 @@ router.get('/available', getAvailableSlots);
  *       409:
  *         description: Time slot already booked
  */
-router.post('/', validate(createAppointmentValidator), createAppointment);
+router.post('/', appointmentLimiter, validate(createAppointmentValidator), createAppointment);
 
 /**
  * @swagger
