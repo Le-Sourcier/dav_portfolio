@@ -31,10 +31,10 @@ export function Testimonials() {
             viewport={{ once: true }}
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-6"
           >
-            Voices of <span className="text-white/40 italic">Partners.</span>
+            Paroles de <span className="text-white/40 italic">Partenaires.</span>
           </motion.h2>
           <p className="text-primary-foreground/60 text-xl max-w-2xl">
-            Success is best measured by the impact we have on the people we work with.
+            Le succes se mesure par l'impact que nous avons sur les gens avec qui nous travaillons.
           </p>
         </div>
 

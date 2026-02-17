@@ -55,7 +55,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         "sm:bottom-6 md:bottom-8",
         "sm:right-6 md:right-12",
         "sm:w-[400px] md:w-[440px] lg:w-[480px]",
-        "sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)]",
+        "sm:h-[calc(100vh-3rem)] md:h-[calc(100vh-4rem)]",
         "rounded-none sm:rounded-[2rem]"
       )}
     >

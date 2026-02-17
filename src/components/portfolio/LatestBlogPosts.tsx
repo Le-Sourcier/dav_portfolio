@@ -32,8 +32,8 @@ export function LatestBlogPosts() {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl font-black tracking-tighter leading-none"
             >
-              INSIGHTS & <br />
-              <span className="text-muted-foreground/30 italic">Réflexions.</span>
+              ARTICLES & <br />
+              <span className="text-muted-foreground/30 italic">Reflexions.</span>
             </motion.h2>
           </div>
           
