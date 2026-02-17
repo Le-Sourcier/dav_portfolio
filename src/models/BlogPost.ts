@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional, HasManyGetAssociationsMixin } from 'sequelize';
 import crypto from 'crypto';
 import { sequelize } from '../config/database.js';
+import { config } from '../config/index.js';
 import { IBlogPost, IBlogComment } from '../types/entities.types.js';
 
 // Comment model
@@ -115,7 +116,7 @@ BlogPost.init(
     author: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      defaultValue: 'Yao David Logan',
+      defaultValue: config.owner.name,
     },
     published: {
       type: DataTypes.BOOLEAN,

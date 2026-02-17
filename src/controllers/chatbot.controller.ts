@@ -23,7 +23,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 export const getQuickActions = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const actions = chatbotService.getQuickActions();
+    const actions = await chatbotService.getQuickActions();
     sendSuccess(res, actions, 'Quick actions retrieved');
   } catch (error) {
     next(error);
@@ -32,7 +32,7 @@ export const getQuickActions = async (_req: Request, res: Response, next: NextFu
 
 export const getInitialMessage = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const message = chatbotService.getInitialMessage();
+    const message = await chatbotService.getInitialMessage();
     sendSuccess(res, message, 'Initial message retrieved');
   } catch (error) {
     next(error);

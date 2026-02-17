@@ -56,6 +56,14 @@ export const config = {
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
   },
 
+  // Owner / Profile (used as defaults in models and services)
+  owner: {
+    name: process.env.OWNER_NAME || 'Admin',
+    email: process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || 'admin@portfolio.dev',
+    phone: process.env.OWNER_PHONE || '',
+    location: process.env.OWNER_LOCATION || '',
+  },
+
   // Logging
   logLevel: process.env.LOG_LEVEL || 'debug',
 };

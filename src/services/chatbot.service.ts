@@ -1,26 +1,10 @@
 import { ChatMessage, MessageType } from '../types/entities.types.js';
 import { generateId } from '../utils/helpers.js';
+import { config } from '../config/index.js';
 import projectService from './project.service.js';
 import experienceService from './experience.service.js';
 import blogService from './blog.service.js';
 import { settingsService } from './settings.service.js';
-
-// Fallback personal info (used when settings API has no data)
-const DEFAULT_INFO = {
-  name: 'Yao David Logan',
-  title: 'Developpeur Fullstack & Software Engineer',
-  location: 'Lome - TOGO',
-  email: 'yaodavidlogan02@gmail.com',
-  phone: '+228 91680967 / 96690680',
-  github: 'https://github.com/Le-Sourcier',
-  linkedin: 'https://linkedin.com/in/yao-logan',
-};
-
-const skills = {
-  frontend: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Flutter'],
-  backend: ['Node.js', 'Express', 'PostgreSQL', 'Redis', 'Python'],
-  tools: ['Git', 'Docker', 'AWS', 'Firebase', 'Figma'],
-};
 
 interface QuickAction {
   id: string;
@@ -29,26 +13,61 @@ interface QuickAction {
 }
 
 class ChatbotService {
-  private quickActions: QuickAction[] = [
-    { id: '1', label: 'Mes Projets', prompt: 'Montre-moi tes projets' },
-    { id: '2', label: 'Rendez-vous', prompt: 'Je veux prendre rendez-vous' },
-    { id: '3', label: 'Mon Profil', prompt: 'Qui est David Logan ?' },
-    { id: '4', label: 'Competences', prompt: 'Quelles sont tes competences ?' },
-    { id: '5', label: 'Lire le Blog', prompt: 'Montre-moi le blog' },
-    { id: '6', label: 'Contact', prompt: 'Comment te contacter ?' },
-  ];
+  private get defaultInfo() {
+    return {
+      name: config.owner.name,
+      title: '',
+      location: config.owner.location,
+      email: config.owner.email,
+      phone: config.owner.phone,
+      github: '',
+      linkedin: '',
+    };
+  }
 
   private async getPersonalInfo() {
     try {
-      const profile = await settingsService.getByKey('profile');
-      if (profile && profile.name) return { ...DEFAULT_INFO, ...profile };
+      const [profile, social] = await Promise.all([
+        settingsService.getByKey('profile'),
+        settingsService.getByKey('socialLinks'),
+      ]);
+      return {
+        ...this.defaultInfo,
+        ...(profile || {}),
+        ...(social || {}),
+      };
     } catch { /* fallback */ }
-    return DEFAULT_INFO;
+    return this.defaultInfo;
+  }
+
+  private async getQuickActionsFromSettings(): Promise<QuickAction[]> {
+    try {
+      const chatbot = await settingsService.getByKey('chatbot');
+      if (chatbot?.quickActions?.length) return chatbot.quickActions;
+    } catch { /* fallback */ }
+    const firstName = config.owner.name.split(' ').pop() || config.owner.name;
+    return [
+      { id: '1', label: 'Mes Projets', prompt: 'Montre-moi tes projets' },
+      { id: '2', label: 'Rendez-vous', prompt: 'Je veux prendre rendez-vous' },
+      { id: '3', label: 'Mon Profil', prompt: `Qui est ${firstName} ?` },
+      { id: '4', label: 'Competences', prompt: 'Quelles sont tes competences ?' },
+      { id: '5', label: 'Lire le Blog', prompt: 'Montre-moi le blog' },
+      { id: '6', label: 'Contact', prompt: 'Comment te contacter ?' },
+    ];
+  }
+
+  private async getWelcomeMessage(): Promise<string> {
+    try {
+      const chatbot = await settingsService.getByKey('chatbot');
+      if (chatbot?.welcomeMessage) return chatbot.welcomeMessage;
+    } catch { /* fallback */ }
+    return `Bonjour ! Je suis l'assistant de **${config.owner.name}**. Comment puis-je vous aider ?`;
   }
 
   async processMessage(content: string): Promise<Partial<ChatMessage>> {
     const input = content.toLowerCase().trim();
     const info = await this.getPersonalInfo();
+    const firstName = info.name.split(' ').pop() || info.name;
 
     // Greetings
     if (this.matchesIntent(input, ['bonjour', 'salut', 'hello', 'hey', 'bonsoir', 'coucou'])) {
@@ -59,9 +78,9 @@ class ChatbotService {
     }
 
     // Identity
-    if (this.matchesIntent(input, ['qui es-tu', 'qui est david', 'presente-toi', 'parle-moi de toi', 'ton profil', 'identite', 'mon profil'])) {
+    if (this.matchesIntent(input, ['qui es-tu', `qui est ${firstName.toLowerCase()}`, 'presente-toi', 'parle-moi de toi', 'ton profil', 'identite', 'mon profil'])) {
       return {
-        content: `**${info.name}** est un **${info.title}** base a **${info.location}**.\n\nPassionne par la creation de solutions logicielles robustes et evolutives, il met en oeuvre des technologies modernes pour concevoir des applications performantes.`,
+        content: `**${info.name}** est un **${info.title || 'professionnel'}** base a **${info.location}**.\n\nPassionne par la creation de solutions logicielles robustes et evolutives, il met en oeuvre des technologies modernes pour concevoir des applications performantes.`,
         type: 'text' as MessageType,
       };
     }
@@ -85,26 +104,32 @@ class ChatbotService {
       };
     }
 
-    // Skills
+    // Skills — read from settings or fallback
     if (this.matchesIntent(input, ['competence', 'stack', 'techno', 'langage', 'sais-tu faire', 'expertise', 'domaine'])) {
       return {
-        content: `Expertise technique :\n\n- **Frontend** : ${skills.frontend.join(', ')}\n- **Backend** : ${skills.backend.join(', ')}\n- **Outils & DevOps** : ${skills.tools.join(', ')}`,
+        content: `${firstName} possede une expertise variee en tant que ${info.title || 'developpeur'}. Consultez la section "A Propos" pour voir la liste complete de ses competences techniques.`,
         type: 'text' as MessageType,
       };
     }
 
-    // Contact - propose inline form
+    // Contact
     if (this.matchesIntent(input, ['contact', 'email', 'telephone', 'joindre', 'linkedin', 'github', 'ecrire', 'message'])) {
-      return {
-        content: `Coordonnees de ${info.name} :\n- **Email** : ${info.email}\n- **Telephone** : ${info.phone}\n- **LinkedIn** : ${info.linkedin}\n- **GitHub** : ${info.github}\n\nOu envoyez un message rapide ci-dessous :`,
-        type: 'contact_form' as MessageType,
-      };
+      const lines = [
+        `Coordonnees de ${info.name} :`,
+        info.email ? `- **Email** : ${info.email}` : '',
+        info.phone ? `- **Telephone** : ${info.phone}` : '',
+        info.linkedin ? `- **LinkedIn** : ${info.linkedin}` : '',
+        info.github ? `- **GitHub** : ${info.github}` : '',
+        '',
+        'Ou envoyez un message rapide ci-dessous :',
+      ].filter(Boolean).join('\n');
+      return { content: lines, type: 'contact_form' as MessageType };
     }
 
     // Appointment
     if (this.matchesIntent(input, ['rendez-vous', 'disponibilite', 'reserver', 'rdv', 'rencontrer'])) {
       return {
-        content: `${info.name} serait ravi d'echanger avec vous. Voici les creneaux disponibles :`,
+        content: `${firstName} serait ravi d'echanger avec vous. Voici les creneaux disponibles :`,
         type: 'appointment_picker' as MessageType,
         metadata: {
           availableTimes: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'],
@@ -145,7 +170,7 @@ class ChatbotService {
     // Location
     if (this.matchesIntent(input, ['ou est', 'ou vit', 'habite', 'ville', 'localisation', 'pays'])) {
       return {
-        content: `${info.name} est base a **${info.location}**. Il est disponible pour des missions en presentiel ou en remote.`,
+        content: `${firstName} est base a **${info.location}**. Il est disponible pour des missions en presentiel ou en remote.`,
         type: 'text' as MessageType,
       };
     }
@@ -153,7 +178,7 @@ class ChatbotService {
     // Thanks
     if (this.matchesIntent(input, ['merci', 'thanks', 'super', 'genial', 'parfait', 'cool'])) {
       return {
-        content: `Avec plaisir ! N'hesitez pas si vous avez d'autres questions. 😊`,
+        content: `Avec plaisir ! N'hesitez pas si vous avez d'autres questions.`,
         type: 'text' as MessageType,
       };
     }
@@ -169,18 +194,19 @@ class ChatbotService {
     return keywords.some(keyword => input.includes(keyword));
   }
 
-  getInitialMessage(): ChatMessage {
+  async getInitialMessage(): Promise<ChatMessage> {
+    const welcome = await this.getWelcomeMessage();
     return {
       id: generateId(),
       role: 'assistant',
-      content: `Bonjour ! 👋 Je suis l'assistant de **Yao David Logan**.\n\nJe peux vous parler de son parcours, ses competences, ses projets ou vous aider a prendre rendez-vous. Comment puis-je vous aider ?`,
+      content: welcome,
       type: 'text',
       timestamp: new Date(),
     };
   }
 
-  getQuickActions(): QuickAction[] {
-    return this.quickActions;
+  async getQuickActions(): Promise<QuickAction[]> {
+    return this.getQuickActionsFromSettings();
   }
 }
 
