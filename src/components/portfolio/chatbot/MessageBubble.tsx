@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { contactsApi } from '@/services/api';
+import { contactsApi, appointmentsApi } from '@/services/api';
 import { toast } from 'sonner';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
 import { envConfig } from '@/config/env';
@@ -144,23 +144,107 @@ function LinkCard({ to, icon, label, title, isAssistant }: {
   );
 }
 
-// ======================== APPOINTMENT PICKER ========================
+// ======================== INLINE APPOINTMENT BOOKING ========================
 
 function AppointmentPicker({ times }: { times: string[] }) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const { session, isIdentified, isPersisted, saveSession } = useVisitorSession();
 
-  const handleSelect = (time: string) => {
-    setSelected(time);
-    // Scroll to booking section on the main page
-    const bookingEl = document.getElementById('booking');
-    if (bookingEl) {
-      bookingEl.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      // Navigate to home page booking section
-      window.location.href = '/#booking';
+  const [step, setStep] = useState<'time' | 'info' | 'done'>('time');
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [name, setName] = useState(session?.name || '');
+  const [email, setEmail] = useState(session?.email || '');
+  const [subject, setSubject] = useState('');
+  const [rememberMe, setRememberMe] = useState(isPersisted);
+  const [sending, setSending] = useState(false);
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const isFormValid = name.trim().length > 0
+    && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    && subject.trim().length > 0;
+
+  const handleBook = async () => {
+    if (!selectedTime || !isFormValid) return;
+    if (!isIdentified || rememberMe !== isPersisted) {
+      saveSession({ name: name.trim(), email: email.trim() }, rememberMe);
+    }
+    setSending(true);
+    try {
+      await appointmentsApi.create({
+        name: name.trim(),
+        email: email.trim(),
+        subject: subject.trim(),
+        urgency: 'non-urgent',
+        date: today,
+        time: selectedTime,
+      });
+      setStep('done');
+      toast.success('Rendez-vous reserve !');
+    } catch {
+      toast.error('Erreur lors de la reservation');
+    } finally {
+      setSending(false);
     }
   };
 
+  // Step 3: Done
+  if (step === 'done') {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 pt-3 border-t border-border/30">
+        <div className="flex items-center gap-2 text-emerald-500 mb-2">
+          <CheckCircle2 className="w-4 h-4" />
+          <span className="text-[12px] font-bold">Rendez-vous confirme !</span>
+        </div>
+        <div className="text-[11px] text-muted-foreground space-y-0.5">
+          <p>Creneau : <strong>{selectedTime}</strong></p>
+          <p>Sujet : <strong>{subject}</strong></p>
+          <p>Un email de confirmation vous sera envoye.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Step 2: Info form
+  if (step === 'info') {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 pt-3 border-t border-border/30 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+            <Calendar className="w-3 h-3 text-primary" /> RDV a {selectedTime}
+          </div>
+          <button onClick={() => setStep('time')} className="text-[10px] text-primary font-bold hover:underline">Changer</button>
+        </div>
+        {isIdentified ? (
+          <div className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-primary/5 border border-primary/20">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-black">
+              {session!.name.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-[11px] font-semibold truncate">{session!.name}</span>
+          </div>
+        ) : (
+          <>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Votre nom" type="text"
+              className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
+            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Votre email" type="email"
+              className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
+            <label className="flex items-center gap-1.5 cursor-pointer select-none">
+              <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary" />
+              <span className="text-[10px] text-muted-foreground">Se souvenir de moi</span>
+            </label>
+          </>
+        )}
+        <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Sujet du rendez-vous"
+          className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
+        <button onClick={handleBook} disabled={sending || !isFormValid}
+          className="w-full h-8 rounded-lg bg-primary text-primary-foreground text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+          {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><CheckCircle2 className="w-3.5 h-3.5" /> Confirmer le rendez-vous</>}
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Step 1: Time selection
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-4 grid grid-cols-2 gap-2">
       {times.map((time, idx) => (
@@ -169,13 +253,8 @@ function AppointmentPicker({ times }: { times: string[] }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 + idx * 0.05 }}
-          onClick={() => handleSelect(time)}
-          className={cn(
-            "border text-foreground px-3 py-2.5 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-2 group",
-            selected === time
-              ? "bg-primary/20 border-primary/50 ring-1 ring-primary/30"
-              : "bg-background/50 hover:bg-primary/10 border-border/50 hover:border-primary/50"
-          )}
+          onClick={() => { setSelectedTime(time); setStep('info'); }}
+          className="border bg-background/50 hover:bg-primary/10 border-border/50 hover:border-primary/50 text-foreground px-3 py-2.5 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-2 group"
         >
           <Calendar className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
           {time}
