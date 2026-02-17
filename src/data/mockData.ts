@@ -28,18 +28,6 @@ export interface Project {
   impactGraph?: ImpactData[];
 }
 
-export interface Award {
-  title: string;
-  year: string;
-  organization: string;
-}
-
-export interface Testimonial {
-  name: string;
-  role: string;
-  avatar: string;
-  content: string;
-}
 
 export const PROJECTS: Project[] = [
   {
@@ -186,23 +174,3 @@ export const PROJECTS: Project[] = [
   }
 ];
 
-export const AWARDS: Award[] = [
-  { title: "Expert Fullstack", year: "2025", organization: "Nexus Corp" },
-  { title: "Meilleure Solution SaaS", year: "2025", organization: "Ubuntu Consulting" },
-  { title: "Excellence Technique", year: "2024", organization: "Groupe Drapeau" }
-];
-
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    name: "Directeur Nexus",
-    role: "CEO, Nexus Corporation",
-    avatar: "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/testimonial-1-0b068c53-1770728440346.webp",
-    content: "David a su transformer notre vision complexe en une plateforme stable et performante. Son expertise en architecture logicielle est impressionnante."
-  },
-  {
-    name: "Consultant SaaS",
-    role: "CTO, Ubuntu Consulting",
-    avatar: "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/testimonial-2-9f00eb86-1770728437843.webp",
-    content: "Un d\u00e9veloppeur exceptionnel qui comprend non seulement le code, mais aussi les enjeux business. Prospect-Pro est un succ\u00e8s gr\u00e2ce \u00e0 lui."
-  }
-];

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowLeft, Calendar, MapPin, Building2, ExternalLink,
   Cpu, Trophy, AlertCircle, ChevronRight, Share2,
   ArrowUp, Mail, Layers, Clock,
 } from 'lucide-react';
-import { cvData } from '../../data/cvData';
 import { Badge } from '../ui/badge';
 import { MarkdownRenderer } from '../shared/MarkdownRenderer';
 import { useExperience } from '@/hooks/queries';
@@ -17,20 +16,13 @@ import type { Experience } from '@/types/admin.types';
 
 export function ExperienceDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const { data: apiExperience, isLoading } = useExperience(id || '');
-  const mockExperience = cvData.experience.find(exp => exp.id === id);
-  const experience = (apiExperience as Experience | undefined) || (mockExperience as unknown as Experience) || null;
-  const loading = isLoading && !mockExperience;
+  const { data: apiExperience, isLoading, isError } = useExperience(id || '');
+  const experience = (apiExperience as Experience | undefined) || null;
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
-
-  useEffect(() => {
-    if (!loading && !experience) navigate('/404');
-  }, [loading, experience, navigate]);
 
   // Show back-to-top button after scroll
   useEffect(() => {
@@ -41,7 +33,7 @@ export function ExperienceDetailPage() {
   const opacity = useTransform(scrollY, [0, 200], [1, 0]);
   const scale = useTransform(scrollY, [0, 200], [1, 1.1]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -49,7 +41,39 @@ export function ExperienceDetailPage() {
     );
   }
 
-  if (!experience) return null;
+  if (isError || !experience) {
+    return (
+      <div className="pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-screen bg-background">
+        <div className="max-w-2xl mx-auto text-center py-24">
+          <Link to="/#about" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" />
+            Retour au profil
+          </Link>
+          <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-8">
+            <Building2 className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h2 className="text-3xl font-black tracking-tight mb-4">
+            {isError ? 'Experience temporairement indisponible' : 'Experience introuvable'}
+          </h2>
+          <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
+            {isError
+              ? 'Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.'
+              : "Cette experience n'existe pas ou a ete supprimee."}
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link to="/#about" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
+              Voir le profil
+            </Link>
+            {isError && (
+              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
+                Reessayer
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Build table of contents from available sections
   const tocItems: { id: string; label: string }[] = [];

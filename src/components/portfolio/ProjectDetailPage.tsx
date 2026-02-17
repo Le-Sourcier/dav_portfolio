@@ -1,30 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { PROJECTS, Project } from '../../data/mockData';
+import { Project } from '../../data/mockData';
 import { ProjectMetrics } from './ProjectMetrics';
 import { VisualDiagram } from './VisualDiagram';
-import { 
-  ArrowLeft, 
-  Target, 
-  Lightbulb, 
-  Trophy, 
-  ArrowRight, 
-  Share2, 
-  Layout, 
-  Cpu, 
-  Zap,
+import {
+  ArrowLeft,
+  Target,
+  Lightbulb,
+  Trophy,
+  ArrowRight,
+  Share2,
+  Layout,
+  Cpu,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { api } from '@/services/api';
+import { useProject } from '@/hooks/queries';
 
 export function ProjectDetailPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: project, isLoading, isError } = useProject(id || '');
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -33,33 +31,49 @@ export function ProjectDetailPage() {
     restDelta: 0.001
   });
 
-  useEffect(() => {
-    const fetchProj = async () => {
-      try {
-        const data = await api.get('/projects');
-        const found = data.find((p: any) => p.id === id);
-        if (found) {
-          setProject(found);
-        } else {
-          const mock = PROJECTS.find((p) => p.id === id);
-          if (mock) setProject(mock);
-          else navigate('/404');
-        }
-      } catch (error) {
-        const mock = PROJECTS.find((p) => p.id === id);
-        if (mock) setProject(mock);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProj();
-    window.scrollTo(0, 0);
-  }, [id, navigate]);
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
-  if (loading) return <div className="min-h-screen bg-background" />;
-  if (!project) return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
-  const nextProject = PROJECTS[(PROJECTS.findIndex(p => p.id === project.id) + 1) % PROJECTS.length];
+  if (isError || !project) {
+    return (
+      <div className="pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-screen bg-background">
+        <div className="max-w-2xl mx-auto text-center py-24">
+          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" />
+            Retour a l'accueil
+          </Link>
+          <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-8">
+            <AlertTriangle className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h2 className="text-3xl font-black tracking-tight mb-4">
+            {isError ? 'Projet temporairement indisponible' : 'Projet introuvable'}
+          </h2>
+          <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
+            {isError
+              ? 'Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.'
+              : "Ce projet n'existe pas ou a ete supprime."}
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
+              Voir tous les projets
+            </Link>
+            {isError && (
+              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
+                Reessayer
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleShare = async () => {
     const shareData = {

@@ -1,31 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Download, ExternalLink, Award as AwardIcon, CheckCircle2, Code2, Zap, Cpu, Database, Layout, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cvData, Experience } from '../../data/cvData';
-import { api } from '@/services/api';
+import { cvData } from '../../data/cvData';
 import { useProfile } from '@/hooks/useProfile';
+import { useExperiences } from '@/hooks/queries';
 
 export function About() {
   const navigate = useNavigate();
   const profile = useProfile();
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: experiences = [] } = useExperiences();
   const profileImage = profile.avatar;
-
-  useEffect(() => {
-    const fetchExp = async () => {
-      try {
-        const data = await api.get('/experiences');
-        setExperiences(data);
-      } catch {
-        setExperiences([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchExp();
-  }, []);
 
   const handleDownloadResume = () => {
     const { skills, education } = cvData;
