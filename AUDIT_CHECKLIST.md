@@ -27,20 +27,20 @@
 
 ## Priorite 4 — Base de donnees
 
-- [ ] **D1** — Ajouter index sur `comments.postId`
-- [ ] **D2** — Ajouter index composite sur `blog_views(postId, visitorHash)`
-- [ ] **D3** — Ajouter index sur `appointments.date`
-- [ ] **D4** — Ajouter index sur `appointments.email`
+- [x] **D1** — Index sur `comments.post_id` ✅
+- [x] **D2** — Index composite sur `blog_views(post_id, visitor_hash)` ✅
+- [x] **D3** — Index sur `appointments.date` ✅
+- [x] **D4** — Index sur `appointments.email` ✅
 
 ## Priorite 5 — Backend hardcode
 
-- [ ] **B1** — `BlogPost.ts:117` — `defaultValue: 'Yao David Logan'` pour author → lire depuis settings/env
-- [ ] **B2** — `chatbot.service.ts` — message initial, skills, quick actions, DEFAULT_INFO tous en dur → lire depuis settings
+- [x] **B1** — `BlogPost.ts` author default lit depuis `config.owner.name` (env) ✅
+- [x] **B2** — `chatbot.service.ts` entierement dynamique — welcome msg, quick actions, personal info depuis settings DB + env fallback ✅
 - [ ] **B3** — Validation manquante sur `POST /newsletter/send-article`, `GET /blog/slug/:slug`, `GET /appointments/available`
 
 ## Priorite 6 — UX / Qualite
 
 - [ ] **U1** — Uniformiser la langue FR : Testimonials ("Voices of Partners"), LatestBlogPosts ("INSIGHTS &"), ChatWindow ("Portfolio Agent"), ProjectGallery ("Portfolio"), ProjectDetailPage ("Services", "Stack")
 - [ ] **U2** — Pages legales : `LegalMentions.tsx` et `TermsOfService.tsx` contiennent des donnees fictives ("Alexandre Riviere", "Creative Studio SAS", adresse Paris) — remplacer par donnees dynamiques depuis env/settings
-- [ ] **U3** — `AdminForms.tsx:229` — SUPPRIME (fichier supprime en N5) ✅
+- [x] **U3** — `AdminForms.tsx` — SUPPRIME (fichier supprime en N5) ✅
 - [ ] **U4** — Accents manquants dans certains textes FR (inconsistance entre `é` et `e`)
