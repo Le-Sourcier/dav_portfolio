@@ -51,7 +51,7 @@ Appointment.init(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('pending', 'confirmed', 'cancelled', 'completed'),
+      type: DataTypes.ENUM('pending', 'confirmed', 'cancelled', 'completed', 'expired'),
       defaultValue: 'pending',
     },
     notes: {

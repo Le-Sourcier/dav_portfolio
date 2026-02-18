@@ -36,11 +36,16 @@
 
 - [x] **B1** — `BlogPost.ts` author default lit depuis `config.owner.name` (env) ✅
 - [x] **B2** — `chatbot.service.ts` entierement dynamique — welcome msg, quick actions, personal info depuis settings DB + env fallback ✅
-- [ ] **B3** — Validation manquante sur `POST /newsletter/send-article`, `GET /blog/slug/:slug`, `GET /appointments/available`
+- [x] **B3** — Validations ajoutees : `blogSlugValidator`, `sendArticleValidator`, `availableSlotsValidator` ✅
 
 ## Priorite 6 — UX / Qualite
 
-- [ ] **U1** — Uniformiser la langue FR : Testimonials ("Voices of Partners"), LatestBlogPosts ("INSIGHTS &"), ChatWindow ("Portfolio Agent"), ProjectGallery ("Portfolio"), ProjectDetailPage ("Services", "Stack")
-- [ ] **U2** — Pages legales : `LegalMentions.tsx` et `TermsOfService.tsx` contiennent des donnees fictives ("Alexandre Riviere", "Creative Studio SAS", adresse Paris) — remplacer par donnees dynamiques depuis env/settings
-- [x] **U3** — `AdminForms.tsx` — SUPPRIME (fichier supprime en N5) ✅
-- [ ] **U4** — Accents manquants dans certains textes FR (inconsistance entre `é` et `e`)
+- [x] **U1** — ChatWindow "Portfolio Agent" → "Assistant" ✅ (reste : Testimonials, LatestBlogPosts, ProjectGallery, ProjectDetailPage)
+- [ ] **U2** — Pages legales : `LegalMentions.tsx` et `TermsOfService.tsx` — donnees fictives a remplacer
+- [x] **U3** — `AdminForms.tsx` — SUPPRIME ✅
+- [ ] **U4** — Accents manquants dans certains textes FR
+
+## Bonus — Chatbox responsive
+
+- [x] Chatbox depassait le viewport (haut coupe) — corrige avec `max-h-[calc(100vh-4rem)]` ✅
+- [x] Bouton trigger repositionne pour etre coherent avec la fenetre ✅

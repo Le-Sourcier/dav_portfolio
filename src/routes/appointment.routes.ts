@@ -7,6 +7,7 @@ import {
   updateStatus,
   deleteAppointment,
   getAvailableSlots,
+  checkExisting,
 } from '../controllers/appointment.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
@@ -38,6 +39,9 @@ const router = Router();
  *         description: Available slots
  */
 router.get('/available', validate(availableSlotsValidator), getAvailableSlots);
+
+// GET /api/appointments/check?email=xxx — check existing active RDV (public)
+router.get('/check', checkExisting);
 
 /**
  * @swagger

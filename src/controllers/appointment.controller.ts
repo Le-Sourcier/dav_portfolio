@@ -66,6 +66,20 @@ export const getAvailableSlots = async (req: Request, res: Response, next: NextF
   }
 };
 
+export const checkExisting = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const email = req.query.email as string;
+    if (!email) {
+      sendSuccess(res, [], 'No email provided');
+      return;
+    }
+    const appointments = await appointmentService.findActiveByEmail(email);
+    sendSuccess(res, appointments, 'Active appointments retrieved');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getAllAppointments,
   getUpcomingAppointments,

@@ -135,7 +135,7 @@ export interface IContact {
 // ========================
 // Appointment Types
 // ========================
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'expired';
 export type AppointmentUrgency = 'non-urgent' | 'urgent';
 
 export interface IAppointment {
