@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Message } from './types';
 import { cn } from '../../../lib/utils';
@@ -10,6 +10,7 @@ import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { contactsApi, appointmentsApi } from '@/services/api';
 import { toast } from 'sonner';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
+import { OtpVerification } from '@/components/shared/OtpVerification';
 import { envConfig } from '@/config/env';
 
 interface MessageBubbleProps {
@@ -147,9 +148,13 @@ function LinkCard({ to, icon, label, title, isAssistant }: {
 // ======================== INLINE APPOINTMENT BOOKING ========================
 
 function AppointmentPicker({ times }: { times: string[] }) {
-  const { session, isIdentified, isPersisted, saveSession } = useVisitorSession();
+  const {
+    session, isIdentified, isVerified, isPersisted,
+    otpStatus, otpError, requestOtp, verifyOtp,
+  } = useVisitorSession();
 
-  const [step, setStep] = useState<'time' | 'info' | 'done'>('time');
+  const [step, setStep] = useState<'check' | 'time' | 'info' | 'otp' | 'done'>('check');
+  const [existingRdv, setExistingRdv] = useState<Array<{ date: string; time: string; subject: string; status: string }>>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [name, setName] = useState(session?.name || '');
   const [email, setEmail] = useState(session?.email || '');
@@ -159,15 +164,47 @@ function AppointmentPicker({ times }: { times: string[] }) {
 
   const today = new Date().toISOString().split('T')[0];
 
+  // Check existing appointments on mount (only if verified)
+  useEffect(() => {
+    if (isVerified && session?.email) {
+      appointmentsApi.checkExisting(session.email)
+        .then((rdvs) => {
+          if (rdvs.length > 0) {
+            setExistingRdv(rdvs);
+            setStep('check');
+          } else {
+            setStep('time');
+          }
+        })
+        .catch(() => setStep('time'));
+    } else {
+      setStep('time');
+    }
+  }, []);
+
+  // Auto-advance from OTP to booking when verified
+  useEffect(() => {
+    if (isVerified && step === 'otp') setStep('info');
+  }, [isVerified, step]);
+
   const isFormValid = name.trim().length > 0
     && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
     && subject.trim().length > 0;
 
+  const handleInfoSubmit = async () => {
+    if (!isFormValid) return;
+    if (isVerified) {
+      // Already verified — go to booking directly
+      handleBook();
+    } else {
+      // Need OTP first
+      await requestOtp(email.trim(), name.trim());
+      setStep('otp');
+    }
+  };
+
   const handleBook = async () => {
     if (!selectedTime || !isFormValid) return;
-    if (!isIdentified || rememberMe !== isPersisted) {
-      saveSession({ name: name.trim(), email: email.trim() }, rememberMe);
-    }
     setSending(true);
     try {
       await appointmentsApi.create({
@@ -187,7 +224,50 @@ function AppointmentPicker({ times }: { times: string[] }) {
     }
   };
 
-  // Step 3: Done
+  // Step 0: Check existing RDV
+  if (step === 'check' && existingRdv.length > 0) {
+    const hasPending = existingRdv.some((r) => r.status === 'pending');
+    const onlyConfirmed = !hasPending;
+
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 pt-3 border-t border-border/30 space-y-2">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+          <Calendar className="w-3 h-3" /> RDV existant
+        </div>
+        <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+          {existingRdv.map((rdv, i) => (
+            <div key={i} className="text-[11px]">
+              <p className="font-semibold">{rdv.subject}</p>
+              <p className="text-muted-foreground">
+                {new Date(rdv.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} a {rdv.time} — <span className="font-bold">{rdv.status === 'pending' ? 'En attente' : 'Confirme'}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+        {hasPending ? (
+          <p className="text-[10px] text-muted-foreground">
+            Votre rendez-vous est en attente de confirmation. Veuillez patienter ou nous contacter pour le modifier.
+          </p>
+        ) : (
+          <>
+            <p className="text-[10px] text-muted-foreground">Vous avez un rendez-vous confirme. Souhaitez-vous en prendre un autre ?</p>
+            <div className="flex gap-2">
+              <button onClick={() => setStep('time')}
+                className="flex-1 h-7 rounded-lg bg-primary text-primary-foreground text-[10px] font-bold hover:bg-primary/90 transition-colors">
+                Nouveau RDV
+              </button>
+              <button onClick={() => setStep('done')}
+                className="flex-1 h-7 rounded-lg border border-border text-[10px] font-bold hover:bg-secondary transition-colors">
+                Non merci
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    );
+  }
+
+  // Step 4: Done
   if (step === 'done') {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 pt-3 border-t border-border/30">
@@ -204,6 +284,24 @@ function AppointmentPicker({ times }: { times: string[] }) {
     );
   }
 
+  // Step OTP: verification
+  if (step === 'otp') {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 pt-3 border-t border-border/30">
+        <OtpVerification
+          email={email}
+          otpStatus={otpStatus}
+          otpError={otpError}
+          onVerify={(code, rem) => verifyOtp(code, rem)}
+          onResend={() => requestOtp(email.trim(), name.trim())}
+          remember={rememberMe}
+          onRememberChange={setRememberMe}
+          compact
+        />
+      </motion.div>
+    );
+  }
+
   // Step 2: Info form
   if (step === 'info') {
     return (
@@ -214,12 +312,12 @@ function AppointmentPicker({ times }: { times: string[] }) {
           </div>
           <button onClick={() => setStep('time')} className="text-[10px] text-primary font-bold hover:underline">Changer</button>
         </div>
-        {isIdentified ? (
+        {isVerified && session ? (
           <div className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-primary/5 border border-primary/20">
             <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-black">
-              {session!.name.charAt(0).toUpperCase()}
+              {session.name.charAt(0).toUpperCase()}
             </div>
-            <span className="text-[11px] font-semibold truncate">{session!.name}</span>
+            <span className="text-[11px] font-semibold truncate">{session.name}</span>
           </div>
         ) : (
           <>
@@ -227,18 +325,13 @@ function AppointmentPicker({ times }: { times: string[] }) {
               className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
             <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Votre email" type="email"
               className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)}
-                className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary" />
-              <span className="text-[10px] text-muted-foreground">Se souvenir de moi</span>
-            </label>
           </>
         )}
         <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Sujet du rendez-vous"
           className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors" />
-        <button onClick={handleBook} disabled={sending || !isFormValid}
+        <button onClick={handleInfoSubmit} disabled={sending || !isFormValid || otpStatus === 'sending'}
           className="w-full h-8 rounded-lg bg-primary text-primary-foreground text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><CheckCircle2 className="w-3.5 h-3.5" /> Confirmer le rendez-vous</>}
+          {sending || otpStatus === 'sending' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><CheckCircle2 className="w-3.5 h-3.5" /> {isVerified ? 'Confirmer le rendez-vous' : 'Verifier et reserver'}</>}
         </button>
       </motion.div>
     );
@@ -267,12 +360,11 @@ function AppointmentPicker({ times }: { times: string[] }) {
 // ======================== INLINE CONTACT FORM ========================
 
 function InlineContactForm() {
-  const { session, isIdentified, isPersisted, saveSession } = useVisitorSession();
+  const { session, isIdentified, saveSession } = useVisitorSession();
 
   const [name, setName] = useState(session?.name || '');
   const [email, setEmail] = useState(session?.email || '');
   const [message, setMessage] = useState('');
-  const [rememberMe, setRememberMe] = useState(isPersisted);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -281,9 +373,8 @@ function InlineContactForm() {
 
   const handleSend = async () => {
     if (!isFormValid) return;
-    // Save session (with remember preference)
-    if (!isIdentified || rememberMe !== isPersisted) {
-      saveSession({ name: name.trim(), email: email.trim() }, rememberMe);
+    if (!isIdentified) {
+      saveSession({ name: name.trim(), email: email.trim() });
     }
     setSending(true);
     try {
@@ -335,15 +426,6 @@ function InlineContactForm() {
             type="email"
             className="w-full h-8 px-3 rounded-lg bg-background/80 border border-border/50 text-[12px] outline-none focus:border-primary/50 transition-colors"
           />
-          <label className="flex items-center gap-1.5 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={e => setRememberMe(e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary"
-            />
-            <span className="text-[10px] text-muted-foreground">Se souvenir de moi</span>
-          </label>
         </>
       )}
       <textarea

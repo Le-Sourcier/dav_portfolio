@@ -146,18 +146,6 @@ export function Contact() {
                 {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
               </div>
 
-              {!isIdentified && (
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-muted-foreground">Se souvenir de moi pour les prochaines visites</span>
-                </label>
-              )}
-
               <button
                 disabled={sendMutation.isPending}
                 className="w-full py-6 bg-primary text-primary-foreground rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-70 active:scale-[0.98]"

@@ -6,6 +6,7 @@ import { MarkdownRenderer } from '../shared/MarkdownRenderer';
 import { toast } from 'sonner';
 import { useBlogPost, useAddComment, useTrackView, useTrackShare } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
+import { OtpVerification } from '@/components/shared/OtpVerification';
 import type { BlogComment } from '@/types/admin.types';
 
 // ======================== COMPONENT ========================
@@ -20,7 +21,10 @@ export function BlogPostDetail() {
   const trackShareMutation = useTrackShare();
 
   // Visitor session (persisted in sessionStorage)
-  const { session, isIdentified, saveSession, clearSession } = useVisitorSession();
+  const {
+    session, isIdentified, isVerified, needsReverification,
+    otpStatus, otpError, requestOtp, verifyOtp, clearSession,
+  } = useVisitorSession();
 
   const post = apiPost;
   const loading = apiLoading;
@@ -92,15 +96,14 @@ export function BlogPostDetail() {
 
   // ======================== HANDLERS ========================
 
-  const handleIdentify = (e: React.FormEvent) => {
+  const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email } = identifyForm;
     if (!name.trim()) { toast.error('Veuillez entrer votre nom'); return; }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error('Veuillez entrer un email valide'); return;
     }
-    saveSession({ name: name.trim(), email: email.trim() }, rememberMe);
-    toast.success(`Bienvenue, ${name.trim()} !`);
+    await requestOtp(email.trim(), name.trim());
   };
 
   const handleSubmitComment = (e: React.FormEvent) => {
@@ -258,8 +261,8 @@ export function BlogPostDetail() {
           </div>
 
           {/* Comment form */}
-          {isIdentified ? (
-            /* ---- IDENTIFIED: show simple comment box ---- */
+          {isVerified ? (
+            /* ---- VERIFIED: show simple comment box ---- */
             <form onSubmit={handleSubmitComment} className="p-8 rounded-3xl bg-card border border-border shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -306,12 +309,25 @@ export function BlogPostDetail() {
                 </button>
               </div>
             </form>
+          ) : otpStatus === 'sent' || otpStatus === 'verifying' || otpStatus === 'error' || needsReverification ? (
+            /* ---- OTP VERIFICATION ---- */
+            <div className="p-8 rounded-3xl bg-card border border-border shadow-lg">
+              <OtpVerification
+                email={session?.email || identifyForm.email}
+                otpStatus={otpStatus}
+                otpError={otpError}
+                onVerify={(code, rem) => verifyOtp(code, rem)}
+                onResend={() => requestOtp(session?.email || identifyForm.email, session?.name || identifyForm.name)}
+                remember={rememberMe}
+                onRememberChange={setRememberMe}
+              />
+            </div>
           ) : (
             /* ---- NOT IDENTIFIED: show identification form ---- */
             <form onSubmit={handleIdentify} className="p-8 rounded-3xl bg-card border border-border shadow-lg">
               <h4 className="text-sm font-black uppercase tracking-widest mb-2">Rejoindre la discussion</h4>
               <p className="text-[12px] text-muted-foreground mb-6">
-                Identifiez-vous pour commenter, prendre rendez-vous ou envoyer un message.
+                Identifiez-vous pour commenter. Un code de verification sera envoye a votre email.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -343,29 +359,17 @@ export function BlogPostDetail() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mb-6">
-                <input
-                  type="checkbox"
-                  id="remember-me"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <label htmlFor="remember-me" className="text-[12px] text-muted-foreground cursor-pointer select-none">
-                  Se souvenir de moi pour les prochaines visites
-                </label>
-              </div>
-
               <div className="flex items-center justify-between">
                 <p className="text-[11px] text-muted-foreground">
-                  * Votre email ne sera pas affiche publiquement
+                  * Un code sera envoye a votre email
                 </p>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all"
+                  disabled={otpStatus === 'sending'}
+                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
                 >
-                  Continuer
-                  <Send className="w-4 h-4" />
+                  {otpStatus === 'sending' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  Recevoir le code
                 </button>
               </div>
             </form>

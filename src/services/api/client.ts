@@ -69,6 +69,12 @@ class ApiClient {
       }
     }
 
+    // Always attach visitor token if present (separate from admin auth)
+    const visitorToken = localStorage.getItem('visitor_token') || sessionStorage.getItem('visitor_token');
+    if (visitorToken) {
+      (headers as Record<string, string>)['X-Visitor-Token'] = visitorToken;
+    }
+
     return headers;
   }
 

@@ -6,18 +6,29 @@ import { StatusBadge } from '../shared/StatusBadge';
 import { Calendar, Clock, User, Mail, MessageSquare, AlertCircle, ExternalLink } from 'lucide-react';
 import type { Appointment, AppointmentStatus } from '@/types/admin.types';
 
-const statusLabels: Record<string, string> = {
+const statusLabels: Record<AppointmentStatus, string> = {
   pending: 'En attente',
   confirmed: 'Confirme',
   cancelled: 'Annule',
   completed: 'Termine',
+  expired: 'Expire',
 };
 
-const statusVariants: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
+const statusVariants: Record<AppointmentStatus, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
   pending: 'warning',
   confirmed: 'success',
   cancelled: 'danger',
   completed: 'info',
+  expired: 'neutral',
+};
+
+// State machine — only show valid transitions from current status
+const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
+  pending: ['confirmed', 'cancelled'],
+  confirmed: ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
+  expired: [],
 };
 
 export function AppointmentsPage() {
@@ -67,22 +78,26 @@ export function AppointmentsPage() {
       key: 'status',
       label: 'Statut',
       render: (item) => (
-        <select
-          value={item.status}
-          onChange={(e) => {
-            e.stopPropagation();
-            updateStatusMutation.mutate({
-              id: item.id,
-              status: e.target.value as AppointmentStatus,
-            });
-          }}
-          className="bg-transparent border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs font-bold cursor-pointer outline-none"
-        >
-          <option value="pending">En attente</option>
-          <option value="confirmed">Confirme</option>
-          <option value="cancelled">Annule</option>
-          <option value="completed">Termine</option>
-        </select>
+        VALID_TRANSITIONS[item.status]?.length > 0 ? (
+          <select
+            value={item.status}
+            onChange={(e) => {
+              e.stopPropagation();
+              updateStatusMutation.mutate({
+                id: item.id,
+                status: e.target.value as AppointmentStatus,
+              });
+            }}
+            className="bg-transparent border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs font-bold cursor-pointer outline-none"
+          >
+            <option value={item.status}>{statusLabels[item.status]}</option>
+            {VALID_TRANSITIONS[item.status].map((s) => (
+              <option key={s} value={s}>{statusLabels[s]}</option>
+            ))}
+          </select>
+        ) : (
+          <StatusBadge label={statusLabels[item.status]} variant={statusVariants[item.status]} />
+        )
       ),
     },
   ];
@@ -191,25 +206,32 @@ export function AppointmentsPage() {
 
             {/* Status change */}
             <div className="mb-6">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Changer le statut</p>
-              <div className="flex flex-wrap gap-2">
-                {(['pending', 'confirmed', 'completed', 'cancelled'] as AppointmentStatus[]).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => {
-                      updateStatusMutation.mutate({ id: viewingItem.id, status: s });
-                      setViewingItem({ ...viewingItem, status: s });
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border ${
-                      viewingItem.status === s
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-transparent border-border hover:bg-secondary/50'
-                    }`}
-                  >
-                    {statusLabels[s]}
-                  </button>
-                ))}
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Statut actuel</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                <StatusBadge label={statusLabels[viewingItem.status]} variant={statusVariants[viewingItem.status]} />
               </div>
+              {VALID_TRANSITIONS[viewingItem.status]?.length > 0 && (
+                <>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Actions possibles</p>
+                  <div className="flex flex-wrap gap-2">
+                    {VALID_TRANSITIONS[viewingItem.status].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => {
+                          updateStatusMutation.mutate({ id: viewingItem.id, status: s });
+                          setViewingItem({ ...viewingItem, status: s });
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border bg-transparent border-border hover:bg-secondary/50"
+                      >
+                        {statusLabels[s]}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {VALID_TRANSITIONS[viewingItem.status]?.length === 0 && (
+                <p className="text-[11px] text-muted-foreground italic">Ce statut est terminal — aucune action possible.</p>
+              )}
             </div>
 
             {/* Meta */}

@@ -38,6 +38,10 @@ export const appointmentsApi = {
       `/appointments/available?date=${date}`
     );
   },
+
+  async checkExisting(email: string): Promise<Appointment[]> {
+    return apiClient.get<Appointment[]>(`/appointments/check?email=${encodeURIComponent(email)}`);
+  },
 };
 
 export default appointmentsApi;

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Calendar as CalendarIcon, Clock, ChevronRight, Check, MessageSquare, AlertCircle, User, Mail, ArrowLeft, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ChevronRight, Check, MessageSquare, AlertCircle, User, Mail, ArrowLeft, Loader2, Info } from 'lucide-react';
 import { Calendar } from '../ui/calendar';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -10,12 +10,27 @@ import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useCreateAppointment } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
+import { appointmentsApi } from '@/services/api';
+import { OtpVerification } from '@/components/shared/OtpVerification';
 
 export function AppointmentBooking() {
-  const { session, isIdentified, isPersisted, saveSession } = useVisitorSession();
+  const {
+    session, isIdentified, isVerified, needsReverification,
+    isPersisted, otpStatus, otpError, requestOtp, verifyOtp, saveSession,
+  } = useVisitorSession();
 
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [step, setStep] = useState(1);
+  const [existingRdv, setExistingRdv] = useState<Array<{ date: string; time: string; subject: string; status: string }>>([]);
+
+  // Check existing RDV when visitor is verified
+  useEffect(() => {
+    if (isVerified && session?.email) {
+      appointmentsApi.checkExisting(session.email)
+        .then((rdvs) => setExistingRdv(rdvs))
+        .catch(() => {});
+    }
+  }, [isVerified, session?.email]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [sujet, setSujet] = useState('');
   const [urgence, setUrgence] = useState<'non-urgent' | 'urgent'>('non-urgent');
@@ -26,7 +41,12 @@ export function AppointmentBooking() {
   const createMutation = useCreateAppointment();
   const times = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
 
-  const handleNextToStep2 = () => {
+  // Auto-advance from OTP step to time selection when verified
+  useEffect(() => {
+    if (isVerified && step === 10) setStep(2);
+  }, [isVerified, step]);
+
+  const handleNextToStep2 = async () => {
     if (!nom || !email || !sujet) {
       toast.error('Veuillez remplir tous les champs obligatoires (Nom, Email, Sujet).');
       return;
@@ -35,11 +55,14 @@ export function AppointmentBooking() {
       toast.error('Veuillez entrer une adresse email valide.');
       return;
     }
-    // Save visitor session (with remember preference)
-    if (!isIdentified || rememberMe !== isPersisted) {
-      saveSession({ name: nom.trim(), email: email.trim() }, rememberMe);
+    if (isVerified) {
+      // Already verified, go directly to time selection
+      setStep(2);
+    } else {
+      // Need OTP verification first
+      await requestOtp(email.trim(), nom.trim());
+      setStep(10); // OTP step
     }
-    setStep(2);
   };
 
   const handleBook = () => {
@@ -85,6 +108,31 @@ export function AppointmentBooking() {
           <p className="text-sm text-muted-foreground font-medium italic">Discutons de votre projet en direct</p>
         </div>
       </div>
+
+      {/* Existing RDV — block if pending, warn if confirmed */}
+      {existingRdv.length > 0 && step === 1 && (() => {
+        const hasPending = existingRdv.some((r) => r.status === 'pending');
+        return (
+          <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 ${hasPending ? 'bg-destructive/10 border border-destructive/20' : 'bg-amber-500/10 border border-amber-500/20'}`}>
+            <Info className={`w-5 h-5 shrink-0 mt-0.5 ${hasPending ? 'text-destructive' : 'text-amber-500'}`} />
+            <div>
+              <p className={`text-sm font-bold mb-1 ${hasPending ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}`}>
+                {hasPending ? 'Rendez-vous en attente de confirmation' : 'Vous avez un rendez-vous confirme'}
+              </p>
+              {existingRdv.map((rdv, i) => (
+                <p key={i} className="text-xs text-muted-foreground">
+                  {rdv.subject} — {new Date(rdv.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} a {rdv.time} ({rdv.status === 'pending' ? 'En attente' : 'Confirme'})
+                </p>
+              ))}
+              <p className="text-xs text-muted-foreground mt-1 italic">
+                {hasPending
+                  ? 'Veuillez patienter la confirmation de votre rendez-vous actuel ou nous contacter pour le modifier.'
+                  : 'Vous pouvez quand meme en prendre un nouveau si besoin.'}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="min-h-fit sm:min-h-[450px]">
         <AnimatePresence mode="wait">
@@ -173,23 +221,38 @@ export function AppointmentBooking() {
                 </div>
               </div>
 
-              {!isIdentified && (
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-muted-foreground">Se souvenir de moi pour les prochaines visites</span>
-                </label>
-              )}
-
               <button
                 onClick={handleNextToStep2}
-                className="w-full py-4 sm:py-5 bg-primary text-primary-foreground rounded-2xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all uppercase tracking-widest text-sm"
+                disabled={otpStatus === 'sending'}
+                className="w-full py-4 sm:py-5 bg-primary text-primary-foreground rounded-2xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all uppercase tracking-widest text-sm disabled:opacity-60"
               >
                 Choisir l'horaire <ChevronRight className="w-4 h-4" />
+              </button>
+            </motion.div>
+          )}
+
+          {step === 10 && (
+            <motion.div
+              key="stepOtp"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8 py-8"
+            >
+              <OtpVerification
+                email={email}
+                otpStatus={otpStatus}
+                otpError={otpError}
+                onVerify={(code, rem) => verifyOtp(code, rem)}
+                onResend={() => requestOtp(email.trim(), nom.trim())}
+                remember={rememberMe}
+                onRememberChange={setRememberMe}
+              />
+              <button
+                onClick={() => setStep(1)}
+                className="w-full py-3 border border-border rounded-xl font-bold text-sm hover:bg-secondary transition-all flex items-center justify-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" /> Retour
               </button>
             </motion.div>
           )}
