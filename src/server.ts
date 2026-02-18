@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { config } from './config/index.js';
 import { connectDatabase } from './config/database.js';
-import { startAppointmentCron } from './cron/appointmentCron.js';
+import { startCronJobs } from './cron/appointmentCron.js';
 import { swaggerSpec } from './config/swagger.js';
 import { logger } from './utils/logger.js';
 import { verifyEmailConnection } from './helpers/mailer.js';
@@ -112,7 +112,7 @@ const startServer = async () => {
     });
 
     // Start cron jobs
-    startAppointmentCron();
+    startCronJobs();
 
     // Start listening
     server.listen(config.port, () => {

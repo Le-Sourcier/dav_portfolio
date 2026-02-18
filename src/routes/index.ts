@@ -9,11 +9,13 @@ import newsletterRoutes from './newsletter.routes.js';
 import testimonialRoutes from './testimonial.routes.js';
 import chatbotRoutes from './chatbot.routes.js';
 import settingsRoutes from './settings.routes.js';
+import visitorRoutes from './visitor.routes.js';
 
 const router = Router();
 
 // Mount all routes
 router.use('/auth', authRoutes);
+router.use('/visitor', visitorRoutes);
 router.use('/projects', projectRoutes);
 router.use('/experiences', experienceRoutes);
 router.use('/blog', blogRoutes);

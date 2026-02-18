@@ -10,6 +10,7 @@ import {
   checkExisting,
 } from '../controllers/appointment.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
+import { requireVisitorAuth, matchVisitorEmail } from '../middlewares/visitorAuth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
 import { appointmentLimiter } from '../middlewares/rateLimit.middleware.js';
 import {
@@ -40,8 +41,8 @@ const router = Router();
  */
 router.get('/available', validate(availableSlotsValidator), getAvailableSlots);
 
-// GET /api/appointments/check?email=xxx — check existing active RDV (public)
-router.get('/check', checkExisting);
+// GET /api/appointments/check?email=xxx — check existing active RDV (visitor auth required)
+router.get('/check', requireVisitorAuth, checkExisting);
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ router.get('/check', checkExisting);
  *       409:
  *         description: Time slot already booked
  */
-router.post('/', appointmentLimiter, validate(createAppointmentValidator), createAppointment);
+router.post('/', appointmentLimiter, requireVisitorAuth, matchVisitorEmail(), validate(createAppointmentValidator), createAppointment);
 
 /**
  * @swagger

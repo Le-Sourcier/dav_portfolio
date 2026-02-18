@@ -8,6 +8,7 @@ import Appointment from './Appointment.js';
 import Newsletter from './Newsletter.js';
 import Testimonial from './Testimonial.js';
 import Settings from './Settings.js';
+import VisitorOtp from './VisitorOtp.js';
 
 // Export all models
 export {
@@ -23,6 +24,7 @@ export {
   Newsletter,
   Testimonial,
   Settings,
+  VisitorOtp,
 };
 
 // Export db object for convenience

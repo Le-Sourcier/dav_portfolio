@@ -64,6 +64,14 @@ export const config = {
     location: process.env.OWNER_LOCATION || '',
   },
 
+  // Visitor OTP / JWT
+  visitor: {
+    jwtSecret: process.env.VISITOR_JWT_SECRET || 'visitor-secret-change-in-prod',
+    jwtExpiresIn: process.env.VISITOR_JWT_EXPIRES_IN || '24h',
+    jwtRememberExpiresIn: process.env.VISITOR_JWT_REMEMBER_EXPIRES_IN || '7d',
+    otpExpiresMinutes: 10,
+  },
+
   // Logging
   logLevel: process.env.LOG_LEVEL || 'debug',
 };

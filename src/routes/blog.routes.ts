@@ -21,6 +21,7 @@ import {
   createCommentValidator,
 } from '../validators/blog.validator.js';
 import { commentLimiter, trackingLimiter } from '../middlewares/rateLimit.middleware.js';
+import { requireVisitorAuth, matchVisitorEmail } from '../middlewares/visitorAuth.middleware.js';
 
 const router = Router();
 
@@ -185,7 +186,7 @@ router.delete('/:id', authMiddleware, adminMiddleware, validate(blogPostIdValida
  *       404:
  *         description: Post not found
  */
-router.post('/:id/comments', commentLimiter, validate(createCommentValidator), addComment);
+router.post('/:id/comments', commentLimiter, requireVisitorAuth, matchVisitorEmail(), validate(createCommentValidator), addComment);
 
 // POST /api/blog/:id/view   -- track a view (public)
 router.post('/:id/view', trackingLimiter, validate(blogPostIdValidator), trackView);

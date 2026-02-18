@@ -52,6 +52,21 @@ class AppointmentService {
       throw new AppError('Impossible de reserver un creneau dans le passe', HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR);
     }
 
+    // Block if visitor already has a pending RDV
+    const pendingByEmail = await Appointment.findOne({
+      where: {
+        email: data.email,
+        status: 'pending',
+      },
+    });
+    if (pendingByEmail) {
+      throw new AppError(
+        'Vous avez deja un rendez-vous en attente de confirmation. Veuillez patienter ou nous contacter pour l\'annuler.',
+        HttpStatus.CONFLICT,
+        ErrorCode.CONFLICT,
+      );
+    }
+
     // Check if slot is available (excludes cancelled/expired)
     const existing = await Appointment.findOne({
       where: {
@@ -62,7 +77,7 @@ class AppointmentService {
     });
 
     if (existing) {
-      throw new AppError('This time slot is already booked', HttpStatus.CONFLICT, ErrorCode.CONFLICT);
+      throw new AppError('Ce creneau est deja reserve', HttpStatus.CONFLICT, ErrorCode.CONFLICT);
     }
 
     const appointment = await Appointment.create({
