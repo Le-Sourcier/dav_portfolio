@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-const ALLOWED_KEYS = ['profile', 'socialLinks', 'seo', 'chatbot'];
+const ALLOWED_KEYS = ['profile', 'socialLinks', 'seo', 'chatbot', 'skills', 'education'];
 const MAX_VALUE_SIZE = 10000; // max JSON string length per key
 
 export const updateSettingsValidator = [
