@@ -1,19 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User, Lock, Palette, Globe, Sun, Moon, Monitor, Check, Camera, Shield, Eye, EyeOff, Loader2, CheckCircle2, Bot, Plus, Trash2, GripVertical } from 'lucide-react';
+import { User, Lock, Palette, Globe, Sun, Moon, Monitor, Check, Camera, Shield, Eye, EyeOff, Loader2, CheckCircle2, Bot, Plus, Trash2, GripVertical, Code2, GraduationCap, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/stores/authStore';
-import { useSettingsStore, applyTheme, type ThemeMode, type ProfileData, type SocialLinks, type SeoData, type ChatbotSettings, type ChatbotQuickAction } from '@/stores/settingsStore';
+import { useSettingsStore, applyTheme, type ThemeMode, type ProfileData, type SocialLinks, type SeoData, type ChatbotSettings, type ChatbotQuickAction, type SkillsData, type EducationEntry } from '@/stores/settingsStore';
 import { useUIStore } from '@/stores/uiStore';
-import { useUpdateSettings } from '@/hooks/queries';
+import { useUpdateSettings, useApiSettings } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { cvData } from '@/data/cvData';
 
-type Section = 'profile' | 'security' | 'appearance' | 'seo' | 'chatbot';
+type Section = 'profile' | 'security' | 'appearance' | 'seo' | 'chatbot' | 'expertise';
 
 const sectionList: { id: Section; label: string; icon: React.ElementType }[] = [
   { id: 'profile', label: 'Profil', icon: User },
+  { id: 'expertise', label: 'Expertise', icon: Code2 },
   { id: 'security', label: 'Securite', icon: Lock },
   { id: 'appearance', label: 'Apparence', icon: Palette },
   { id: 'seo', label: 'SEO & Meta', icon: Globe },
@@ -85,7 +87,7 @@ function useSaveFeedback() {
 }
 
 // ===================== MAIN COMPONENT =====================
-const VALID_SECTIONS: Section[] = ['profile', 'security', 'appearance', 'seo', 'chatbot'];
+const VALID_SECTIONS: Section[] = ['profile', 'expertise', 'security', 'appearance', 'seo', 'chatbot'];
 
 export function SettingsPage() {
   const { user } = useAuthStore();
@@ -130,8 +132,44 @@ export function SettingsPage() {
   const [chatbotForm, setChatbotForm] = useState<ChatbotSettings>({ ...settings.chatbot });
   const chatbotSave = useSaveFeedback();
 
+  // --- Expertise ---
+  const storeSkills = settings.skills ?? { frontend: [], backend: [], tools: [] };
+  const storeEduItems = settings.education?.items ?? (Array.isArray(settings.education) ? settings.education as unknown as EducationEntry[] : []);
+  const fallbackSkills: SkillsData = {
+    frontend: storeSkills.frontend?.length > 0 ? storeSkills.frontend : cvData.skills.frontend,
+    backend: storeSkills.backend?.length > 0 ? storeSkills.backend : cvData.skills.backend,
+    tools: storeSkills.tools?.length > 0 ? storeSkills.tools : cvData.skills.tools,
+  };
+  const fallbackEducation: EducationEntry[] = storeEduItems.length > 0
+    ? storeEduItems
+    : cvData.education.map((edu, i) => ({ id: String(i + 1), ...edu }));
+
+  const [skillsForm, setSkillsForm] = useState<SkillsData>(fallbackSkills);
+  const [educationForm, setEducationForm] = useState<EducationEntry[]>(fallbackEducation);
+  const [newSkillInputs, setNewSkillInputs] = useState<Record<string, string>>({ frontend: '', backend: '', tools: '' });
+  const skillsSave = useSaveFeedback();
+  const educationSave = useSaveFeedback();
+
   // --- API sync ---
   const updateSettingsMutation = useUpdateSettings();
+  const { data: apiSettings } = useApiSettings();
+
+  // Auto-seed: persist cvData fallbacks to DB if skills/education missing from API
+  const [seeded, setSeeded] = useState(false);
+  useEffect(() => {
+    if (seeded || !apiSettings) return;
+    const needsSkills = !apiSettings.skills || !((apiSettings.skills as SkillsData).frontend?.length > 0);
+    const needsEducation = !apiSettings.education || !(apiSettings.education as { items?: unknown[] }).items?.length;
+    if (needsSkills || needsEducation) {
+      const seedData: Record<string, unknown> = {};
+      if (needsSkills) seedData.skills = fallbackSkills;
+      if (needsEducation) seedData.education = { items: fallbackEducation };
+      updateSettingsMutation.mutate(seedData as any);
+      if (needsSkills) settings.updateSkills(fallbackSkills);
+      if (needsEducation) settings.updateEducation({ items: fallbackEducation });
+    }
+    setSeeded(true);
+  }, [apiSettings]);
 
   // Apply theme on change
   useEffect(() => {
@@ -226,6 +264,49 @@ export function SettingsPage() {
       quickActions: chatbotForm.quickActions.map((a) =>
         a.id === id ? { ...a, [field]: value } : a
       ),
+    });
+  };
+
+  // --- Expertise handlers ---
+  const handleAddSkill = (category: keyof SkillsData) => {
+    const skill = newSkillInputs[category].trim();
+    if (!skill || skillsForm[category].includes(skill)) return;
+    setSkillsForm({ ...skillsForm, [category]: [...skillsForm[category], skill] });
+    setNewSkillInputs({ ...newSkillInputs, [category]: '' });
+  };
+
+  const handleRemoveSkill = (category: keyof SkillsData, index: number) => {
+    setSkillsForm({
+      ...skillsForm,
+      [category]: skillsForm[category].filter((_, i) => i !== index),
+    });
+  };
+
+  const handleSaveSkills = () => {
+    skillsSave.trigger(() => {
+      settings.updateSkills(skillsForm);
+      updateSettingsMutation.mutate({ skills: skillsForm });
+    });
+  };
+
+  const handleAddEducation = () => {
+    const newId = String(Date.now());
+    setEducationForm([...educationForm, { id: newId, degree: '', field: '', description: '' }]);
+  };
+
+  const handleRemoveEducation = (id: string) => {
+    setEducationForm(educationForm.filter((e) => e.id !== id));
+  };
+
+  const handleUpdateEducation = (id: string, field: keyof EducationEntry, value: string) => {
+    setEducationForm(educationForm.map((e) => e.id === id ? { ...e, [field]: value } : e));
+  };
+
+  const handleSaveEducation = () => {
+    educationSave.trigger(() => {
+      const data = { items: educationForm };
+      settings.updateEducation(data);
+      updateSettingsMutation.mutate({ education: data });
     });
   };
 
@@ -369,6 +450,110 @@ export function SettingsPage() {
               </div>
               <div className="flex justify-end pt-4">
                 <SaveButton onClick={handleSaveSocial} loading={socialSave.saving} saved={socialSave.saved} />
+              </div>
+            </SectionCard>
+          </>
+        )}
+
+        {/* ===== EXPERTISE ===== */}
+        {activeSection === 'expertise' && (
+          <>
+            <SectionCard title="Competences techniques" description="Les competences affichees dans la section Expertise de votre portfolio.">
+              <div className="space-y-6">
+                {(['frontend', 'backend', 'tools'] as const).map((category) => {
+                  const labels = { frontend: 'Frontend', backend: 'Backend', tools: 'Outils' };
+                  return (
+                    <div key={category}>
+                      <FieldLabel>{labels[category]}</FieldLabel>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {skillsForm[category].map((skill, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                            {skill}
+                            <button
+                              onClick={() => handleRemoveSkill(category, i)}
+                              className="ml-0.5 text-zinc-400 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <FieldInput
+                          value={newSkillInputs[category]}
+                          onChange={(e) => setNewSkillInputs({ ...newSkillInputs, [category]: e.target.value })}
+                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(category); } }}
+                          placeholder={`Ajouter une competence ${labels[category].toLowerCase()}...`}
+                          className="flex-1"
+                        />
+                        <button
+                          onClick={() => handleAddSkill(category)}
+                          className="h-9 px-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="flex justify-end pt-2">
+                  <SaveButton onClick={handleSaveSkills} loading={skillsSave.saving} saved={skillsSave.saved} />
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Formation" description="Votre parcours academique et vos certifications.">
+              <div className="space-y-3">
+                {educationForm.map((edu) => (
+                  <div key={edu.id} className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 space-y-3">
+                        <div>
+                          <FieldLabel>Diplome / Titre</FieldLabel>
+                          <FieldInput
+                            value={edu.degree}
+                            onChange={(e) => handleUpdateEducation(edu.id, 'degree', e.target.value)}
+                            placeholder="Ex: Licence en Informatique"
+                          />
+                        </div>
+                        <div>
+                          <FieldLabel>Domaine</FieldLabel>
+                          <FieldInput
+                            value={edu.field}
+                            onChange={(e) => handleUpdateEducation(edu.id, 'field', e.target.value)}
+                            placeholder="Ex: Genie Logiciel"
+                          />
+                        </div>
+                        <div>
+                          <FieldLabel>Description</FieldLabel>
+                          <FieldInput
+                            value={edu.description}
+                            onChange={(e) => handleUpdateEducation(edu.id, 'description', e.target.value)}
+                            placeholder="Breve description..."
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveEducation(edu.id)}
+                        className="mt-5 p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  onClick={handleAddEducation}
+                  className="w-full py-2.5 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors flex items-center justify-center gap-2 text-[12px] font-medium"
+                >
+                  <GraduationCap className="w-3.5 h-3.5" /> Ajouter une formation
+                </button>
+
+                <div className="flex justify-end pt-2">
+                  <SaveButton onClick={handleSaveEducation} loading={educationSave.saving} saved={educationSave.saved} />
+                </div>
               </div>
             </SectionCard>
           </>

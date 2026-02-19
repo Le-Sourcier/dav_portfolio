@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, ExternalLink, Award as AwardIcon, CheckCircle2, Code2, Zap, Cpu, Database, Layout, Sparkles } from 'lucide-react';
+import { Download, ExternalLink, Award as AwardIcon, CheckCircle2, Zap, Cpu, Layout, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cvData } from '../../data/cvData';
 import { useProfile } from '@/hooks/useProfile';
 import { useExperiences } from '@/hooks/queries';
 
@@ -13,8 +12,6 @@ export function About() {
   const profileImage = profile.avatar;
 
   const handleDownloadResume = () => {
-    const { skills, education } = cvData;
-
     let content = `CV ${profile.name} - ${profile.title}
 
 `;
@@ -28,16 +25,16 @@ export function About() {
     content += `
 COMPÉTENCES
 `;
-    content += `- Frontend: ${skills.frontend.join(', ')}
+    content += `- Frontend: ${profile.skills.frontend.join(', ')}
 `;
-    content += `- Backend: ${skills.backend.join(', ')}
+    content += `- Backend: ${profile.skills.backend.join(', ')}
 `;
-    content += `- Outils: ${skills.tools.join(', ')}
+    content += `- Outils: ${profile.skills.tools.join(', ')}
 `;
     content += `
 FORMATION
 `;
-    education.forEach(edu => {
+    profile.education.forEach(edu => {
       content += `- ${edu.degree} en ${edu.field}
   ${edu.description}
 `;
@@ -53,20 +50,11 @@ FORMATION
     link.remove();
   };
 
-  const getSkillIcon = (name: string) => {
-    const n = name.toLowerCase();
-    if (n.includes('react') || n.includes('next') || n.includes('frontend')) return <Layout className="w-4 h-4" />;
-    if (n.includes('node') || n.includes('python') || n.includes('backend')) return <Cpu className="w-4 h-4" />;
-    if (n.includes('sql') || n.includes('db') || n.includes('redis')) return <Database className="w-4 h-4" />;
-    if (n.includes('docker') || n.includes('git') || n.includes('aws')) return <Zap className="w-4 h-4" />;
-    return <Code2 className="w-4 h-4" />;
-  };
-
-  const allSkills = [
-    ...cvData.skills.frontend.slice(0, 3),
-    ...cvData.skills.backend.slice(0, 2),
-    ...cvData.skills.tools.slice(0, 1)
-  ].map(name => ({ name, icon: getSkillIcon(name) }));
+  const skillCategories = [
+    { label: 'Frontend', items: profile.skills.frontend, icon: <Layout className="w-3.5 h-3.5" /> },
+    { label: 'Backend', items: profile.skills.backend, icon: <Cpu className="w-3.5 h-3.5" /> },
+    { label: 'Outils', items: profile.skills.tools, icon: <Zap className="w-3.5 h-3.5" /> },
+  ].filter(cat => cat.items.length > 0);
 
   const [firstName, ...lastNameParts] = profile.name.split(' ');
   const lastName = lastNameParts.join(' ');
@@ -147,23 +135,35 @@ FORMATION
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 mb-20">
               <div className="space-y-6">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">Expertise</h4>
-                <div className="grid grid-cols-1 gap-4">
-                  {allSkills.map((skill, i) => (
-                    <div key={i} className="flex items-center gap-3 group cursor-default">
-                      <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                        {skill.icon}
+                <div className="space-y-5">
+                  {skillCategories.map((cat) => (
+                    <div key={cat.label}>
+                      <div className="flex items-center gap-2 mb-2.5">
+                        <div className="w-6 h-6 rounded-md bg-secondary flex items-center justify-center text-primary">
+                          {cat.icon}
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{cat.label}</span>
                       </div>
-                      <span className="text-sm font-bold tracking-tight">{skill.name}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {cat.items.map((skill) => (
+                          <span
+                            key={skill}
+                            className="px-2.5 py-1 rounded-lg bg-secondary text-xs font-bold tracking-tight hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-6 min-w-0">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">Formation</h4>
                 <div className="space-y-4">
-                  {cvData.education.map((edu, i) => (
-                    <div key={i}>
-                      <p className="font-black text-sm uppercase tracking-wider">{edu.degree}</p>
+                  {profile.education.map((edu) => (
+                    <div key={edu.id} className="min-w-0">
+                      <p className="font-black text-sm leading-snug">{edu.degree}</p>
                       <p className="text-xs text-muted-foreground font-bold italic">{edu.field}</p>
                     </div>
                   ))}

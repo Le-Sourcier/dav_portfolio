@@ -50,6 +50,23 @@ export interface ChatbotSettings {
   quickActions: ChatbotQuickAction[];
 }
 
+export interface SkillsData {
+  frontend: string[];
+  backend: string[];
+  tools: string[];
+}
+
+export interface EducationEntry {
+  id: string;
+  degree: string;
+  field: string;
+  description: string;
+}
+
+export interface EducationData {
+  items: EducationEntry[];
+}
+
 interface SettingsState {
   profile: ProfileData;
   socialLinks: SocialLinks;
@@ -57,6 +74,8 @@ interface SettingsState {
   theme: ThemeMode;
   display: DisplayPreferences;
   chatbot: ChatbotSettings;
+  skills: SkillsData;
+  education: EducationData;
   lastSaved: string | null;
 }
 
@@ -67,6 +86,8 @@ interface SettingsActions {
   setTheme: (theme: ThemeMode) => void;
   updateDisplay: (data: Partial<DisplayPreferences>) => void;
   updateChatbot: (data: Partial<ChatbotSettings>) => void;
+  updateSkills: (data: Partial<SkillsData>) => void;
+  updateEducation: (data: EducationData) => void;
   resetSettings: () => void;
 }
 
@@ -119,6 +140,14 @@ const defaultChatbot: ChatbotSettings = {
   ],
 };
 
+const defaultSkills: SkillsData = {
+  frontend: [],
+  backend: [],
+  tools: [],
+};
+
+const defaultEducation: EducationData = { items: [] };
+
 const initialState: SettingsState = {
   profile: defaultProfile,
   socialLinks: defaultSocialLinks,
@@ -126,6 +155,8 @@ const initialState: SettingsState = {
   theme: 'system',
   display: defaultDisplay,
   chatbot: defaultChatbot,
+  skills: defaultSkills,
+  education: defaultEducation,
   lastSaved: null,
 };
 
@@ -166,6 +197,15 @@ export const useSettingsStore = create<SettingsStore>()(
           chatbot: { ...state.chatbot, ...data },
           lastSaved: new Date().toISOString(),
         })),
+
+      updateSkills: (data) =>
+        set((state) => ({
+          skills: { ...state.skills, ...data },
+          lastSaved: new Date().toISOString(),
+        })),
+
+      updateEducation: (data) =>
+        set({ education: { ...data }, lastSaved: new Date().toISOString() }),
 
       resetSettings: () => set(initialState),
     }),

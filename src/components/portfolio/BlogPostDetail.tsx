@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Calendar, Clock, User, Share2, MessageSquare, Send, Mail, Loader2, LogOut, Eye } from 'lucide-react';
 import { MarkdownRenderer } from '../shared/MarkdownRenderer';
+import { AuthorCard } from './blog/AuthorCard';
+import { BlogCtaCard } from './blog/BlogCtaCard';
+import { RelatedPosts } from './blog/RelatedPosts';
 import { toast } from 'sonner';
 import { useBlogPost, useAddComment, useTrackView, useTrackShare } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
@@ -209,9 +212,24 @@ export function BlogPostDetail() {
         )}
 
         {/* Article content */}
-        <article className="mb-24">
+        <article className="mb-16">
           <MarkdownRenderer content={post.content} />
         </article>
+
+        {/* Author bio */}
+        <div className="mb-12">
+          <AuthorCard />
+        </div>
+
+        {/* Newsletter CTA */}
+        <div className="mb-12 max-w-lg mx-auto">
+          <BlogCtaCard variant="newsletter" />
+        </div>
+
+        {/* Related posts */}
+        <div className="mb-24">
+          <RelatedPosts currentPostId={post.id} category={post.category} />
+        </div>
 
         {/* ======================== COMMENTS SECTION ======================== */}
         <section className="pt-16 border-t border-border">
