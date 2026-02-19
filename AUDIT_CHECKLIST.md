@@ -1,6 +1,6 @@
 # Visual Story Folio — Audit & Checklist
 
-> Derniere mise a jour : 2026-02-17
+> Derniere mise a jour : 2026-02-18
 
 ## Priorite 1 — Securite (CRITIQUE)
 
@@ -9,6 +9,7 @@
 - [x] **S3** — `GET /api/blog/:id` filtre les brouillons pour les visiteurs publics ✅
 - [x] **S4** — `GET /api/testimonials/:id` filtre les temoignages caches pour les visiteurs publics ✅
 - [x] **S5** — Socket.io chatbot handler : rate limit ajoute (30 msg/min par socket) ✅
+- [x] **S6** — Verification OTP visiteur par email : endpoints proteger (appointments, comments) ✅
 
 ## Priorite 2 — Nettoyage code mort
 
@@ -40,12 +41,24 @@
 
 ## Priorite 6 — UX / Qualite
 
-- [x] **U1** — ChatWindow "Portfolio Agent" → "Assistant" ✅ (reste : Testimonials, LatestBlogPosts, ProjectGallery, ProjectDetailPage)
+- [x] **U1** — Uniformiser la langue FR : Testimonials, LatestBlogPosts, ChatWindow ✅
 - [ ] **U2** — Pages legales : `LegalMentions.tsx` et `TermsOfService.tsx` — donnees fictives a remplacer
 - [x] **U3** — `AdminForms.tsx` — SUPPRIME ✅
 - [ ] **U4** — Accents manquants dans certains textes FR
 
-## Bonus — Chatbox responsive
+## Bonus — Fonctionnalites ajoutees
 
-- [x] Chatbox depassait le viewport (haut coupe) — corrige avec `max-h-[calc(100vh-4rem)]` ✅
-- [x] Bouton trigger repositionne pour etre coherent avec la fenetre ✅
+- [x] Chatbox responsive — corrige depassement viewport ✅
+- [x] Inline appointment booking dans le chatbot (flow complet 3 etapes) ✅
+- [x] State machine RDV — workflow a sens unique (pending→confirmed→completed, terminal states) ✅
+- [x] Blocage RDV en double si `pending` existe pour meme email ✅
+- [x] Blocage RDV dates passees ✅
+- [x] Auto-expiration cron : pending >48h → expired, confirmed >24h → completed ✅
+- [x] Status `expired` ajoute au modele Appointment ✅
+- [x] Admin : transitions valides uniquement dans le select + detail modal ✅
+- [x] Detection RDV existant cote client (chatbot + page booking) ✅
+- [x] Verification OTP visiteur par email (6 chiffres, 10min TTL) ✅
+- [x] Composant OtpVerification reutilisable (6 inputs, timer, resend, compact mode) ✅
+- [x] JWT visiteur distinct du JWT admin (X-Visitor-Token header) ✅
+- [x] Protection endpoints : appointments + comments exigent token visiteur verifie ✅
+- [x] Contact form reste public (pas d'OTP requis) ✅
