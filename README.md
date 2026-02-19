@@ -1,120 +1,135 @@
-# React + Vite + shadcn/ui Starter Template
+# Visual Story Folio
 
-A modern React starter template built with Vite, TypeScript, Tailwind CSS, and shadcn/ui components.
+Portfolio personnel fullstack avec blog, prise de rendez-vous, chatbot IA, et espace d'administration complet.
 
-## 🚀 Features
+## Stack technique
 
-- ⚡️ **Vite** - Fast build tool and development server
-- ⚛️ **React 18** - Latest React with hooks support
-- 🎯 **TypeScript** - Type safety and better developer experience
-- 🎨 **Tailwind CSS** - Utility-first CSS framework
-- 🧩 **shadcn/ui** - Beautifully designed components built with Radix UI
-- 📦 **Path Mapping** - Clean imports with `@/` prefix
+### Frontend
+- **React 18** + **TypeScript** + **Vite**
+- **Tailwind CSS v4** — theming via CSS custom properties (oklch)
+- **shadcn/ui** — composants UI (Radix UI)
+- **TanStack React Query** — gestion cache/requetes API
+- **Zustand** — state management (auth, settings, UI)
+- **Framer Motion** — animations et transitions
+- **Sonner** — notifications toast
 
-## 📦 Included shadcn/ui Components
+### Backend
+- **Express** + **TypeScript**
+- **Sequelize** + **PostgreSQL**
+- **JWT** — authentification admin + visiteur (OTP)
+- **node-cron** — auto-expiration rendez-vous + nettoyage OTP
+- **express-validator** — validation des entrees
 
-- Button
-- Card
-- Input
-- Label
-- Badge
-- Dialog
-- And more...
+## Fonctionnalites
 
-## 🛠️ Getting Started
+### Portfolio public
+- Page d'accueil avec hero, projets, experiences, temoignages, blog, contact
+- **Blog** — articles Markdown, recherche, filtres par categorie, hero post, cartes CTA (newsletter, services)
+- **Commentaires** — verification email par OTP avant publication
+- **Prise de rendez-vous** — calendrier, creneaux horaires, verification OTP, state machine (pending → confirmed → completed → expired)
+- **Chatbot IA** — assistant conversationnel avec actions rapides configurables
+- **Newsletter** — inscription/desinscription avec notification par email
+- **Contact** — formulaire direct (sans OTP)
+- **Theme** — dark/light avec transition View Transitions API (clip-path circle reveal)
+- **Pages legales** — mentions legales, CGU, politique de confidentialite (donnees dynamiques)
 
-1. **Install dependencies**
+### Espace admin (`/dashboard`)
+- **Dashboard** — statistiques (contacts, RDV, articles, temoignages)
+- **Blog** — editeur Markdown complet, publication, gestion commentaires
+- **Projets** — CRUD avec images, technologies, liens
+- **Experiences** — editeur pleine page
+- **Temoignages** — moderation, pagination
+- **Rendez-vous** — gestion statuts (state machine), transitions valides uniquement
+- **Contacts** — lecture, marquage lu/non-lu
+- **Newsletter** — statistiques, envoi d'articles aux abonnes
+- **Parametres** :
+  - Profil (nom, email, titre, bio, avatar, telephone)
+  - Expertise (competences frontend/backend/outils + formation)
+  - Liens sociaux
+  - SEO & Open Graph
+  - Chatbot (activation, message de bienvenue, actions rapides)
+  - Securite (mot de passe)
+  - Apparence (theme, preferences d'affichage)
 
-   ```bash
-   npm install
-   ```
+## Demarrage rapide
 
-2. **Start development server**
+### Prerequisites
+- Node.js 18+
+- PostgreSQL
 
-   ```bash
-   npm run dev
-   ```
+### Backend
 
-3. **Build for production**
+```bash
+cd backend
+cp .env.example .env    # Configurer les variables
+npm install
+npm run dev             # Port 3002
+```
 
-   ```bash
-   npm run build
-   ```
+### Frontend
 
-4. **Preview production build**
-   ```bash
-   npm run preview
-   ```
+```bash
+cd frontend
+cp .env.example .env    # Configurer les variables
+npm install
+npm run dev             # Port 3000
+```
 
-## 📁 Project Structure
+### Variables d'environnement (frontend)
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | URL de l'API backend |
+| `VITE_APP_BRAND` | Nom de la marque |
+| `VITE_OWNER_NAME` | Nom du proprietaire |
+| `VITE_OWNER_EMAIL` | Email de contact |
+| `VITE_OWNER_TITLE` | Titre professionnel |
+| `VITE_OWNER_AVATAR` | URL de l'avatar |
+| `VITE_CHATBOT_ENABLED` | Activer le chatbot (true/false) |
+
+## Structure du projet
 
 ```
-src/
+frontend/src/
 ├── components/
-│   └── ui/              # shadcn/ui components
-├── lib/
-│   └── utils.ts         # Utility functions
-├── App.tsx              # Main application component
-├── index.css            # Global styles with Tailwind
-└── main.tsx             # Application entry point
+│   ├── admin/          # Pages et composants admin
+│   ├── portfolio/      # Pages et composants publics
+│   │   ├── blog/       # BlogCard, BlogCtaCard, AuthorCard, RelatedPosts
+│   │   ├── chatbot/    # ChatbotContainer, useChatbot, MessageBubble
+│   │   └── ...         # About, Contact, Navbar, ThemeToggle, etc.
+│   ├── shared/         # MarkdownRenderer, OtpVerification, SeoHead
+│   └── ui/             # shadcn/ui components
+├── config/             # envConfig (centralise .env)
+├── data/               # cvData (fallback), mockData
+├── hooks/
+│   ├── queries/        # TanStack Query hooks par entite
+│   ├── useProfile.ts   # Donnees profil unifiees (API > store > env)
+│   └── useVisitorSession.ts  # Session visiteur + OTP
+├── services/api/       # Clients API types par entite
+├── stores/             # Zustand (auth, settings, UI)
+└── types/              # Types TypeScript
+
+backend/src/
+├── config/             # Database, JWT, env
+├── controllers/        # Controllers par entite
+├── cron/               # Auto-expiration RDV + cleanup OTP
+├── middlewares/         # Auth, rate limiting, validation, visitor auth
+├── models/             # Sequelize models
+├── routes/             # Express routes
+├── services/           # Business logic par entite
+├── validators/         # express-validator schemas
+└── views/emails/       # Templates email (OTP, etc.)
 ```
 
-## 🎨 Customization
+## Securite
 
-### Adding New shadcn/ui Components
+- **Admin** : JWT via `/api/auth/login`
+- **Visiteur** : verification email par OTP (6 chiffres, 10min TTL) + JWT visiteur distinct
+- **Rate limiting** : sur tous les endpoints publics POST
+- **CORS** : configuration stricte avec `X-Visitor-Token` autorise
+- **Validation** : express-validator sur toutes les entrees
+- **Deduplication** : vues blog par hash SHA256 (IP + User-Agent)
 
-This template is pre-configured with shadcn/ui. You can add more components by creating them in the `src/components/ui/` directory.
+## Licence
 
-### Tailwind Configuration
-
-The Tailwind configuration is set up with shadcn/ui color variables. You can customize colors and other design tokens in:
-
-- `tailwind.config.js` - Tailwind configuration
-- `src/index.css` - CSS custom properties for themes
-
-### TypeScript Configuration
-
-Path mapping is configured for clean imports:
-
-```typescript
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-```
-
-## 🌗 Dark Mode
-
-The template includes dark mode support through Tailwind's `dark:` classes and CSS custom properties.
-
-## 📚 Learn More
-
-- [Vite Documentation](https://vitejs.dev/)
-- [React Documentation](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Radix UI](https://www.radix-ui.com/)
-
-## 🤝 Contributing
-
-Feel free to submit issues and enhancement requests!
-
-**⚡ Powered by [Dala](https://dala.gebeya.com)** - The AI-powered web development platform that helps you build full-stack applications faster.
-
----
-
-## 🤖 What is Dala?
-
-**[Gebeya Dala](https://dala.gebeya.com)** is an intelligent web development platform that accelerates your React development workflow. Build, preview, and deploy web applications, and instant development environments.
-
-🔗 **Try Dala:** [dala.gebeya.com](https://dala.gebeya.com)
-
-### Why Use Dala?
-
-- **AI-Powered Development** - Get intelligent code suggestions and automated component generation
-- **Instant Preview** - See your changes live in real-time sandbox environments
-- **Zero Setup** - No local environment configuration needed
-- **Collaborative** - Build and share projects with your team
-- **Deployment Ready** - One-click deployment to production
-
----
-
-Built with ❤️ by the Dala team to help developers build faster and smarter.
+MIT
