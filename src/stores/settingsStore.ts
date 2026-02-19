@@ -215,17 +215,94 @@ export const useSettingsStore = create<SettingsStore>()(
   )
 );
 
-// Apply theme to document
+// Stored click coordinates for theme transition origin
+let _themeClickX = 0;
+let _themeClickY = 0;
+
+/** Call this before setting the theme to capture the click origin point */
+export function setThemeClickOrigin(x: number, y: number) {
+  _themeClickX = x;
+  _themeClickY = y;
+}
+
+// Resolve the effective theme class
+function resolveThemeClass(mode: ThemeMode): 'dark' | 'light' {
+  if (mode === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return mode;
+}
+
+// Apply theme to document with View Transition animation
 export function applyTheme(mode: ThemeMode) {
   const root = window.document.documentElement;
-  root.classList.remove('light', 'dark');
+  const oldResolved = root.classList.contains('dark') ? 'dark' : 'light';
+  const newResolved = resolveThemeClass(mode);
 
-  if (mode === 'system') {
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.classList.add(systemDark ? 'dark' : 'light');
-    localStorage.setItem('theme', systemDark ? 'dark' : 'light');
-  } else {
-    root.classList.add(mode);
-    localStorage.setItem('theme', mode);
+  // No-op if same theme
+  if (oldResolved === newResolved) {
+    localStorage.setItem('theme', newResolved);
+    return;
   }
+
+  const x = _themeClickX || window.innerWidth / 2;
+  const y = _themeClickY || window.innerHeight / 2;
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y)
+  );
+  const isDarkening = newResolved === 'dark';
+
+  const doSwitch = () => {
+    root.classList.remove('light', 'dark');
+    root.classList.add(newResolved);
+    localStorage.setItem('theme', newResolved);
+  };
+
+  // Respect reduced motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    doSwitch();
+    return;
+  }
+
+  // Strategy A: View Transitions API (Chrome 111+)
+  if ('startViewTransition' in document) {
+    const transition = (document as any).startViewTransition(doSwitch);
+    transition.ready.then(() => {
+      root.animate(
+        {
+          clipPath: isDarkening
+            ? [`circle(${endRadius}px at ${x}px ${y}px)`, `circle(0px at ${x}px ${y}px)`]
+            : [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
+        },
+        {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          pseudoElement: isDarkening
+            ? '::view-transition-old(root)'
+            : '::view-transition-new(root)',
+        }
+      );
+    });
+    return;
+  }
+
+  // Strategy B: Overlay fallback (Firefox, Safari)
+  const oldBg = getComputedStyle(root).backgroundColor;
+  doSwitch();
+  const newBg = getComputedStyle(root).backgroundColor;
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;z-index:99999;pointer-events:none;background-color:${newBg};clip-path:circle(0px at ${x}px ${y}px);`;
+  document.body.appendChild(overlay);
+
+  const anim = overlay.animate(
+    [
+      { clipPath: `circle(0px at ${x}px ${y}px)` },
+      { clipPath: `circle(${endRadius}px at ${x}px ${y}px)` },
+    ],
+    { duration: 500, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }
+  );
+
+  anim.onfinish = () => overlay.remove();
 }

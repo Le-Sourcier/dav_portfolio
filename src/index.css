@@ -189,3 +189,18 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+/* View Transitions API — smooth theme switch animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 9999; }
+.dark::view-transition-old(root) { z-index: 9999; }
+.dark::view-transition-new(root) { z-index: 1; }
+::view-transition-image-pair(root) { isolation: isolate; }

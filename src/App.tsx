@@ -23,7 +23,6 @@ import { ProtectedRoute } from './components/admin/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from './components/portfolio/ThemeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeTransition } from './components/portfolio/ThemeTransition';
 import { ChatbotContainer } from './components/portfolio/chatbot/ChatbotContainer';
 import { useProfile } from './hooks/useProfile';
 import { envConfig } from './config/env';
@@ -73,7 +72,6 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans antialiased transition-colors duration-500">
       <SeoHead />
-      <ThemeTransition />
       {!hideNavFooter && <Navbar />}
 
       {children}

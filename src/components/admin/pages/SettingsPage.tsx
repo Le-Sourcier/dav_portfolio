@@ -4,7 +4,7 @@ import { User, Lock, Palette, Globe, Sun, Moon, Monitor, Check, Camera, Shield, 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/stores/authStore';
-import { useSettingsStore, applyTheme, type ThemeMode, type ProfileData, type SocialLinks, type SeoData, type ChatbotSettings, type ChatbotQuickAction, type SkillsData, type EducationEntry } from '@/stores/settingsStore';
+import { useSettingsStore, applyTheme, setThemeClickOrigin, type ThemeMode, type ProfileData, type SocialLinks, type SeoData, type ChatbotSettings, type ChatbotQuickAction, type SkillsData, type EducationEntry } from '@/stores/settingsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useUpdateSettings, useApiSettings } from '@/hooks/queries';
 import { toast } from 'sonner';
@@ -672,7 +672,7 @@ export function SettingsPage() {
               ]).map((theme) => (
                 <button
                   key={theme.id}
-                  onClick={() => setSelectedTheme(theme.id)}
+                  onClick={(e) => { setThemeClickOrigin(e.clientX, e.clientY); setSelectedTheme(theme.id); }}
                   className={cn(
                     'relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-150',
                     selectedTheme === theme.id
