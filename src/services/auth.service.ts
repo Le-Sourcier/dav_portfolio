@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { config } from '../config/index.js';
 import Admin from '../models/Admin.js';
 import { JwtPayload, TokenPair, LoginResponse } from '../types/auth.types.js';
@@ -20,30 +19,10 @@ class AuthService {
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    // Try to find admin in database
-    let admin = await Admin.findOne({ where: { email } });
+    // Always authenticate via database + bcrypt
+    const admin = await Admin.findOne({ where: { email } });
 
-    // If not found in DB, check against env credentials
     if (!admin) {
-      if (email === config.admin.email && password === config.admin.password) {
-        // Create/return token for default admin
-        const payload: JwtPayload = {
-          id: 'default-admin',
-          email: config.admin.email,
-          role: 'admin',
-        };
-        const tokens = this.generateTokens(payload);
-        return {
-          token: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          user: {
-            id: 'default-admin',
-            email: config.admin.email,
-            name: 'Yao Logan',
-            role: 'admin',
-          },
-        };
-      }
       throw new AppError('Invalid credentials', HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_CREDENTIALS);
     }
 
@@ -92,16 +71,6 @@ class AuthService {
   }
 
   async getProfile(userId: string): Promise<Omit<import('../types/entities.types.js').IAdmin, 'password'>> {
-    // Handle default admin
-    if (userId === 'default-admin') {
-      return {
-        id: 'default-admin',
-        email: config.admin.email,
-        name: 'Yao Logan',
-        role: 'admin',
-      };
-    }
-
     const admin = await Admin.findByPk(userId);
     if (!admin) {
       throw new AppError('User not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);

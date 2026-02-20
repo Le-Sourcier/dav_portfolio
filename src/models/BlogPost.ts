@@ -1,13 +1,24 @@
-import { DataTypes, Model, Optional, HasManyGetAssociationsMixin } from 'sequelize';
-import crypto from 'crypto';
-import { sequelize } from '../config/database.js';
-import { config } from '../config/index.js';
-import { IBlogPost, IBlogComment } from '../types/entities.types.js';
+import {
+  DataTypes,
+  Model,
+  Optional,
+  HasManyGetAssociationsMixin,
+} from "sequelize";
+import crypto from "crypto";
+import { sequelize } from "../config/database.js";
+import { config } from "../config/index.js";
+import { IBlogPost, IBlogComment } from "../types/entities.types.js";
 
 // Comment model
-interface CommentCreationAttributes extends Optional<IBlogComment, 'id' | 'createdAt'> {}
+interface CommentCreationAttributes extends Optional<
+  IBlogComment,
+  "id" | "createdAt"
+> {}
 
-export class Comment extends Model<IBlogComment, CommentCreationAttributes> implements IBlogComment {
+export class Comment
+  extends Model<IBlogComment, CommentCreationAttributes>
+  implements IBlogComment
+{
   declare id: string;
   declare author: string;
   declare email: string;
@@ -47,17 +58,23 @@ Comment.init(
   },
   {
     sequelize,
-    modelName: 'Comment',
-    tableName: 'comments',
+    modelName: "Comment",
+    tableName: "comments",
     updatedAt: false,
-    indexes: [{ fields: ['post_id'] }],
-  }
+    indexes: [{ fields: ["post_id"] }],
+  },
 );
 
 // BlogPost model
-interface BlogPostCreationAttributes extends Optional<IBlogPost, 'id' | 'viewCount' | 'shareCount' | 'createdAt' | 'updatedAt' | 'comments'> {}
+interface BlogPostCreationAttributes extends Optional<
+  IBlogPost,
+  "id" | "viewCount" | "shareCount" | "createdAt" | "updatedAt" | "comments"
+> {}
 
-class BlogPost extends Model<IBlogPost, BlogPostCreationAttributes> implements IBlogPost {
+class BlogPost
+  extends Model<IBlogPost, BlogPostCreationAttributes>
+  implements IBlogPost
+{
   declare id: string;
   declare title: string;
   declare slug: string;
@@ -135,9 +152,9 @@ BlogPost.init(
   },
   {
     sequelize,
-    modelName: 'BlogPost',
-    tableName: 'blog_posts',
-  }
+    modelName: "BlogPost",
+    tableName: "blog_posts",
+  },
 );
 
 // ======================== BlogView model (dedup unique views) ========================
@@ -153,13 +170,20 @@ export class BlogView extends Model {
    * Not PII — just a SHA-256 hash for deduplication.
    */
   static hashVisitor(ip: string, userAgent: string): string {
-    return crypto.createHash('sha256').update(`${ip}::${userAgent}`).digest('hex');
+    return crypto
+      .createHash("sha256")
+      .update(`${ip}::${userAgent}`)
+      .digest("hex");
   }
 
   /**
    * Record a unique view. Returns true if new view, false if this visitor already viewed this post.
    */
-  static async recordView(postId: string, ip: string, userAgent: string): Promise<boolean> {
+  static async recordView(
+    postId: string,
+    ip: string,
+    userAgent: string,
+  ): Promise<boolean> {
     const hash = BlogView.hashVisitor(ip, userAgent);
 
     const existing = await BlogView.findOne({
@@ -195,17 +219,17 @@ BlogView.init(
   },
   {
     sequelize,
-    modelName: 'BlogView',
-    tableName: 'blog_views',
+    modelName: "BlogView",
+    tableName: "blog_views",
     updatedAt: false,
-    indexes: [{ fields: ['post_id', 'visitor_hash'] }],
-  }
+    indexes: [{ fields: ["post_id", "visitor_hash"] }],
+  },
 );
 
 // Associations
-BlogPost.hasMany(Comment, { foreignKey: 'postId', as: 'comments' });
-Comment.belongsTo(BlogPost, { foreignKey: 'postId' });
-BlogPost.hasMany(BlogView, { foreignKey: 'postId', as: 'views' });
-BlogView.belongsTo(BlogPost, { foreignKey: 'postId' });
+BlogPost.hasMany(Comment, { foreignKey: "postId", as: "comments" });
+Comment.belongsTo(BlogPost, { foreignKey: "postId" });
+BlogPost.hasMany(BlogView, { foreignKey: "postId", as: "views" });
+BlogView.belongsTo(BlogPost, { foreignKey: "postId" });
 
 export default BlogPost;

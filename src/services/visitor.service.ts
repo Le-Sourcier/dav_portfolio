@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import { config } from '../config/index.js';
@@ -16,7 +17,7 @@ export interface VisitorPayload {
 
 class VisitorService {
   private generateCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return randomInt(100000, 1000000).toString();
   }
 
   async requestOtp(email: string, name: string): Promise<void> {

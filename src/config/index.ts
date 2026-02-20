@@ -1,9 +1,18 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Fail-safe: require critical secrets at startup
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`[SECURITY] Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 export const config = {
-  // Server
-  nodeEnv: process.env.NODE_ENV || 'development',
+  // Server — default to 'production' (fail-safe)
+  nodeEnv: process.env.NODE_ENV || 'production',
   port: parseInt(process.env.PORT || '3001', 10),
 
   // Database
@@ -23,18 +32,18 @@ export const config = {
     },
   },
 
-  // JWT
+  // JWT — no fallback secrets
   jwt: {
-    secret: process.env.JWT_SECRET || 'default-secret-change-in-production',
-    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
+    secret: requireEnv('JWT_SECRET'),
+    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    refreshSecret: requireEnv('JWT_REFRESH_SECRET'),
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
 
-  // Admin
+  // Admin — no fallback password
   admin: {
     email: process.env.ADMIN_EMAIL || 'admin@logan.dev',
-    password: process.env.ADMIN_PASSWORD || 'admin2024',
+    password: requireEnv('ADMIN_PASSWORD'),
   },
 
   // Email
@@ -64,9 +73,9 @@ export const config = {
     location: process.env.OWNER_LOCATION || '',
   },
 
-  // Visitor OTP / JWT
+  // Visitor OTP / JWT — no fallback secret
   visitor: {
-    jwtSecret: process.env.VISITOR_JWT_SECRET || 'visitor-secret-change-in-prod',
+    jwtSecret: requireEnv('VISITOR_JWT_SECRET'),
     jwtExpiresIn: process.env.VISITOR_JWT_EXPIRES_IN || '24h',
     jwtRememberExpiresIn: process.env.VISITOR_JWT_REMEMBER_EXPIRES_IN || '7d',
     otpExpiresMinutes: 10,

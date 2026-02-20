@@ -5,7 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
-import { config } from "./config/index.js";
+import { config, isProduction } from "./config/index.js";
 import { connectDatabase } from "./config/database.js";
 import { startCronJobs } from "./cron/appointmentCron.js";
 import { swaggerSpec } from "./config/swagger.js";
@@ -35,15 +35,24 @@ const io = new SocketServer(server, {
 // Security middleware
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable for Swagger UI
+    contentSecurityPolicy: isProduction
+      ? undefined // Use helmet defaults in production
+      : {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"], // Swagger UI needs inline scripts
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+          },
+        },
     crossOriginEmbedderPolicy: false,
   }),
 );
 
-// CORS configuration
+// CORS configuration — always use explicit origin list
 app.use(
   cors({
-    origin: config.nodeEnv === "production" ? config.frontendUrl : "*",
+    origin: [config.frontendUrl],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Visitor-Token"],
     credentials: true,
@@ -51,8 +60,8 @@ app.use(
 );
 
 // Body parser
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Request logging
 app.use(requestLogger);
@@ -60,15 +69,17 @@ app.use(requestLogger);
 // Rate limiting
 app.use("/api", apiLimiter);
 
-// Swagger documentation
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Portfolio API Documentation",
-  }),
-);
+// Swagger documentation — only in non-production
+if (!isProduction) {
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      customCss: ".swagger-ui .topbar { display: none }",
+      customSiteTitle: "Portfolio API Documentation",
+    }),
+  );
+}
 
 // API routes
 app.use("/api", routes);
