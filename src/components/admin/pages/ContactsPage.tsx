@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { useContacts, useDeleteContact, useMarkAsRead } from '@/hooks/queries';
+import { useContacts, useDeleteContact, useMarkAsRead, useReplyContact } from '@/hooks/queries';
 import { DataTable, type Column } from '../shared/DataTable';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { StatusBadge } from '../shared/StatusBadge';
-import { Mail, MailOpen, ExternalLink } from 'lucide-react';
+import { Mail, MailOpen, ExternalLink, Send, MessageSquareReply, Loader2 } from 'lucide-react';
 import type { Contact } from '@/types/admin.types';
 
 export function ContactsPage() {
   const { data: contacts = [], isLoading } = useContacts();
   const deleteMutation = useDeleteContact();
   const markAsReadMutation = useMarkAsRead();
+  const replyMutation = useReplyContact();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [viewingContact, setViewingContact] = useState<Contact | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   const columns: Column<Contact>[] = [
     {
@@ -50,17 +52,23 @@ export function ContactsPage() {
     {
       key: 'read',
       label: 'Statut',
-      render: (item) => (
-        <StatusBadge
-          label={item.read ? 'Lu' : 'Non lu'}
-          variant={item.read ? 'neutral' : 'info'}
-        />
-      ),
+      render: (item) => {
+        if (item.reply) {
+          return <StatusBadge label="Repondu" variant="success" />;
+        }
+        return (
+          <StatusBadge
+            label={item.read ? 'Lu' : 'Non lu'}
+            variant={item.read ? 'neutral' : 'info'}
+          />
+        );
+      },
     },
   ];
 
   const handleView = (item: Contact) => {
     setViewingContact(item);
+    setReplyText('');
     if (!item.read) {
       markAsReadMutation.mutate(item.id);
     }
@@ -68,6 +76,19 @@ export function ContactsPage() {
 
   const handleDelete = (item: Contact) => {
     setDeleteId(item.id);
+  };
+
+  const handleSendReply = () => {
+    if (!viewingContact || replyText.trim().length < 10) return;
+    replyMutation.mutate(
+      { id: viewingContact.id, reply: replyText.trim() },
+      {
+        onSuccess: (updated) => {
+          setViewingContact(updated);
+          setReplyText('');
+        },
+      }
+    );
   };
 
   const confirmDelete = () => {
@@ -97,7 +118,7 @@ export function ContactsPage() {
           onClick={() => setViewingContact(null)}
         >
           <div
-            className="bg-card border border-border w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl"
+            className="bg-card border border-border w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-6">
@@ -126,6 +147,60 @@ export function ContactsPage() {
                 minute: '2-digit',
               })}
             </p>
+
+            {/* Reply section */}
+            <div className="mt-6 pt-6 border-t border-border">
+              {viewingContact.reply ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <MessageSquareReply className="w-4 h-4 text-emerald-500" />
+                    <span className="text-sm font-bold text-emerald-500">Reponse envoyee</span>
+                  </div>
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{viewingContact.reply}</p>
+                  </div>
+                  {viewingContact.repliedAt && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Repondu le {new Date(viewingContact.repliedAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <MessageSquareReply className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-bold">Repondre</span>
+                  </div>
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Ecrivez votre reponse (minimum 10 caracteres)..."
+                    rows={4}
+                    className="w-full rounded-xl border border-border bg-secondary/30 p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/50"
+                  />
+                  <div className="flex justify-end mt-3">
+                    <button
+                      onClick={handleSendReply}
+                      disabled={replyText.trim().length < 10 || replyMutation.isPending}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {replyMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                      Envoyer la reponse
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

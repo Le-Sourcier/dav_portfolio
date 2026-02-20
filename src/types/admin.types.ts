@@ -212,6 +212,8 @@ export interface Contact {
   subject?: string;
   message: string;
   read: boolean;
+  reply?: string;
+  repliedAt?: string;
   createdAt: string;
 }
 

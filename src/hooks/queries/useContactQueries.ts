@@ -61,6 +61,26 @@ export function useMarkAsRead() {
   });
 }
 
+// Reply to Contact
+export function useReplyContact() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, reply }: { id: string; reply: string }) =>
+      contactsApi.reply(id, reply),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<Contact[]>(contactKeys.lists(), (old) =>
+        old?.map((c) => (c.id === updated.id ? updated : c))
+      );
+      queryClient.invalidateQueries({ queryKey: contactKeys.unreadCount() });
+      toast.success('Reponse envoyee avec succes');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de l\'envoi de la reponse');
+    },
+  });
+}
+
 // Delete Contact
 export function useDeleteContact() {
   const queryClient = useQueryClient();

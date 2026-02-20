@@ -14,6 +14,10 @@ export const contactsApi = {
     return apiClient.post<Contact>('/contact', data);
   },
 
+  async reply(id: string, reply: string): Promise<Contact> {
+    return apiClient.post<Contact>(`/contact/${id}/reply`, { reply });
+  },
+
   async markAsRead(id: string): Promise<Contact> {
     return apiClient.patch<Contact>(`/contact/${id}/read`);
   },
