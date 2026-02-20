@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { CodeHighlighter } from '../portfolio/CodeHighlighter';
 
 interface MarkdownRendererProps {
@@ -191,7 +192,8 @@ function markdownToHtml(md: string): string {
   // Remove empty figcaptions
   html = html.replace(/<figcaption><\/figcaption>/g, '');
 
-  return html;
+  // Sanitize to prevent XSS
+  return DOMPurify.sanitize(html);
 }
 
 // ======================== LEGACY HTML PARSING ========================
@@ -205,7 +207,7 @@ function parseHtmlContent(html: string): ParsedBlock[] {
   while ((match = regex.exec(html)) !== null) {
     const before = html.slice(lastIndex, match.index);
     if (before.trim()) {
-      blocks.push({ type: 'html', content: before });
+      blocks.push({ type: 'html', content: DOMPurify.sanitize(before) });
     }
     blocks.push({
       type: 'code',
@@ -217,7 +219,7 @@ function parseHtmlContent(html: string): ParsedBlock[] {
 
   const after = html.slice(lastIndex);
   if (after.trim()) {
-    blocks.push({ type: 'html', content: after });
+    blocks.push({ type: 'html', content: DOMPurify.sanitize(after) });
   }
 
   return blocks;
