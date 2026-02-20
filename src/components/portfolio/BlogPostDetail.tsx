@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Calendar, Clock, User, Share2, MessageSquare, Send, Mail, Loader2, LogOut, Eye } from 'lucide-react';
 import { MarkdownRenderer } from '../shared/MarkdownRenderer';
 import { AuthorCard } from './blog/AuthorCard';
-import { BlogCtaCard } from './blog/BlogCtaCard';
+import { NewsletterCtaWide } from './blog/BlogCtaCard';
 import { RelatedPosts } from './blog/RelatedPosts';
 import { toast } from 'sonner';
 import { useBlogPost, useAddComment, useTrackView, useTrackShare } from '@/hooks/queries';
@@ -222,8 +222,8 @@ export function BlogPostDetail() {
         </div>
 
         {/* Newsletter CTA */}
-        <div className="mb-12 max-w-lg mx-auto">
-          <BlogCtaCard variant="newsletter" />
+        <div className="mb-16">
+          <NewsletterCtaWide />
         </div>
 
         {/* Related posts */}

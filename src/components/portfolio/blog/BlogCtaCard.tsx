@@ -77,6 +77,74 @@ function NewsletterCta() {
   );
 }
 
+export function NewsletterCtaWide() {
+  const [email, setEmail] = useState('');
+  const subscribeMutation = useSubscribe();
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    subscribeMutation.mutate(email, {
+      onSuccess: () => {
+        setSubscribed(true);
+        setEmail('');
+      },
+    });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8 md:p-10"
+    >
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+      <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
+              <Mail className="w-4 h-4" />
+            </div>
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
+          <h3 className="text-2xl font-black tracking-tight mb-2">Restez informe</h3>
+          <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+            Recevez les derniers articles et reflexions directement dans votre boite mail. Pas de spam, desabonnement en un clic.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="w-full md:w-auto shrink-0 flex flex-col sm:flex-row gap-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={subscribed}
+            placeholder="votre@email.com"
+            className="flex-1 md:w-64 bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all disabled:opacity-50"
+            required
+          />
+          <button
+            type="submit"
+            disabled={subscribeMutation.isPending || subscribed}
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 whitespace-nowrap"
+          >
+            {subscribeMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : subscribed ? (
+              <>Inscrit ! <Check className="w-4 h-4" /></>
+            ) : (
+              <>S'abonner <ArrowRight className="w-4 h-4" /></>
+            )}
+          </button>
+        </form>
+      </div>
+    </motion.div>
+  );
+}
+
 function ServicesCta() {
   return (
     <motion.div

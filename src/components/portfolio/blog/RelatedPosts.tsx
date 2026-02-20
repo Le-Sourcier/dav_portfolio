@@ -1,4 +1,6 @@
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { BookOpen } from 'lucide-react';
 import { useBlogPosts } from '@/hooks/queries';
 import { BlogCard } from './BlogCard';
 
@@ -22,17 +24,34 @@ export function RelatedPosts({ currentPostId, category }: RelatedPostsProps) {
   if (related.length === 0) return null;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Continuez la lecture</p>
-        <h3 className="text-2xl font-black tracking-tight">Articles similaires</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="space-y-8"
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+          <BookOpen className="w-5 h-5" />
+        </div>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">Continuez la lecture</p>
+          <h3 className="text-2xl font-black tracking-tight">Articles similaires</h3>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {related.map((post, i) => (
-          <BlogCard key={post.id} post={post} index={i} />
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * (i + 1) }}
+          >
+            <BlogCard post={post} index={i} />
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
