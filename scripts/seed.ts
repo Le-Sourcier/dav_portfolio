@@ -200,7 +200,9 @@ const seedAdmin = async () => {
     });
     logger.info("Created admin user");
   } else {
-    logger.info("Admin user already exists");
+    // Update password from env to ensure it stays in sync
+    await existingAdmin.update({ password: config.admin.password });
+    logger.info("Admin user already exists — password synced from env");
   }
 };
 
