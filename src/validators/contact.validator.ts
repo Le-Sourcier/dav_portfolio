@@ -31,3 +31,15 @@ export const contactIdValidator = [
     .isUUID()
     .withMessage('Invalid contact ID'),
 ];
+
+export const replyContactValidator = [
+  param('id')
+    .isUUID()
+    .withMessage('Invalid contact ID'),
+  body('reply')
+    .trim()
+    .notEmpty()
+    .withMessage('Reply is required')
+    .isLength({ min: 10 })
+    .withMessage('Reply must be at least 10 characters'),
+];

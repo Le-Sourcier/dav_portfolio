@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database.js';
 import { IContact } from '../types/entities.types.js';
 
-interface ContactCreationAttributes extends Optional<IContact, 'id' | 'read' | 'createdAt'> {}
+interface ContactCreationAttributes extends Optional<IContact, 'id' | 'read' | 'reply' | 'repliedAt' | 'createdAt'> {}
 
 class Contact extends Model<IContact, ContactCreationAttributes> implements IContact {
   declare id: string;
@@ -11,6 +11,8 @@ class Contact extends Model<IContact, ContactCreationAttributes> implements ICon
   declare subject?: string;
   declare message: string;
   declare read: boolean;
+  declare reply?: string;
+  declare repliedAt?: Date;
   declare readonly createdAt: Date;
 }
 
@@ -41,6 +43,14 @@ Contact.init(
     read: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    reply: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    repliedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {

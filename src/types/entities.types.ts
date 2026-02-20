@@ -129,6 +129,8 @@ export interface IContact {
   subject?: string;
   message: string;
   read: boolean;
+  reply?: string;
+  repliedAt?: Date;
   createdAt?: Date;
 }
 

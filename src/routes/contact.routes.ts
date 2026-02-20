@@ -4,12 +4,13 @@ import {
   getContactById,
   createContact,
   markAsRead,
+  replyToContact,
   deleteContact,
   getUnreadCount,
 } from '../controllers/contact.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validation.middleware.js';
-import { createContactValidator, contactIdValidator } from '../validators/contact.validator.js';
+import { createContactValidator, contactIdValidator, replyContactValidator } from '../validators/contact.validator.js';
 import { contactLimiter } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
@@ -119,6 +120,40 @@ router.get('/:id', authMiddleware, adminMiddleware, validate(contactIdValidator)
  *         description: Message marked as read
  */
 router.patch('/:id/read', authMiddleware, adminMiddleware, validate(contactIdValidator), markAsRead);
+
+/**
+ * @swagger
+ * /api/contact/{id}/reply:
+ *   post:
+ *     summary: Reply to a contact message (admin only)
+ *     tags: [Contact]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - reply
+ *             properties:
+ *               reply:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reply sent
+ *       404:
+ *         description: Message not found
+ */
+router.post('/:id/reply', authMiddleware, adminMiddleware, validate(replyContactValidator), replyToContact);
 
 /**
  * @swagger

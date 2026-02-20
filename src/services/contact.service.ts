@@ -4,6 +4,7 @@ import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
 import { sendEmail } from '../helpers/mailer.js';
 import { contactReceivedTemplate } from '../views/emails/contact.template.js';
+import { contactReplyTemplate } from '../views/emails/contact-reply.template.js';
 import { config } from '../config/index.js';
 
 class ContactService {
@@ -61,6 +62,29 @@ class ContactService {
     }
 
     await contact.destroy();
+  }
+
+  async reply(id: string, replyText: string): Promise<IContact> {
+    const contact = await Contact.findByPk(id);
+    if (!contact) {
+      throw new AppError('Contact message not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+
+    // Send email BEFORE updating DB — if email fails, no false trace
+    await sendEmail({
+      to: contact.email,
+      subject: `Re: ${contact.subject || 'Votre message'}`,
+      html: contactReplyTemplate({
+        visitorName: contact.name,
+        originalSubject: contact.subject || 'Sans sujet',
+        originalMessage: contact.message,
+        replyMessage: replyText,
+        ownerName: config.owner.name,
+      }),
+    });
+
+    await contact.update({ reply: replyText, repliedAt: new Date(), read: true });
+    return contact;
   }
 
   async getUnreadCount(): Promise<number> {

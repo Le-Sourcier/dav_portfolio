@@ -47,6 +47,15 @@ export const deleteContact = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+export const replyToContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const contact = await contactService.reply(req.params.id, req.body.reply);
+    sendSuccess(res, contact, 'Reply sent successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUnreadCount = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const count = await contactService.getUnreadCount();
@@ -56,4 +65,4 @@ export const getUnreadCount = async (_req: Request, res: Response, next: NextFun
   }
 };
 
-export default { getAllContacts, getContactById, createContact, markAsRead, deleteContact, getUnreadCount };
+export default { getAllContacts, getContactById, createContact, markAsRead, replyToContact, deleteContact, getUnreadCount };
