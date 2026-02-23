@@ -49,7 +49,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'super_admin';
+  role: "admin" | "super_admin";
 }
 
 export interface LoginResponse {
@@ -83,7 +83,7 @@ export interface ChartDataPoint {
 export interface DiagramNode {
   id: string;
   label: string;
-  type: 'client' | 'gateway' | 'service' | 'database' | 'external' | 'ai';
+  type: "client" | "gateway" | "service" | "database" | "external" | "ai";
 }
 
 export interface DiagramConnection {
@@ -102,7 +102,14 @@ export interface ImpactData {
   value: number;
 }
 
-export type ProjectCategory = 'UI/UX' | 'Branding' | 'Web' | 'Art' | 'Photo' | 'Fullstack' | 'Software';
+export type ProjectCategory =
+  | "UI/UX"
+  | "Branding"
+  | "Web"
+  | "Art"
+  | "Photo"
+  | "Fullstack"
+  | "Software";
 
 export interface Project {
   id: string;
@@ -123,7 +130,7 @@ export interface Project {
   updatedAt?: string;
 }
 
-export type ProjectFormData = Omit<Project, 'id' | 'createdAt' | 'updatedAt'>;
+export type ProjectFormData = Omit<Project, "id" | "createdAt" | "updatedAt">;
 
 // ========================
 // Experience Types
@@ -159,7 +166,10 @@ export interface Experience {
   updatedAt?: string;
 }
 
-export type ExperienceFormData = Omit<Experience, 'id' | 'createdAt' | 'updatedAt'>;
+export type ExperienceFormData = Omit<
+  Experience,
+  "id" | "createdAt" | "updatedAt"
+>;
 
 // ========================
 // Blog Types
@@ -186,12 +196,23 @@ export interface BlogPost {
   published: boolean;
   viewCount: number;
   shareCount: number;
+  tags?: string[];
   comments?: BlogComment[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type BlogPostFormData = Omit<BlogPost, 'id' | 'slug' | 'readTime' | 'viewCount' | 'shareCount' | 'comments' | 'createdAt' | 'updatedAt'>;
+export type BlogPostFormData = Omit<
+  BlogPost,
+  | "id"
+  | "slug"
+  | "readTime"
+  | "viewCount"
+  | "shareCount"
+  | "comments"
+  | "createdAt"
+  | "updatedAt"
+>;
 
 export interface BlogStats {
   totalViews: number;
@@ -199,7 +220,10 @@ export interface BlogStats {
   totalComments: number;
   totalPosts: number;
   publishedPosts: number;
-  topPosts: Pick<BlogPost, 'id' | 'title' | 'slug' | 'viewCount' | 'shareCount'>[];
+  topPosts: Pick<
+    BlogPost,
+    "id" | "title" | "slug" | "viewCount" | "shareCount"
+  >[];
 }
 
 // ========================
@@ -220,8 +244,13 @@ export interface Contact {
 // ========================
 // Appointment Types
 // ========================
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'expired';
-export type AppointmentUrgency = 'non-urgent' | 'urgent';
+export type AppointmentStatus =
+  | "pending"
+  | "confirmed"
+  | "cancelled"
+  | "completed"
+  | "expired";
+export type AppointmentUrgency = "non-urgent" | "urgent";
 
 export interface Appointment {
   id: string;
@@ -263,7 +292,10 @@ export interface Testimonial {
   createdAt?: string;
 }
 
-export type TestimonialFormData = Omit<Testimonial, 'id' | 'visible' | 'createdAt'>;
+export type TestimonialFormData = Omit<
+  Testimonial,
+  "id" | "visible" | "createdAt"
+>;
 
 // ========================
 // Dashboard Stats
@@ -293,7 +325,7 @@ export interface TableAction<T> {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   onClick: (item: T) => void;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
 }
 
 // ========================

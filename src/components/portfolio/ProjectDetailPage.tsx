@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { Project } from '../../data/mockData';
 import { ProjectMetrics } from './ProjectMetrics';
@@ -22,6 +22,7 @@ import { useProject } from '@/hooks/queries';
 
 export function ProjectDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: project, isLoading, isError } = useProject(id || '');
 
   const { scrollYProgress } = useScroll();

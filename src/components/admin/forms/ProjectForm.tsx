@@ -22,6 +22,7 @@ const defaultFormData: ProjectFormData = {
   solution: '',
   results: [''],
   metrics: [{ name: '', value: 0, previousValue: 0, unit: '%' }],
+  chartData: [],
   technologies: [''],
   url: '',
 };
@@ -44,6 +45,7 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
         metrics: initialData.metrics?.length
           ? initialData.metrics
           : [{ name: '', value: 0, previousValue: 0, unit: '%' }],
+        chartData: initialData.chartData || [],
         technologies: initialData.technologies?.length ? initialData.technologies : [''],
         url: initialData.url || '',
       };

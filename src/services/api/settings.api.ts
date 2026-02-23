@@ -1,10 +1,11 @@
 import { apiClient } from './client';
-import type { ProfileData, SocialLinks, SeoData, SkillsData, EducationData } from '@/stores/settingsStore';
+import type { ProfileData, SocialLinks, SeoData, ChatbotSettings, SkillsData, EducationData } from '@/stores/settingsStore';
 
 export interface ApiSettings {
   profile?: ProfileData;
   socialLinks?: SocialLinks;
   seo?: SeoData;
+  chatbot?: ChatbotSettings;
   skills?: SkillsData;
   education?: EducationData;
 }

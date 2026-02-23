@@ -6,6 +6,7 @@ interface ThemeContextType {
   theme: Theme;
   toggleTheme: (event?: React.MouseEvent) => void;
   isTransitioning: boolean;
+  transitionPosition: { x: number; y: number } | null;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -133,8 +134,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     performTransition(newTheme);
   }, [theme, performTransition]);
 
+  const transitionPosition = isTransitioning ? { x: clickX, y: clickY } : null;
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isTransitioning }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, isTransitioning, transitionPosition }}>
       {children}
     </ThemeContext.Provider>
   );

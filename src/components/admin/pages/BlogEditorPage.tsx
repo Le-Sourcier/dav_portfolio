@@ -34,6 +34,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         content: initialData.content,
         category: initialData.category,
         imageUrl: initialData.imageUrl || '',
+        author: initialData.author || '',
         tags: initialData.tags?.length ? initialData.tags : [''],
         published: initialData.published,
       };
@@ -44,6 +45,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       content: '',
       category: 'Tech',
       imageUrl: '',
+      author: '',
       tags: [''],
       published: false,
     };
@@ -72,22 +74,16 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       return;
     }
 
-    const cleaned: Record<string, unknown> = {
+    const cleaned: BlogPostFormData = {
       title: formData.title.trim(),
       excerpt: formData.excerpt?.trim() || '',
       content: formData.content,
       category: formData.category,
+      imageUrl: formData.imageUrl?.trim() || '',
+      author: formData.author || '',
       published: publish ? true : formData.published,
+      tags: formData.tags?.filter((t) => t.trim()) || [],
     };
-    // Only include imageUrl if it's a valid URL
-    if (formData.imageUrl?.trim()) {
-      cleaned.imageUrl = formData.imageUrl.trim();
-    }
-    // Only include tags if non-empty
-    const tags = formData.tags?.filter((t) => t.trim()) || [];
-    if (tags.length > 0) {
-      cleaned.tags = tags;
-    }
 
     const options = {
       onSuccess: () => {

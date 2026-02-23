@@ -266,7 +266,7 @@ export function applyTheme(mode: ThemeMode) {
   }
 
   // Strategy A: View Transitions API (Chrome 111+)
-  if ('startViewTransition' in document) {
+  if (typeof (document as any).startViewTransition === 'function') {
     const transition = (document as any).startViewTransition(doSwitch);
     transition.ready.then(() => {
       root.animate(
