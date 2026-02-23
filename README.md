@@ -132,4 +132,4 @@ backend/src/
 
 ## Licence
 
-MIT
+MIT.
