@@ -3,8 +3,10 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '@/hooks/queries';
 import { BlogCard } from './blog/BlogCard';
+import { useTranslation } from 'react-i18next';
 
 export function LatestBlogPosts() {
+  const { t } = useTranslation();
   const { data: posts = [], isLoading: loading } = useBlogPosts(true);
 
   const latestPosts = posts.slice(0, 3);
@@ -22,7 +24,7 @@ export function LatestBlogPosts() {
               viewport={{ once: true }}
               className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-4 block"
             >
-              Dernieres nouvelles
+              {t('latestPosts.label')}
             </motion.span>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -31,8 +33,8 @@ export function LatestBlogPosts() {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl font-black tracking-tighter leading-none"
             >
-              ARTICLES & <br />
-              <span className="text-muted-foreground/30 italic">Reflexions.</span>
+              {t('latestPosts.title')} <br />
+              <span className="text-muted-foreground/30 italic">{t('latestPosts.titleAccent')}</span>
             </motion.h2>
           </div>
 
@@ -46,7 +48,7 @@ export function LatestBlogPosts() {
               to="/blog"
               className="group flex items-center gap-3 px-8 py-4 bg-secondary hover:bg-primary hover:text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest transition-all border border-border"
             >
-              Lire tout le blog <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {t('latestPosts.viewAll')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>

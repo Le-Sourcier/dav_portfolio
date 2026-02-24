@@ -7,6 +7,7 @@ import { AppointmentBooking } from './AppointmentBooking';
 import { useProfile } from '@/hooks/useProfile';
 import { useSendContact } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
+import { useTranslation } from 'react-i18next';
 
 interface ContactFormData {
   name: string;
@@ -17,6 +18,7 @@ interface ContactFormData {
 
 export function Contact() {
   const { session, isIdentified, isPersisted, saveSession } = useVisitorSession();
+  const { t } = useTranslation();
   const [rememberMe, setRememberMe] = useState(isPersisted);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormData>({
     defaultValues: {
@@ -65,16 +67,16 @@ export function Contact() {
               viewport={{ once: true }}
               className="text-5xl md:text-7xl font-bold mb-12 tracking-tighter"
             >
-              Parlons de votre <span className="text-primary italic">prochain projet</span>.
+              {t('contact.title')} <span className="text-primary italic">{t('contact.titleAccent')}</span>.
             </motion.h2>
 
             <p className="text-xl text-muted-foreground mb-16 max-w-md font-medium leading-relaxed">
-              Que vous ayez une idee precise ou juste une intuition, je suis la pour vous aider a la concretiser.
+              {t('contact.subtitle')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Contact</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{t('contact.contactLabel')}</h4>
                 <div className="space-y-2">
                   <p className="font-bold text-lg">{profile.email}</p>
                   <p className="text-muted-foreground font-medium">{profile.phone.split(' / ')[0]}</p>
@@ -82,10 +84,10 @@ export function Contact() {
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Localisation</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{t('contact.locationLabel')}</h4>
                 <div className="space-y-2">
                   <p className="font-bold text-lg">{profile.location}</p>
-                  <p className="text-muted-foreground font-medium">Disponible pour missions remote</p>
+                  <p className="text-muted-foreground font-medium">{t('contact.remoteAvailable')}</p>
                 </div>
               </div>
             </div>
@@ -100,48 +102,48 @@ export function Contact() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nom Complet</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.fullName')}</label>
                   <input
-                    {...register('name', { required: 'Le nom est requis' })}
+                    {...register('name', { required: t('contact.nameRequired') })}
                     className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
-                    placeholder="Jean Dupont"
+                    placeholder={t('contact.namePlaceholder')}
                   />
                   {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.email')}</label>
                   <input
                     {...register('email', {
-                      required: 'L\'email est requis',
-                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Email invalide' }
+                      required: t('contact.emailRequired'),
+                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('contact.emailInvalid') }
                     })}
                     type="email"
                     className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
-                    placeholder="jean@exemple.com"
+                    placeholder={t('contact.emailPlaceholder')}
                   />
                   {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sujet</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.subject')}</label>
                 <select
                   {...register('subject')}
                   className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium appearance-none"
                 >
-                  <option>Nouveau Projet</option>
-                  <option>Collaboration</option>
-                  <option>Demande d'information</option>
+                  <option>{t('contact.subjectNew')}</option>
+                  <option>{t('contact.subjectCollab')}</option>
+                  <option>{t('contact.subjectInfo')}</option>
                 </select>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Votre Message</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.message')}</label>
                 <textarea
-                  {...register('message', { required: 'Le message est requis' })}
+                  {...register('message', { required: t('contact.messageRequired') })}
                   rows={5}
                   className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all resize-none font-medium"
-                  placeholder="Dites-m'en plus sur votre projet..."
+                  placeholder={t('contact.messagePlaceholder')}
                 />
                 {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
               </div>
@@ -154,7 +156,7 @@ export function Contact() {
                   <Loader2 className="w-6 h-6 animate-spin" />
                 ) : (
                   <>
-                    Envoyer le message
+                    {t('contact.send')}
                     <Send className="w-5 h-5" />
                   </>
                 )}

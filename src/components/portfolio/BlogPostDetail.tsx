@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useBlogPost, useAddComment, useTrackView, useTrackShare } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
 import { OtpVerification } from '@/components/shared/OtpVerification';
+import { useTranslation } from 'react-i18next';
 import type { BlogComment } from '@/types/admin.types';
 
 // ======================== COMPONENT ========================
@@ -28,6 +29,7 @@ export function BlogPostDetail() {
     session, isIdentified, isVerified, needsReverification,
     otpStatus, otpError, requestOtp, verifyOtp, clearSession,
   } = useVisitorSession();
+  const { t } = useTranslation();
 
   const post = apiPost;
   const loading = apiLoading;
@@ -63,32 +65,32 @@ export function BlogPostDetail() {
         <div className="max-w-2xl mx-auto text-center py-24">
           <Link to="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
             <ChevronLeft className="w-4 h-4" />
-            Retour au blog
+            {t('blogPost.backBlog')}
           </Link>
           <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-8">
             <MessageSquare className="w-10 h-10 text-muted-foreground" />
           </div>
           <h2 className="text-3xl font-black tracking-tight mb-4">
-            {isError ? 'Article temporairement indisponible' : 'Article introuvable'}
+            {isError ? t('blogPost.unavailable') : t('blogPost.notFound')}
           </h2>
           <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
             {isError
-              ? 'Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.'
-              : "Cet article n'existe pas ou a ete supprime."}
+              ? t('blogPost.unavailableDesc')
+              : t('blogPost.notFoundDesc')}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link
               to="/blog"
               className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
-              Voir tous les articles
+              {t('blogPost.viewAll')}
             </Link>
             {isError && (
               <button
                 onClick={() => window.location.reload()}
                 className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all"
               >
-                Reessayer
+                {t('blogPost.retry')}
               </button>
             )}
           </div>
@@ -102,9 +104,9 @@ export function BlogPostDetail() {
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email } = identifyForm;
-    if (!name.trim()) { toast.error('Veuillez entrer votre nom'); return; }
+    if (!name.trim()) { toast.error(t('blogPost.nameRequired')); return; }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error('Veuillez entrer un email valide'); return;
+      toast.error(t('blogPost.emailInvalid')); return;
     }
     await requestOtp(email.trim(), name.trim());
   };
@@ -112,7 +114,7 @@ export function BlogPostDetail() {
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) return;
-    if (!commentContent.trim()) { toast.error('Veuillez ecrire un commentaire'); return; }
+    if (!commentContent.trim()) { toast.error(t('blogPost.commentRequired')); return; }
 
     addCommentMutation.mutate(
       {
@@ -126,7 +128,7 @@ export function BlogPostDetail() {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     if (id) trackShareMutation.mutate(id);
-    toast.success('Lien copie dans le presse-papier');
+    toast.success(t('blogPost.linkCopied'));
   };
 
   // ======================== RENDER ========================
@@ -136,7 +138,7 @@ export function BlogPostDetail() {
       <div className="max-w-4xl mx-auto">
         <Link to="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
           <ChevronLeft className="w-4 h-4" />
-          Retour au blog
+          {t('blogPost.backBlog')}
         </Link>
 
         {/* Header */}
@@ -156,7 +158,7 @@ export function BlogPostDetail() {
                 <User className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Auteur</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('blogPost.author')}</p>
                 <p className="text-sm font-bold">{post.author}</p>
               </div>
             </div>
@@ -166,7 +168,7 @@ export function BlogPostDetail() {
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('blogPost.date')}</p>
                 <p className="text-sm font-bold">
                   {(post as any).date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-')}
                 </p>
@@ -178,7 +180,7 @@ export function BlogPostDetail() {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lecture</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('blogPost.readTime')}</p>
                 <p className="text-sm font-bold">{post.readTime}</p>
               </div>
             </div>
@@ -236,7 +238,7 @@ export function BlogPostDetail() {
           <div className="flex items-center gap-4 mb-12">
             <MessageSquare className="w-8 h-8 text-primary" />
             <h3 className="text-3xl font-black tracking-tight">
-              {comments.length} Commentaire{comments.length !== 1 && 's'}
+              {t('blogPost.comments', { count: comments.length })}
             </h3>
           </div>
 
@@ -244,7 +246,7 @@ export function BlogPostDetail() {
           <div className="space-y-6 mb-16">
             {comments.length === 0 ? (
               <p className="text-muted-foreground italic text-center py-8">
-                Aucun commentaire pour le moment. Soyez le premier a reagir !
+                {t('blogPost.noComments')}
               </p>
             ) : (
               <AnimatePresence>
@@ -298,14 +300,14 @@ export function BlogPostDetail() {
                   className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <LogOut className="w-3 h-3" />
-                  Changer
+                  {t('blogPost.change')}
                 </button>
               </div>
 
               <textarea
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
-                placeholder="Qu'en pensez-vous ?"
+                placeholder={t('blogPost.commentPlaceholder')}
                 rows={3}
                 className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none outline-none mb-4"
               />
@@ -320,7 +322,7 @@ export function BlogPostDetail() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      Publier
+                      {t('blogPost.publish')}
                       <Send className="w-4 h-4" />
                     </>
                   )}
@@ -343,35 +345,35 @@ export function BlogPostDetail() {
           ) : (
             /* ---- NOT IDENTIFIED: show identification form ---- */
             <form onSubmit={handleIdentify} className="p-8 rounded-3xl bg-card border border-border shadow-lg">
-              <h4 className="text-sm font-black uppercase tracking-widest mb-2">Rejoindre la discussion</h4>
+              <h4 className="text-sm font-black uppercase tracking-widest mb-2">{t('blogPost.joinDiscussion')}</h4>
               <p className="text-[12px] text-muted-foreground mb-6">
-                Identifiez-vous pour commenter. Un code de verification sera envoye a votre email.
+                {t('blogPost.identifyDesc')}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground mb-2">
                     <User className="w-3 h-3 inline mr-1" />
-                    Nom *
+                    {t('blogPost.nameLabel')}
                   </label>
                   <input
                     type="text"
                     value={identifyForm.name}
                     onChange={(e) => setIdentifyForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Votre nom"
+                    placeholder={t('blogPost.namePlaceholder')}
                     className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground mb-2">
                     <Mail className="w-3 h-3 inline mr-1" />
-                    Email *
+                    {t('blogPost.emailLabel')}
                   </label>
                   <input
                     type="email"
                     value={identifyForm.email}
                     onChange={(e) => setIdentifyForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="votre@email.com"
+                    placeholder={t('blogPost.emailPlaceholder')}
                     className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
                   />
                 </div>
@@ -379,7 +381,7 @@ export function BlogPostDetail() {
 
               <div className="flex items-center justify-between">
                 <p className="text-[11px] text-muted-foreground">
-                  * Un code sera envoye a votre email
+                  {t('blogPost.otpHint')}
                 </p>
                 <button
                   type="submit"
@@ -387,7 +389,7 @@ export function BlogPostDetail() {
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
                 >
                   {otpStatus === 'sending' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  Recevoir le code
+                  {t('blogPost.getCode')}
                 </button>
               </div>
             </form>

@@ -11,12 +11,14 @@ import { MarkdownRenderer } from '../shared/MarkdownRenderer';
 import { useExperience } from '@/hooks/queries';
 import { toast } from 'sonner';
 import type { Experience } from '@/types/admin.types';
+import { useTranslation } from 'react-i18next';
 
 // ======================== COMPONENT ========================
 
 export function ExperienceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { scrollY } = useScroll();
+  const { t } = useTranslation();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const { data: apiExperience, isLoading, isError } = useExperience(id || '');
@@ -47,26 +49,26 @@ export function ExperienceDetailPage() {
         <div className="max-w-2xl mx-auto text-center py-24">
           <Link to="/#about" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" />
-            Retour au profil
+            {t('experience.backProfile')}
           </Link>
           <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-8">
             <Building2 className="w-10 h-10 text-muted-foreground" />
           </div>
           <h2 className="text-3xl font-black tracking-tight mb-4">
-            {isError ? 'Experience temporairement indisponible' : 'Experience introuvable'}
+            {isError ? t('experience.unavailable') : t('experience.notFound')}
           </h2>
           <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
             {isError
-              ? 'Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.'
-              : "Cette experience n'existe pas ou a ete supprimee."}
+              ? t('experience.unavailableDesc')
+              : t('experience.notFoundDesc')}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link to="/#about" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
-              Voir le profil
+              {t('experience.viewProfile')}
             </Link>
             {isError && (
               <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
-                Reessayer
+                {t('experience.retry')}
               </button>
             )}
           </div>
@@ -77,16 +79,16 @@ export function ExperienceDetailPage() {
 
   // Build table of contents from available sections
   const tocItems: { id: string; label: string }[] = [];
-  if (experience.description) tocItems.push({ id: 'contexte', label: 'Contexte' });
-  if (experience.details?.length) tocItems.push({ id: 'responsabilites', label: 'Responsabilites' });
-  if (experience.stack?.length) tocItems.push({ id: 'stack', label: 'Stack Technique' });
-  if (experience.challenges?.length) tocItems.push({ id: 'defis', label: 'Defis & Solutions' });
+  if (experience.description) tocItems.push({ id: 'contexte', label: t('experience.context') });
+  if (experience.details?.length) tocItems.push({ id: 'responsabilites', label: t('experience.responsibilities') });
+  if (experience.stack?.length) tocItems.push({ id: 'stack', label: t('experience.techStack') });
+  if (experience.challenges?.length) tocItems.push({ id: 'defis', label: t('experience.challenges') });
 
   const defaultCover = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070';
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success('Lien copie dans le presse-papier');
+    toast.success(t('experience.linkCopied'));
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -107,7 +109,7 @@ export function ExperienceDetailPage() {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <Link to="/#about" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors group">
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                Retour au profil
+                {t('experience.backProfile')}
               </Link>
 
               <div className="flex flex-wrap gap-4 mb-6">
@@ -154,7 +156,7 @@ export function ExperienceDetailPage() {
               {/* Description */}
               {experience.description && (
                 <motion.div id="contexte" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <SectionHeader label="Contexte" />
+                  <SectionHeader label={t('experience.context')} />
                   <div className="text-lg md:text-xl font-medium leading-relaxed text-muted-foreground">
                     <MarkdownRenderer content={experience.description} />
                   </div>
@@ -164,7 +166,7 @@ export function ExperienceDetailPage() {
               {/* Details */}
               {experience.details && experience.details.length > 0 && (
                 <motion.div id="responsabilites" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <SectionHeader label="Responsabilites" />
+                  <SectionHeader label={t('experience.responsibilities')} />
                   <div className="grid gap-6">
                     {experience.details.map((detail, idx) => (
                       <div key={idx} className="flex gap-4 p-6 rounded-2xl bg-secondary/30 border border-border/50">
@@ -179,7 +181,7 @@ export function ExperienceDetailPage() {
               {/* Stack */}
               {experience.stack && experience.stack.length > 0 && (
                 <motion.div id="stack" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <SectionHeader label="Stack Technique" />
+                  <SectionHeader label={t('experience.techStack')} />
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                     {experience.stack.map((tech, idx) => (
                       <div key={idx} className="flex flex-col items-center justify-center p-6 rounded-3xl bg-card border border-border hover:border-primary/30 transition-all group">
@@ -196,7 +198,7 @@ export function ExperienceDetailPage() {
               {/* Challenges */}
               {experience.challenges && experience.challenges.length > 0 && (
                 <motion.div id="defis" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <SectionHeader label="Defis & Solutions" />
+                  <SectionHeader label={t('experience.challenges')} />
                   <div className="space-y-8">
                     {experience.challenges.map((challenge, idx) => (
                       <div key={idx} className="relative pl-12">
@@ -213,7 +215,7 @@ export function ExperienceDetailPage() {
               {/* Illustrative images */}
               {experience.illustrativeImages && experience.illustrativeImages.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <SectionHeader label="Galerie" />
+                  <SectionHeader label={t('experience.gallery')} />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {experience.illustrativeImages.map((img, idx) => (
                       <div key={idx} className="rounded-2xl overflow-hidden border border-border shadow-lg">
@@ -234,7 +236,7 @@ export function ExperienceDetailPage() {
                   <div className="p-6 rounded-[2rem] bg-card border border-border shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                       <Layers className="w-5 h-5 text-primary" />
-                      <h3 className="text-sm font-black uppercase tracking-tight">Sommaire</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight">{t('experience.toc')}</h3>
                     </div>
                     <nav className="space-y-1">
                       {tocItems.map((item) => (
@@ -253,14 +255,14 @@ export function ExperienceDetailPage() {
 
                 {/* Quick info card */}
                 <div className="p-6 rounded-[2rem] bg-secondary/20 border border-border">
-                  <h3 className="text-sm font-black uppercase tracking-tight mb-6">Infos rapides</h3>
+                  <h3 className="text-sm font-black uppercase tracking-tight mb-6">{t('experience.quickInfo')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Building2 className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Entreprise</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('experience.company')}</p>
                         <p className="text-sm font-bold">{experience.company}</p>
                       </div>
                     </div>
@@ -269,7 +271,7 @@ export function ExperienceDetailPage() {
                         <Clock className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Periode</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('experience.period')}</p>
                         <p className="text-sm font-bold">{experience.dates}</p>
                       </div>
                     </div>
@@ -279,7 +281,7 @@ export function ExperienceDetailPage() {
                           <MapPin className="w-4 h-4 text-primary" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Lieu</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('experience.location')}</p>
                           <p className="text-sm font-bold">{experience.location}</p>
                         </div>
                       </div>
@@ -290,8 +292,8 @@ export function ExperienceDetailPage() {
                           <Cpu className="w-4 h-4 text-primary" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Technologies</p>
-                          <p className="text-sm font-bold">{experience.stack.length} outils</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('experience.technologies')}</p>
+                          <p className="text-sm font-bold">{t('experience.toolsCount', { count: experience.stack.length })}</p>
                         </div>
                       </div>
                     )}
@@ -303,7 +305,7 @@ export function ExperienceDetailPage() {
                   <div className="p-6 rounded-[2rem] bg-card border border-border shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                       <Trophy className="w-5 h-5 text-primary" />
-                      <h3 className="text-sm font-black uppercase tracking-tight">Realisations</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight">{t('experience.achievements')}</h3>
                     </div>
                     <div className="space-y-6">
                       {experience.achievements.map((ach, idx) => (
@@ -322,7 +324,7 @@ export function ExperienceDetailPage() {
                 {/* Links */}
                 {experience.links && experience.links.length > 0 && (
                   <div className="p-6 rounded-[2rem] bg-secondary/30 border border-border">
-                    <h3 className="text-sm font-black uppercase tracking-tight mb-6">Liens utiles</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight mb-6">{t('experience.usefulLinks')}</h3>
                     <div className="space-y-3">
                       {experience.links.map((link, idx) => (
                         <a
@@ -347,7 +349,7 @@ export function ExperienceDetailPage() {
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-border hover:bg-secondary/50 transition-colors text-sm font-bold"
                   >
                     <Share2 className="w-4 h-4" />
-                    Partager
+                    {t('experience.share')}
                   </button>
                   <Link
                     to="/#contact"

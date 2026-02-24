@@ -4,10 +4,12 @@ import { Download, ExternalLink, Award as AwardIcon, CheckCircle2, Zap, Cpu, Lay
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
 import { useExperiences } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 export function About() {
   const navigate = useNavigate();
   const profile = useProfile();
+  const { t } = useTranslation();
   const { data: experiences = [] } = useExperiences();
   const profileImage = profile.avatar;
 
@@ -15,7 +17,7 @@ export function About() {
     let content = `CV ${profile.name} - ${profile.title}
 
 `;
-    content += `EXPÉRIENCE
+    content += `${t('about.cvExperience')}
 `;
     experiences.forEach(exp => {
       content += `- ${exp.title} @ ${exp.company} (${exp.dates})
@@ -23,16 +25,16 @@ export function About() {
 `;
     });
     content += `
-COMPÉTENCES
+${t('about.cvSkills')}
 `;
     content += `- Frontend: ${profile.skills.frontend.join(', ')}
 `;
     content += `- Backend: ${profile.skills.backend.join(', ')}
 `;
-    content += `- Outils: ${profile.skills.tools.join(', ')}
+    content += `- ${t('about.tools')}: ${profile.skills.tools.join(', ')}
 `;
     content += `
-FORMATION
+${t('about.cvEducation')}
 `;
     profile.education.forEach(edu => {
       content += `- ${edu.degree} en ${edu.field}
@@ -53,7 +55,7 @@ FORMATION
   const skillCategories = [
     { label: 'Frontend', items: profile.skills.frontend, icon: <Layout className="w-3.5 h-3.5" /> },
     { label: 'Backend', items: profile.skills.backend, icon: <Cpu className="w-3.5 h-3.5" /> },
-    { label: 'Outils', items: profile.skills.tools, icon: <Zap className="w-3.5 h-3.5" /> },
+    { label: t('about.tools'), items: profile.skills.tools, icon: <Zap className="w-3.5 h-3.5" /> },
   ].filter(cat => cat.items.length > 0);
 
   const [firstName, ...lastNameParts] = profile.name.split(' ');
@@ -98,7 +100,7 @@ FORMATION
                 <h4 className="font-black text-4xl tracking-tighter text-primary">5+</h4>
               </div>
               <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] leading-relaxed">
-                Années d'expertise technique cumulées
+                {t('about.yearsExp')}
               </p>
             </motion.div>
           </motion.div>
@@ -112,13 +114,13 @@ FORMATION
             >
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-16 h-[2px] bg-primary rounded-full" />
-                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">Le Profil</span>
+                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">{t('about.label')}</span>
               </div>
               <h2 className="text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter mb-10 uppercase">
                 {firstName} <br /><span className="text-primary italic">{lastName}</span>
               </h2>
               <p className="text-2xl md:text-3xl text-muted-foreground leading-tight font-medium">
-                {profile.title.split('&')[0]} & Expert en <span className="text-foreground border-b-4 border-primary/20">Solutions Scalables.</span>
+                {profile.title.split('&')[0]} & Expert en <span className="text-foreground border-b-4 border-primary/20">{t('about.scalable')}</span>
               </p>
             </motion.div>
             
@@ -134,7 +136,7 @@ FORMATION
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 mb-20">
               <div className="space-y-6">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">Expertise</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">{t('about.expertise')}</h4>
                 <div className="space-y-5">
                   {skillCategories.map((cat) => (
                     <div key={cat.label}>
@@ -159,7 +161,7 @@ FORMATION
                 </div>
               </div>
               <div className="space-y-6 min-w-0">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">Formation</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/50">{t('about.education')}</h4>
                 <div className="space-y-4">
                   {profile.education.map((edu) => (
                     <div key={edu.id} className="min-w-0">
@@ -177,10 +179,10 @@ FORMATION
                 className="group flex items-center gap-4 px-10 py-5 bg-primary text-primary-foreground rounded-[2rem] font-black hover:shadow-2xl hover:shadow-primary/30 transition-all hover:-translate-y-1 active:scale-95"
               >
                 <Download className="w-5 h-5 group-hover:animate-bounce" />
-                Télécharger mon CV
+                {t('about.downloadCv')}
               </button>
               <a href="#contact" className="flex items-center gap-4 px-10 py-5 border-2 border-border rounded-[2rem] font-black hover:bg-secondary transition-all hover:border-primary/30">
-                Me contacter
+                {t('about.contactMe')}
                 <ExternalLink className="w-5 h-5" />
               </a>
             </div>
@@ -194,14 +196,14 @@ FORMATION
               <div className="w-12 h-1 bg-primary mb-8" />
               <div className="flex items-center gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-primary" />
-                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">Dernieres Collaborations</span>
+                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">{t('about.recentLabel')}</span>
               </div>
               <h3 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 uppercase">
-                Experiences <span className="text-primary">Recentes</span>
+                {t('about.recentTitle')} <span className="text-primary">{t('about.recentTitleAccent')}</span>
               </h3>
               <p className="text-xl text-muted-foreground font-medium">
-                Un parcours marque par le developpement de solutions innovantes et l'excellence technique.
-                <span className="text-primary font-bold"> Cliquez sur une experience pour voir les details.</span>
+                {t('about.recentDesc')}
+                <span className="text-primary font-bold"> {t('about.recentCta')}</span>
               </p>
             </div>
           </div>
@@ -224,7 +226,7 @@ FORMATION
                 <h4 className="font-black text-xl mb-3 group-hover:text-primary transition-colors uppercase tracking-tight leading-tight">{exp.title}</h4>
                 <p className="text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-60 mb-8">{exp.company}</p>
                 <div className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">
-                  Voir les détails
+                  {t('about.viewDetails')}
                   <ExternalLink className="w-4 h-4" />
                 </div>
               </motion.div>

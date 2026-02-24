@@ -1,8 +1,10 @@
 import { Github, Linkedin, ExternalLink } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { useTranslation } from 'react-i18next';
 
 export function AuthorCard() {
   const profile = useProfile();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col sm:flex-row items-start gap-6 p-8 rounded-[2rem] bg-secondary/30 border border-border">
@@ -11,7 +13,7 @@ export function AuthorCard() {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">A propos de l'auteur</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">{t('blogPost.aboutAuthor')}</p>
         <h4 className="text-lg font-black tracking-tight mb-1">{profile.name}</h4>
         <p className="text-sm text-muted-foreground font-medium mb-3">{profile.title}</p>
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{profile.bio}</p>

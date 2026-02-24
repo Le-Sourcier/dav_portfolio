@@ -12,12 +12,14 @@ import { useCreateAppointment } from '@/hooks/queries';
 import { useVisitorSession } from '@/hooks/useVisitorSession';
 import { appointmentsApi } from '@/services/api';
 import { OtpVerification } from '@/components/shared/OtpVerification';
+import { useTranslation } from 'react-i18next';
 
 export function AppointmentBooking() {
   const {
     session, isIdentified, isVerified, needsReverification,
     isPersisted, otpStatus, otpError, requestOtp, verifyOtp, saveSession,
   } = useVisitorSession();
+  const { t } = useTranslation();
 
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [step, setStep] = useState(1);
@@ -48,11 +50,11 @@ export function AppointmentBooking() {
 
   const handleNextToStep2 = async () => {
     if (!nom || !email || !sujet) {
-      toast.error('Veuillez remplir tous les champs obligatoires (Nom, Email, Sujet).');
+      toast.error(t('appointment.fillRequired'));
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error('Veuillez entrer une adresse email valide.');
+      toast.error(t('appointment.invalidEmail'));
       return;
     }
     if (isVerified) {
@@ -67,7 +69,7 @@ export function AppointmentBooking() {
 
   const handleBook = () => {
     if (!selectedTime || !date) {
-      toast.error('Veuillez choisir un horaire.');
+      toast.error(t('appointment.chooseSlot'));
       return;
     }
 
@@ -104,8 +106,8 @@ export function AppointmentBooking() {
           <CalendarIcon className="w-6 h-6 sm:w-7 sm:h-7" />
         </div>
         <div>
-          <h3 className="text-2xl sm:text-3xl font-black tracking-tight">Prendre rendez-vous</h3>
-          <p className="text-sm text-muted-foreground font-medium italic">Discutons de votre projet en direct</p>
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tight">{t('appointment.title')}</h3>
+          <p className="text-sm text-muted-foreground font-medium italic">{t('appointment.subtitle')}</p>
         </div>
       </div>
 
@@ -117,17 +119,17 @@ export function AppointmentBooking() {
             <Info className={`w-5 h-5 shrink-0 mt-0.5 ${hasPending ? 'text-destructive' : 'text-amber-500'}`} />
             <div>
               <p className={`text-sm font-bold mb-1 ${hasPending ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}`}>
-                {hasPending ? 'Rendez-vous en attente de confirmation' : 'Vous avez un rendez-vous confirme'}
+                {hasPending ? t('appointment.pendingTitle') : t('appointment.confirmedTitle')}
               </p>
               {existingRdv.map((rdv, i) => (
                 <p key={i} className="text-xs text-muted-foreground">
-                  {rdv.subject} — {new Date(rdv.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} a {rdv.time} ({rdv.status === 'pending' ? 'En attente' : 'Confirme'})
+                  {rdv.subject} — {new Date(rdv.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} a {rdv.time} ({rdv.status === 'pending' ? t('appointment.pending') : t('appointment.confirmed')})
                 </p>
               ))}
               <p className="text-xs text-muted-foreground mt-1 italic">
                 {hasPending
-                  ? 'Veuillez patienter la confirmation de votre rendez-vous actuel ou nous contacter pour le modifier.'
-                  : 'Vous pouvez quand meme en prendre un nouveau si besoin.'}
+                  ? t('appointment.pendingMsg')
+                  : t('appointment.confirmedMsg')}
               </p>
             </div>
           </div>
@@ -146,7 +148,7 @@ export function AppointmentBooking() {
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center lg:text-left">1. Choisir une date</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center lg:text-left">{t('appointment.step1')}</label>
                   <div className="bg-background border border-border rounded-3xl p-2 sm:p-4 shadow-inner flex justify-center w-full max-w-sm mx-auto lg:max-w-none">
                     <Calendar
                       mode="single"
@@ -159,15 +161,15 @@ export function AppointmentBooking() {
                 </div>
 
                 <div className="space-y-6">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center lg:text-left">2. Vos informations</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center lg:text-left">{t('appointment.step2')}</label>
 
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs font-bold flex items-center gap-2">
-                        <User className="w-3 h-3 text-primary" /> Nom complet
+                        <User className="w-3 h-3 text-primary" /> {t('appointment.fullName')}
                       </Label>
                       <Input
-                        placeholder="Jean Dupont"
+                        placeholder={t('appointment.namePlaceholder')}
                         value={nom}
                         onChange={(e) => setNom(e.target.value)}
                         className="h-11 sm:h-12 rounded-xl bg-background border-border"
@@ -179,7 +181,7 @@ export function AppointmentBooking() {
                       </Label>
                       <Input
                         type="email"
-                        placeholder="jean@exemple.com"
+                        placeholder={t('appointment.emailPlaceholder')}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="h-11 sm:h-12 rounded-xl bg-background border-border"
@@ -189,10 +191,10 @@ export function AppointmentBooking() {
 
                   <div className="space-y-2">
                     <Label className="text-xs font-bold flex items-center gap-2">
-                      <MessageSquare className="w-3 h-3 text-primary" /> Sujet de la demande
+                      <MessageSquare className="w-3 h-3 text-primary" /> {t('appointment.subjectLabel')}
                     </Label>
                     <Input
-                      placeholder="Ex: Refonte site e-commerce..."
+                      placeholder={t('appointment.subjectPlaceholder')}
                       value={sujet}
                       onChange={(e) => setSujet(e.target.value)}
                       className="h-11 sm:h-12 rounded-xl bg-background border-border"
@@ -201,7 +203,7 @@ export function AppointmentBooking() {
 
                   <div className="space-y-2">
                     <Label className="text-xs font-bold flex items-center gap-2">
-                      <AlertCircle className="w-3 h-3 text-primary" /> Niveau d'urgence
+                      <AlertCircle className="w-3 h-3 text-primary" /> {t('appointment.urgency')}
                     </Label>
                     <RadioGroup
                       value={urgence}
@@ -210,11 +212,11 @@ export function AppointmentBooking() {
                     >
                       <div className="flex items-center space-x-3 bg-background p-3 rounded-xl border border-border hover:border-primary/30 transition-colors flex-1 cursor-pointer">
                         <RadioGroupItem value="non-urgent" id="r1" />
-                        <Label htmlFor="r1" className="font-bold cursor-pointer text-sm flex-1">Non urgent</Label>
+                        <Label htmlFor="r1" className="font-bold cursor-pointer text-sm flex-1">{t('appointment.notUrgent')}</Label>
                       </div>
                       <div className="flex items-center space-x-3 bg-background p-3 rounded-xl border border-border hover:border-primary/30 transition-colors flex-1 cursor-pointer">
                         <RadioGroupItem value="urgent" id="r2" />
-                        <Label htmlFor="r2" className="font-bold cursor-pointer text-sm flex-1">Urgent</Label>
+                        <Label htmlFor="r2" className="font-bold cursor-pointer text-sm flex-1">{t('appointment.urgent')}</Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -226,7 +228,7 @@ export function AppointmentBooking() {
                 disabled={otpStatus === 'sending'}
                 className="w-full py-4 sm:py-5 bg-primary text-primary-foreground rounded-2xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all uppercase tracking-widest text-sm disabled:opacity-60"
               >
-                Choisir l'horaire <ChevronRight className="w-4 h-4" />
+                {t('appointment.chooseTime')} <ChevronRight className="w-4 h-4" />
               </button>
             </motion.div>
           )}
@@ -252,7 +254,7 @@ export function AppointmentBooking() {
                 onClick={() => setStep(1)}
                 className="w-full py-3 border border-border rounded-xl font-bold text-sm hover:bg-secondary transition-all flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="w-4 h-4" /> Retour
+                <ArrowLeft className="w-4 h-4" /> {t('appointment.back')}
               </button>
             </motion.div>
           )}
@@ -266,7 +268,7 @@ export function AppointmentBooking() {
               className="space-y-10"
             >
               <div className="space-y-6">
-                <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center sm:text-left">3. Choisir un horaire</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center sm:text-left">{t('appointment.step3')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                   {times.map(time => (
                     <button
@@ -288,7 +290,7 @@ export function AppointmentBooking() {
                   onClick={() => setStep(1)}
                   className="flex-1 py-4 sm:py-5 border border-border rounded-xl sm:rounded-2xl font-bold hover:bg-secondary transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Retour
+                  <ArrowLeft className="w-4 h-4" /> {t('appointment.back')}
                 </button>
                 <button
                   disabled={!selectedTime || createMutation.isPending}
@@ -298,7 +300,7 @@ export function AppointmentBooking() {
                   {createMutation.isPending ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    'Confirmer la reservation'
+                    t('appointment.confirm')
                   )}
                 </button>
               </div>
@@ -316,9 +318,9 @@ export function AppointmentBooking() {
                 <Check className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
               <div className="space-y-4">
-                <h4 className="text-2xl sm:text-3xl font-black tracking-tight px-4">C'est reserve, {nom} !</h4>
+                <h4 className="text-2xl sm:text-3xl font-black tracking-tight px-4">{t('appointment.successTitle', { name: nom })}</h4>
                 <div className="bg-secondary/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border max-w-md mx-auto space-y-3">
-                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Recapitulatif</p>
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{t('appointment.summary')}</p>
                   <p className="text-foreground font-bold text-base sm:text-lg leading-tight px-2">
                     "{sujet}"
                   </p>
@@ -335,14 +337,14 @@ export function AppointmentBooking() {
                   </div>
                 </div>
                 <p className="text-muted-foreground font-medium text-sm px-4">
-                  Un email de confirmation vous sera envoye.
+                  {t('appointment.confirmEmail')}
                 </p>
               </div>
               <button
                 onClick={resetForm}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-foreground rounded-xl sm:rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-secondary/80 transition-all"
               >
-                Prendre un autre RDV
+                {t('appointment.bookAnother')}
               </button>
             </motion.div>
           )}

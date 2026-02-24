@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, Shield, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import { useCookieConsent } from '@/hooks/useCookieConsent';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export function CookieConsent() {
   const { hasConsented, accept, reset } = useCookieConsent();
   const [showDetails, setShowDetails] = useState(false);
+  const { t } = useTranslation();
 
   // Also expose reset for the privacy policy page to call
   if (typeof window !== 'undefined') {
@@ -33,11 +35,11 @@ export function CookieConsent() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold mb-1">Ce site utilise des cookies</h3>
+                <h3 className="text-sm font-bold mb-1">{t('cookie.title')}</h3>
                 <p className="text-[13px] text-muted-foreground leading-relaxed">
-                  Nous utilisons des cookies pour ameliorer votre experience, analyser le trafic et personnaliser le contenu.{' '}
+                  {t('cookie.desc')}{' '}
                   <Link to="/politique-confidentialite" className="text-primary hover:underline font-medium">
-                    En savoir plus
+                    {t('cookie.learnMore')}
                   </Link>
                 </p>
               </div>
@@ -49,20 +51,20 @@ export function CookieConsent() {
                 onClick={() => setShowDetails(!showDetails)}
                 className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors rounded-xl border border-border hover:bg-secondary/50"
               >
-                Personnaliser
+                {t('cookie.customize')}
                 {showDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
               <button
                 onClick={() => accept('essential')}
                 className="px-4 py-2.5 text-[12px] font-semibold text-foreground rounded-xl border border-border hover:bg-secondary/50 transition-colors"
               >
-                Essentiel uniquement
+                {t('cookie.essentialOnly')}
               </button>
               <button
                 onClick={() => accept('all')}
                 className="px-5 py-2.5 text-[12px] font-bold bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
               >
-                Tout accepter
+                {t('cookie.acceptAll')}
               </button>
             </div>
           </div>
@@ -80,19 +82,20 @@ export function CookieConsent() {
                 <div className="px-5 md:px-6 pb-5 md:pb-6 pt-2 border-t border-border space-y-3">
                   <CookieCategory
                     icon={<Shield className="w-4 h-4" />}
-                    title="Essentiels"
-                    description="Necessaires au fonctionnement du site (session, preferences, securite). Toujours actifs."
+                    title={t('cookie.essentialTitle')}
+                    description={t('cookie.essentialDesc')}
+                    requiredLabel={t('cookie.required')}
                     required
                   />
                   <CookieCategory
                     icon={<Cookie className="w-4 h-4" />}
-                    title="Analytiques"
-                    description="Nous aident a comprendre comment vous utilisez le site pour l'ameliorer (pages visitees, temps de lecture)."
+                    title={t('cookie.analyticsTitle')}
+                    description={t('cookie.analyticsDesc')}
                   />
                   <CookieCategory
                     icon={<Cookie className="w-4 h-4" />}
-                    title="Marketing"
-                    description="Utilises pour personnaliser les contenus et les publicites en fonction de vos centres d'interet."
+                    title={t('cookie.marketingTitle')}
+                    description={t('cookie.marketingDesc')}
                   />
                 </div>
               </motion.div>
@@ -109,11 +112,13 @@ function CookieCategory({
   title,
   description,
   required = false,
+  requiredLabel,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   required?: boolean;
+  requiredLabel?: string;
 }) {
   return (
     <div className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30 border border-border/50">
@@ -122,7 +127,7 @@ function CookieCategory({
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-[12px] font-bold">{title}</span>
           {required && (
-            <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-full uppercase">Requis</span>
+            <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-full uppercase">{requiredLabel}</span>
           )}
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>

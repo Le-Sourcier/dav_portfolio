@@ -2,11 +2,13 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useVisibleTestimonials } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 4;
 
 export function Testimonials() {
   const { data: testimonials = [], isLoading } = useVisibleTestimonials();
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
 
   const totalPages = Math.ceil(testimonials.length / ITEMS_PER_PAGE);
@@ -43,14 +45,14 @@ export function Testimonials() {
             viewport={{ once: true }}
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-6"
           >
-            Paroles de <span className="text-white/40 italic">Partenaires.</span>
+            {t('testimonials.title')} <span className="text-white/40 italic">{t('testimonials.titleAccent')}</span>
           </motion.h2>
           <p className="text-primary-foreground/60 text-xl max-w-2xl">
-            Le succes se mesure par l'impact que nous avons sur les gens avec qui nous travaillons.
+            {t('testimonials.subtitle')}
           </p>
           {testimonials.length > 1 && (
             <p className="text-primary-foreground/30 text-sm mt-3 font-medium">
-              {testimonials.length} temoignages
+              {t('testimonials.count', { count: testimonials.length })}
             </p>
           )}
         </div>

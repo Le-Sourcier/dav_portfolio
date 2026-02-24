@@ -6,12 +6,14 @@ import { useBlogPosts } from '@/hooks/queries';
 import { BlogCard } from './blog/BlogCard';
 import { BlogCtaCard } from './blog/BlogCtaCard';
 import type { BlogPost } from '@/types/admin.types';
+import { useTranslation } from 'react-i18next';
 
 type GridItem =
   | { type: 'post'; post: BlogPost; index: number }
   | { type: 'cta'; variant: 'newsletter' | 'services' | 'booking' };
 
 export function BlogPage() {
+  const { t } = useTranslation();
   const { data: posts = [], isLoading, isError } = useBlogPosts(true);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -82,14 +84,14 @@ export function BlogPage() {
         <div className="mb-16 text-center md:text-left">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8 font-bold text-xs uppercase tracking-widest">
             <ChevronLeft className="w-4 h-4" />
-            Retour a l'accueil
+            {t('blog.backHome')}
           </Link>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-6xl md:text-8xl font-black tracking-tighter mb-6 uppercase"
           >
-            NOTRE <span className="text-primary">BLOG</span>
+            {t('blog.title')} <span className="text-primary">{t('blog.titleAccent')}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -97,7 +99,7 @@ export function BlogPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-muted-foreground max-w-2xl font-medium mx-auto md:mx-0"
           >
-            Pensees, tutoriels et reflexions sur le design, la technologie et la creativite numerique.
+            {t('blog.subtitle')}
           </motion.p>
         </div>
 
@@ -116,7 +118,7 @@ export function BlogPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher un article..."
+                placeholder={t('blog.searchPlaceholder')}
                 className="w-full pl-11 pr-10 py-3 bg-card border border-border rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary transition-all"
               />
               {search && (
@@ -140,7 +142,7 @@ export function BlogPage() {
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Tous
+                  {t('blog.all')}
                 </button>
                 {categories.map((cat) => (
                   <button
@@ -163,9 +165,9 @@ export function BlogPage() {
         {/* Results count */}
         {hasContent && (search || activeCategory) && (
           <p className="text-sm text-muted-foreground font-medium mb-6">
-            {filtered.length} article{filtered.length !== 1 ? 's' : ''} trouve{filtered.length !== 1 ? 's' : ''}
-            {activeCategory && <> dans <strong className="text-foreground">{activeCategory}</strong></>}
-            {search && <> pour "<strong className="text-foreground">{search}</strong>"</>}
+            {t('blog.resultsCount', { count: filtered.length })}
+            {activeCategory && <> {t('blog.inCategory')} <strong className="text-foreground">{activeCategory}</strong></>}
+            {search && <> {t('blog.forSearch')} "<strong className="text-foreground">{search}</strong>"</>}
           </p>
         )}
 
@@ -173,7 +175,7 @@ export function BlogPage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6" />
-            <p className="text-muted-foreground text-sm font-medium">Chargement des articles...</p>
+            <p className="text-muted-foreground text-sm font-medium">{t('blog.loading')}</p>
           </div>
         )}
 
@@ -187,15 +189,15 @@ export function BlogPage() {
             <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-6">
               <AlertTriangle className="w-8 h-8 text-destructive" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Impossible de charger les articles</h3>
+            <h3 className="text-xl font-bold mb-2">{t('blog.errorTitle')}</h3>
             <p className="text-muted-foreground text-sm max-w-md mb-6">
-              Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.
+              {t('blog.errorDesc')}
             </p>
             <button
               onClick={() => window.location.reload()}
               className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
-              Reessayer
+              {t('blog.retry')}
             </button>
           </motion.div>
         )}
@@ -210,9 +212,9 @@ export function BlogPage() {
             <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-6">
               <FileText className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Aucun article pour le moment</h3>
+            <h3 className="text-xl font-bold mb-2">{t('blog.emptyTitle')}</h3>
             <p className="text-muted-foreground text-sm max-w-md">
-              Les premiers articles arrivent bientot. Restez connectes !
+              {t('blog.emptyDesc')}
             </p>
           </motion.div>
         )}
@@ -227,15 +229,15 @@ export function BlogPage() {
             <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center mb-4">
               <Search className="w-6 h-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-bold mb-2">Aucun resultat</h3>
+            <h3 className="text-lg font-bold mb-2">{t('blog.noResults')}</h3>
             <p className="text-muted-foreground text-sm max-w-md mb-4">
-              Essayez de modifier vos criteres de recherche ou de supprimer les filtres.
+              {t('blog.noResultsDesc')}
             </p>
             <button
               onClick={() => { setSearch(''); setActiveCategory(null); }}
               className="text-primary font-bold text-sm hover:underline"
             >
-              Reinitialiser les filtres
+              {t('blog.resetFilters')}
             </button>
           </motion.div>
         )}

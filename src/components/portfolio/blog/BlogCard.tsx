@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, User, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { BlogPost } from '@/types/admin.types';
+import { useTranslation } from 'react-i18next';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -10,6 +11,7 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps) {
+  const { t } = useTranslation();
   const date = post.createdAt
     ? new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
     : '-';
@@ -74,7 +76,7 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
               to={`/blog/${post.id}`}
               className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
-              Lire l'article
+              {t('blog.readArticle')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

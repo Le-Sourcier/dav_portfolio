@@ -19,10 +19,12 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProject } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 export function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: project, isLoading, isError } = useProject(id || '');
 
   const { scrollYProgress } = useScroll();
@@ -48,26 +50,26 @@ export function ProjectDetailPage() {
         <div className="max-w-2xl mx-auto text-center py-24">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 font-bold text-xs uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" />
-            Retour a l'accueil
+            {t('projectDetail.backHome')}
           </Link>
           <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-8">
             <AlertTriangle className="w-10 h-10 text-muted-foreground" />
           </div>
           <h2 className="text-3xl font-black tracking-tight mb-4">
-            {isError ? 'Projet temporairement indisponible' : 'Projet introuvable'}
+            {isError ? t('projectDetail.unavailable') : t('projectDetail.notFound')}
           </h2>
           <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
             {isError
-              ? 'Le serveur ne repond pas pour le moment. Veuillez reessayer dans quelques instants.'
-              : "Ce projet n'existe pas ou a ete supprime."}
+              ? t('projectDetail.unavailableDesc')
+              : t('projectDetail.notFoundDesc')}
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
-              Voir tous les projets
+              {t('projectDetail.viewAll')}
             </Link>
             {isError && (
               <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
-                Reessayer
+                {t('projectDetail.retry')}
               </button>
             )}
           </div>
@@ -78,7 +80,7 @@ export function ProjectDetailPage() {
 
   const handleShare = async () => {
     const shareData = {
-      title: `Découvrez le projet ${project.title}`,
+      title: project.title,
       text: project.description,
       url: window.location.href,
     };
@@ -86,25 +88,25 @@ export function ProjectDetailPage() {
     try {
       if (navigator.share) {
         await navigator.share(shareData);
-        toast.success("Contenu partagé avec succès !");
+        toast.success(t('projectDetail.shareSuccess'));
         return;
       }
     } catch (err) {}
 
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success("Lien copié dans le presse-papier !");
+      toast.success(t('projectDetail.linkCopied'));
     } catch (err) {
-      toast.error("Impossible de copier le lien.");
+      toast.error(t('projectDetail.linkCopyError'));
     }
   };
 
   const handleLaunch = () => {
     if (project.url) {
       window.open(project.url, '_blank', 'noopener,noreferrer');
-      toast.info(`Ouverture de ${project.title}...`);
+      toast.info(t('projectDetail.opening', { title: project.title }));
     } else {
-      toast.error("URL du projet non disponible.");
+      toast.error(t('projectDetail.urlUnavailable'));
     }
   };
 
@@ -121,7 +123,7 @@ export function ProjectDetailPage() {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex flex-col items-start gap-6">
               <button onClick={() => navigate(-1)} className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-bold hover:bg-white/20 transition-all">
                 <ArrowLeft className="w-4 h-4" />
-                Retour
+                {t('projectDetail.back')}
               </button>
               
               <div>
@@ -135,8 +137,8 @@ export function ProjectDetailPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center"><Layout className="w-5 h-5" /></div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-tighter text-white/50">Services</span>
-                    <span className="text-sm">Stratégie & Design</span>
+                    <span className="text-[10px] uppercase tracking-tighter text-white/50">{t('projectDetail.services')}</span>
+                    <span className="text-sm">{t('projectDetail.servicesValue')}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -158,7 +160,7 @@ export function ProjectDetailPage() {
             <section className="space-y-8">
               <div className="flex items-center gap-4 text-primary">
                 <div className="h-[1px] w-12 bg-primary" />
-                <span className="text-xs font-black uppercase tracking-widest">Introduction</span>
+                <span className="text-xs font-black uppercase tracking-widest">{t('projectDetail.intro')}</span>
               </div>
               <p className="text-2xl md:text-4xl leading-[1.2] font-semibold text-foreground">{project.description}</p>
             </section>
@@ -166,12 +168,12 @@ export function ProjectDetailPage() {
             <section className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="space-y-6">
                 <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-8"><Target className="w-7 h-7" /></div>
-                <h3 className="text-2xl font-bold">Le Défi</h3>
+                <h3 className="text-2xl font-bold">{t('projectDetail.challenge')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{project.problem}</p>
               </div>
               <div className="space-y-6">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-8"><Lightbulb className="w-7 h-7" /></div>
-                <h3 className="text-2xl font-bold">Notre Approche</h3>
+                <h3 className="text-2xl font-bold">{t('projectDetail.approach')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{project.solution}</p>
               </div>
             </section>
@@ -180,7 +182,7 @@ export function ProjectDetailPage() {
               <section className="space-y-16">
                 <div className="flex items-center gap-4 text-primary">
                   <div className="h-[1px] w-12 bg-primary" />
-                  <span className="text-xs font-black uppercase tracking-widest">Architecture & Impact</span>
+                  <span className="text-xs font-black uppercase tracking-widest">{t('projectDetail.architecture')}</span>
                 </div>
                 <VisualDiagram solutionDiagram={project.solutionDiagram} impactGraph={project.impactGraph} />
               </section>
@@ -196,7 +198,7 @@ export function ProjectDetailPage() {
           <div className="lg:col-span-4">
             <div className="sticky top-32 space-y-12">
               <div className="p-8 rounded-[3rem] bg-card border border-border">
-                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-10 flex items-center gap-3"><Trophy className="w-5 h-5" />Victoires Clés</h4>
+                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-10 flex items-center gap-3"><Trophy className="w-5 h-5" />{t('projectDetail.keyWins')}</h4>
                 <ul className="space-y-8 mb-12">
                   {project.results.map((result, i) => (
                     <li key={i} className="flex items-start gap-4 group">
@@ -206,8 +208,8 @@ export function ProjectDetailPage() {
                   ))}
                 </ul>
                 <div className="flex flex-col gap-4">
-                  <button onClick={handleLaunch} className="w-full py-5 bg-primary text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all">Lancer le Projet</button>
-                  <button onClick={handleShare} className="w-full py-5 bg-secondary text-foreground rounded-2xl font-black text-sm uppercase tracking-widest">Partager</button>
+                  <button onClick={handleLaunch} className="w-full py-5 bg-primary text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all">{t('projectDetail.launch')}</button>
+                  <button onClick={handleShare} className="w-full py-5 bg-secondary text-foreground rounded-2xl font-black text-sm uppercase tracking-widest">{t('projectDetail.share')}</button>
                 </div>
               </div>
             </div>

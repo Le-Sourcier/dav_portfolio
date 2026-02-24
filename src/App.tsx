@@ -28,6 +28,8 @@ import { useProfile } from './hooks/useProfile';
 import { envConfig } from './config/env';
 import { SeoHead } from './components/shared/SeoHead';
 import { CookieConsent } from './components/portfolio/CookieConsent';
+import { LanguageToggle } from './components/shared/LanguageToggle';
+import { useTranslation } from 'react-i18next';
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation();
@@ -68,6 +70,7 @@ function HomePage() {
 
 function Layout({ children, hideNavFooter = false }: { children: React.ReactNode; hideNavFooter?: boolean }) {
   const profile = useProfile();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans antialiased transition-colors duration-500">
@@ -90,14 +93,14 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
 
             <div className="flex flex-wrap justify-center gap-12 md:gap-24">
               <div className="flex flex-col gap-4">
-                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Plan du site</h4>
-                <a href="/#work" className="font-bold hover:text-primary transition-colors">Projets</a>
-                <a href="/#about" className="font-bold hover:text-primary transition-colors">A Propos</a>
+                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{t('footer.sitemap')}</h4>
+                <a href="/#work" className="font-bold hover:text-primary transition-colors">{t('footer.projects')}</a>
+                <a href="/#about" className="font-bold hover:text-primary transition-colors">{t('footer.about')}</a>
                 <Link to="/blog" className="font-bold hover:text-primary transition-colors">Blog</Link>
                 <a href="/#contact" className="font-bold hover:text-primary transition-colors">Contact</a>
               </div>
               <div className="flex flex-col gap-4">
-                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Reseaux</h4>
+                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{t('footer.social')}</h4>
                 {profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer" className="font-bold hover:text-primary transition-colors">GitHub</a>}
                 {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="font-bold hover:text-primary transition-colors">LinkedIn</a>}
                 <a href={`mailto:${profile.email}`} className="font-bold hover:text-primary transition-colors">Email</a>
@@ -106,16 +109,20 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
           </div>
 
           <div className="max-w-7xl mx-auto mt-24 pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-muted-foreground text-sm font-medium italic">
-              &copy; {new Date().getFullYear()} {profile.name}. Tous droits reserves.
-            </p>
+            <div className="flex items-center gap-4">
+              <LanguageToggle />
+              <p className="text-muted-foreground text-sm font-medium italic">
+                &copy; {new Date().getFullYear()} {profile.name}. {t('footer.rights')}
+              </p>
+            </div>
             <div className="flex gap-8 text-sm font-bold uppercase tracking-widest text-muted-foreground/50">
-              <Link to="/politique-confidentialite" className="hover:text-primary transition-colors">Confidentialite</Link>
-              <Link to="/mentions-legales" className="hover:text-primary transition-colors">Mentions</Link>
-              <Link to="/cgu" className="hover:text-primary transition-colors">CGU</Link>
+              <Link to="/politique-confidentialite" className="hover:text-primary transition-colors">{t('footer.privacy')}</Link>
+              <Link to="/mentions-legales" className="hover:text-primary transition-colors">{t('footer.legal')}</Link>
+              <Link to="/cgu" className="hover:text-primary transition-colors">{t('footer.terms')}</Link>
               <Link to="/admin/login" className="hover:text-primary transition-colors">Admin</Link>
             </div>
           </div>
+
         </footer>
       )}
 

@@ -3,6 +3,7 @@ import { Mail, Briefcase, CalendarCheck, ArrowRight, Check, Loader2, Sparkles } 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSubscribe } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 interface BlogCtaCardProps {
   variant: 'newsletter' | 'services' | 'booking';
@@ -15,6 +16,7 @@ export function BlogCtaCard({ variant }: BlogCtaCardProps) {
 }
 
 function NewsletterCta() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const subscribeMutation = useSubscribe();
   const [subscribed, setSubscribed] = useState(false);
@@ -40,9 +42,9 @@ function NewsletterCta() {
         <Mail className="w-5 h-5" />
       </div>
 
-      <h3 className="text-xl font-black tracking-tight mb-2">Restez informe</h3>
+      <h3 className="text-xl font-black tracking-tight mb-2">{t('newsletter.title')}</h3>
       <p className="text-muted-foreground font-medium text-sm mb-5 leading-relaxed">
-        Recevez les derniers articles et reflexions directement dans votre boite mail.
+        {t('newsletter.descShort')}
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
@@ -51,7 +53,7 @@ function NewsletterCta() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={subscribed}
-          placeholder="votre@email.com"
+          placeholder={t('newsletter.placeholder')}
           className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all disabled:opacity-50"
           required
         />
@@ -63,21 +65,22 @@ function NewsletterCta() {
           {subscribeMutation.isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : subscribed ? (
-            <>Inscrit ! <Check className="w-4 h-4" /></>
+            <>{t('newsletter.subscribed')} <Check className="w-4 h-4" /></>
           ) : (
-            "S'abonner"
+            t('newsletter.subscribe')
           )}
         </button>
       </form>
 
       <p className="text-[9px] text-muted-foreground/40 font-medium text-center mt-3">
-        Pas de spam. Desabonnez-vous a tout moment.
+        {t('newsletter.noSpamShort')}
       </p>
     </motion.div>
   );
 }
 
 export function NewsletterCtaWide() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const subscribeMutation = useSubscribe();
   const [subscribed, setSubscribed] = useState(false);
@@ -110,9 +113,9 @@ export function NewsletterCtaWide() {
             </div>
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
-          <h3 className="text-2xl font-black tracking-tight mb-2">Restez informe</h3>
+          <h3 className="text-2xl font-black tracking-tight mb-2">{t('newsletter.title')}</h3>
           <p className="text-muted-foreground font-medium text-sm leading-relaxed">
-            Recevez les derniers articles et reflexions directement dans votre boite mail. Pas de spam, desabonnement en un clic.
+            {t('newsletter.descWide')}
           </p>
         </div>
 
@@ -122,7 +125,7 @@ export function NewsletterCtaWide() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={subscribed}
-            placeholder="votre@email.com"
+            placeholder={t('newsletter.placeholder')}
             className="flex-1 md:w-64 bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all disabled:opacity-50"
             required
           />
@@ -134,9 +137,9 @@ export function NewsletterCtaWide() {
             {subscribeMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : subscribed ? (
-              <>Inscrit ! <Check className="w-4 h-4" /></>
+              <>{t('newsletter.subscribed')} <Check className="w-4 h-4" /></>
             ) : (
-              <>S'abonner <ArrowRight className="w-4 h-4" /></>
+              <>{t('newsletter.subscribe')} <ArrowRight className="w-4 h-4" /></>
             )}
           </button>
         </form>
@@ -146,6 +149,7 @@ export function NewsletterCtaWide() {
 }
 
 function ServicesCta() {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -156,16 +160,16 @@ function ServicesCta() {
         <Briefcase className="w-5 h-5" />
       </div>
 
-      <h3 className="text-xl font-black tracking-tight mb-2">Un projet en tete ?</h3>
+      <h3 className="text-xl font-black tracking-tight mb-2">{t('blogCta.projectTitle')}</h3>
       <p className="text-muted-foreground font-medium text-sm mb-6 leading-relaxed">
-        Du design a la mise en production, je vous accompagne dans la realisation de vos idees les plus ambitieuses.
+        {t('blogCta.projectDesc')}
       </p>
 
       <Link
         to="/#contact"
         className="w-full py-3 bg-foreground text-background rounded-xl font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2"
       >
-        Demander un devis
+        {t('blogCta.requestQuote')}
         <ArrowRight className="w-4 h-4" />
       </Link>
     </motion.div>
@@ -173,6 +177,7 @@ function ServicesCta() {
 }
 
 function BookingCta() {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -184,18 +189,18 @@ function BookingCta() {
       </div>
 
       <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-xl font-black tracking-tight">Discutons ensemble</h3>
+        <h3 className="text-xl font-black tracking-tight">{t('blogCta.bookingTitle')}</h3>
         <Sparkles className="w-4 h-4 text-primary" />
       </div>
       <p className="text-muted-foreground font-medium text-sm mb-6 leading-relaxed">
-        Reservez un creneau pour echanger sur votre projet. Premiere consultation gratuite et sans engagement.
+        {t('blogCta.bookingDesc')}
       </p>
 
       <Link
         to="/#booking"
         className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
       >
-        Prendre rendez-vous
+        {t('blogCta.bookingCta')}
         <CalendarCheck className="w-4 h-4" />
       </Link>
     </motion.div>

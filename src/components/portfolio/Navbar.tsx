@@ -4,9 +4,11 @@ import { Menu, X, ArrowRight } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 import { useProfile } from '@/hooks/useProfile';
+import { useTranslation } from 'react-i18next';
 
 export function Navbar() {
   const profile = useProfile();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -19,10 +21,10 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Travaux', href: '/#work' },
-    { name: 'À Propos', href: '/#about' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Contact', href: '/#contact' },
+    { name: t('nav.work'), href: '/#work' },
+    { name: t('nav.about'), href: '/#about' },
+    { name: t('nav.blog'), href: '/blog' },
+    { name: t('nav.contact'), href: '/#contact' },
   ];
 
   const handleLinkClick = (href: string) => {
@@ -105,13 +107,13 @@ export function Navbar() {
           
           <div className="flex items-center gap-4 border-l border-border pl-8">
             <ThemeToggle />
-            <motion.button 
+            <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={handleLetsTalk}
               className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-black text-[10px] uppercase tracking-widest hover:shadow-xl hover:shadow-primary/20 transition-all flex items-center gap-2 group"
             >
-              Let's Talk
+              {t('nav.cta')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
@@ -183,7 +185,7 @@ export function Navbar() {
                 onClick={handleLetsTalk}
                 className="text-4xl font-black tracking-tighter text-primary flex items-center gap-4 group text-left uppercase"
               >
-                LET'S TALK <ArrowRight className="w-8 h-8 group-hover:translate-x-4 transition-transform" />
+                {t('nav.cta').toUpperCase()} <ArrowRight className="w-8 h-8 group-hover:translate-x-4 transition-transform" />
               </motion.button>
             </div>
 

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { useBlogPosts } from '@/hooks/queries';
 import { BlogCard } from './BlogCard';
+import { useTranslation } from 'react-i18next';
 
 interface RelatedPostsProps {
   currentPostId: string;
@@ -10,6 +11,7 @@ interface RelatedPostsProps {
 }
 
 export function RelatedPosts({ currentPostId, category }: RelatedPostsProps) {
+  const { t } = useTranslation();
   const { data: posts = [] } = useBlogPosts(true);
 
   const related = useMemo(() => {
@@ -35,8 +37,8 @@ export function RelatedPosts({ currentPostId, category }: RelatedPostsProps) {
           <BookOpen className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">Continuez la lecture</p>
-          <h3 className="text-2xl font-black tracking-tight">Articles similaires</h3>
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">{t('blogPost.continueReading')}</p>
+          <h3 className="text-2xl font-black tracking-tight">{t('blogPost.relatedPosts')}</h3>
         </div>
       </div>
 

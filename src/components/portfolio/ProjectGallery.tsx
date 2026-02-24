@@ -4,8 +4,10 @@ import { Project } from '../../data/mockData';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 export function ProjectGallery() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<string>('All');
   const { data: projects = [], isLoading } = useProjects();
 
@@ -33,7 +35,7 @@ export function ProjectGallery() {
               className="flex items-center gap-2 mb-4"
             >
               <div className="w-12 h-[1px] bg-primary" />
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Portfolio</span>
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">{t('gallery.label')}</span>
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -42,7 +44,7 @@ export function ProjectGallery() {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
             >
-              Études de <span className="text-muted-foreground/40 italic">Cas</span>
+              {t('gallery.title')} <span className="text-muted-foreground/40 italic">{t('gallery.titleAccent')}</span>
             </motion.h2>
           </div>
           
@@ -95,7 +97,7 @@ export function ProjectGallery() {
                         <p className="text-primary text-sm font-bold uppercase tracking-widest mb-2">{project.category}</p>
                         <h3 className="text-2xl font-bold text-white mb-4">{project.title}</h3>
                         <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                          <span>Voir l'étude de cas</span>
+                          <span>{t('gallery.viewCase')}</span>
                           <ArrowRight className="w-4 h-4" />
                         </div>
                       </motion.div>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, Check, Loader2 } from 'lucide-react';
 import { useSubscribe } from '@/hooks/queries';
+import { useTranslation } from 'react-i18next';
 
 export function NewsletterForm() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const subscribeMutation = useSubscribe();
   const [subscribed, setSubscribed] = useState(false);
@@ -27,8 +29,8 @@ export function NewsletterForm() {
         </div>
 
         <div>
-          <h3 className="text-2xl font-black tracking-tight mb-2">Restez informe</h3>
-          <p className="text-muted-foreground font-medium text-sm">Recevez mes dernieres reflexions sur le design et le code directement dans votre boite mail.</p>
+          <h3 className="text-2xl font-black tracking-tight mb-2">{t('newsletter.title')}</h3>
+          <p className="text-muted-foreground font-medium text-sm">{t('newsletter.desc')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -37,7 +39,7 @@ export function NewsletterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={subscribed}
-            placeholder="votre@email.com"
+            placeholder={t('newsletter.placeholder')}
             className="w-full bg-background border-border rounded-xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all disabled:opacity-50"
             required
           />
@@ -50,16 +52,16 @@ export function NewsletterForm() {
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : subscribed ? (
               <>
-                Inscrit ! <Check className="w-5 h-5" />
+                {t('newsletter.subscribed')} <Check className="w-5 h-5" />
               </>
             ) : (
-              "S'abonner"
+              t('newsletter.subscribe')
             )}
           </button>
         </form>
 
         <p className="text-[10px] text-muted-foreground/50 font-medium text-center italic">
-          Pas de spam, promis. Desabonnez-vous a tout moment.
+          {t('newsletter.noSpam')}
         </p>
       </div>
     </div>
