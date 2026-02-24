@@ -25,6 +25,10 @@ class Project extends Model<IProject, ProjectCreationAttributes> implements IPro
   declare url?: string;
   declare solutionDiagram?: SolutionDiagram;
   declare impactGraph?: ImpactData[];
+  declare title_en?: string;
+  declare description_en?: string;
+  declare problem_en?: string;
+  declare solution_en?: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }
@@ -88,6 +92,10 @@ Project.init(
       type: DataTypes.JSONB,
       allowNull: true,
     },
+    title_en: { type: DataTypes.STRING(255), allowNull: true },
+    description_en: { type: DataTypes.TEXT, allowNull: true },
+    problem_en: { type: DataTypes.TEXT, allowNull: true },
+    solution_en: { type: DataTypes.TEXT, allowNull: true },
   },
   {
     sequelize,

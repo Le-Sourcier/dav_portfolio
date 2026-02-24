@@ -13,6 +13,8 @@ class Testimonial extends Model<ITestimonial, TestimonialCreationAttributes> imp
   declare content: string;
   declare rating?: number;
   declare visible: boolean;
+  declare content_en?: string;
+  declare role_en?: string;
   declare readonly createdAt: Date;
 }
 
@@ -55,6 +57,8 @@ Testimonial.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    content_en: { type: DataTypes.TEXT, allowNull: true },
+    role_en: { type: DataTypes.STRING(100), allowNull: true },
   },
   {
     sequelize,

@@ -88,6 +88,9 @@ class BlogPost
   declare viewCount: number;
   declare shareCount: number;
   declare comments?: IBlogComment[];
+  declare title_en?: string;
+  declare excerpt_en?: string;
+  declare content_en?: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 
@@ -149,6 +152,9 @@ BlogPost.init(
       defaultValue: 0,
       allowNull: false,
     },
+    title_en: { type: DataTypes.STRING(255), allowNull: true },
+    excerpt_en: { type: DataTypes.TEXT, allowNull: true },
+    content_en: { type: DataTypes.TEXT, allowNull: true },
   },
   {
     sequelize,
