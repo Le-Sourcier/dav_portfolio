@@ -11,6 +11,7 @@ import { useBlogPost, useAddComment, useTrackView, useTrackShare } from '@/hooks
 import { useVisitorSession } from '@/hooks/useVisitorSession';
 import { OtpVerification } from '@/components/shared/OtpVerification';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 import type { BlogComment } from '@/types/admin.types';
 
 // ======================== COMPONENT ========================
@@ -30,6 +31,7 @@ export function BlogPostDetail() {
     otpStatus, otpError, requestOtp, verifyOtp, clearSession,
   } = useVisitorSession();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
 
   const post = apiPost;
   const loading = apiLoading;
@@ -149,7 +151,7 @@ export function BlogPostDetail() {
             </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 leading-[1.1]">
-            {post.title}
+            {localize(post.title, post.title_en)}
           </h1>
 
           <div className="flex flex-wrap items-center gap-8 py-8 border-y border-border">
@@ -215,7 +217,7 @@ export function BlogPostDetail() {
 
         {/* Article content */}
         <article className="mb-16">
-          <MarkdownRenderer content={post.content} />
+          <MarkdownRenderer content={localize(post.content, post.content_en)} />
         </article>
 
         {/* Author bio */}

@@ -5,9 +5,11 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '@/hooks/queries';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 export function ProjectGallery() {
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const [filter, setFilter] = useState<string>('All');
   const { data: projects = [], isLoading } = useProjects();
 
@@ -95,7 +97,7 @@ export function ProjectGallery() {
                         transition={{ duration: 0.3 }}
                       >
                         <p className="text-primary text-sm font-bold uppercase tracking-widest mb-2">{project.category}</p>
-                        <h3 className="text-2xl font-bold text-white mb-4">{project.title}</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">{localize(project.title, project.title_en)}</h3>
                         <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
                           <span>{t('gallery.viewCase')}</span>
                           <ArrowRight className="w-4 h-4" />

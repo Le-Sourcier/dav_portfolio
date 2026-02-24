@@ -20,11 +20,13 @@ import {
 import { toast } from 'sonner';
 import { useProject } from '@/hooks/queries';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 export function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const { data: project, isLoading, isError } = useProject(id || '');
 
   const { scrollYProgress } = useScroll();
@@ -80,8 +82,8 @@ export function ProjectDetailPage() {
 
   const handleShare = async () => {
     const shareData = {
-      title: project.title,
-      text: project.description,
+      title: localize(project.title, project.title_en),
+      text: localize(project.description, project.description_en),
       url: window.location.href,
     };
 
@@ -104,7 +106,7 @@ export function ProjectDetailPage() {
   const handleLaunch = () => {
     if (project.url) {
       window.open(project.url, '_blank', 'noopener,noreferrer');
-      toast.info(t('projectDetail.opening', { title: project.title }));
+      toast.info(t('projectDetail.opening', { title: localize(project.title, project.title_en) }));
     } else {
       toast.error(t('projectDetail.urlUnavailable'));
     }
@@ -129,7 +131,7 @@ export function ProjectDetailPage() {
               <div>
                 <span className="px-4 py-1.5 bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest rounded-full mb-6 inline-block">{project.category}</span>
                 <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white mb-8">
-                  {project.title}
+                  {localize(project.title, project.title_en)}
                 </h1>
               </div>
 
@@ -162,19 +164,19 @@ export function ProjectDetailPage() {
                 <div className="h-[1px] w-12 bg-primary" />
                 <span className="text-xs font-black uppercase tracking-widest">{t('projectDetail.intro')}</span>
               </div>
-              <p className="text-2xl md:text-4xl leading-[1.2] font-semibold text-foreground">{project.description}</p>
+              <p className="text-2xl md:text-4xl leading-[1.2] font-semibold text-foreground">{localize(project.description, project.description_en)}</p>
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="space-y-6">
                 <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-8"><Target className="w-7 h-7" /></div>
                 <h3 className="text-2xl font-bold">{t('projectDetail.challenge')}</h3>
-                <p className="text-lg text-muted-foreground leading-relaxed">{project.problem}</p>
+                <p className="text-lg text-muted-foreground leading-relaxed">{localize(project.problem, project.problem_en)}</p>
               </div>
               <div className="space-y-6">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-8"><Lightbulb className="w-7 h-7" /></div>
                 <h3 className="text-2xl font-bold">{t('projectDetail.approach')}</h3>
-                <p className="text-lg text-muted-foreground leading-relaxed">{project.solution}</p>
+                <p className="text-lg text-muted-foreground leading-relaxed">{localize(project.solution, project.solution_en)}</p>
               </div>
             </section>
 

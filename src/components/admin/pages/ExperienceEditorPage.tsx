@@ -9,6 +9,7 @@ import { useCreateExperience, useUpdateExperience } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
+import { LangToggle } from '@/components/admin/shared/LangToggle';
 import type { Experience, ExperienceFormData, ExperienceAchievement, ExperienceLink } from '@/types/admin.types';
 
 // ======================== PROPS ========================
@@ -41,15 +42,18 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
   const createMutation = useCreateExperience();
   const updateMutation = useUpdateExperience();
   const [saved, setSaved] = useState(false);
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   const [form, setForm] = useState<ExperienceFormData>(() => {
-    if (!initialData) return { ...defaultForm };
+    if (!initialData) return { ...defaultForm, title_en: '', description_en: '' };
     return {
       title: initialData.title,
+      title_en: initialData.title_en || '',
       company: initialData.company,
       location: initialData.location || '',
       dates: initialData.dates,
       description: initialData.description || '',
+      description_en: initialData.description_en || '',
       details: initialData.details?.length ? initialData.details : [''],
       coverImage: initialData.coverImage || '',
       illustrativeImages: initialData.illustrativeImages || [],
@@ -154,6 +158,9 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
       description: form.description?.trim() || '',
     };
 
+    cleaned.title_en = form.title_en?.trim() || '';
+    cleaned.description_en = form.description_en?.trim() || '';
+
     if (form.location?.trim()) cleaned.location = form.location.trim();
     if (form.coverImage?.trim()) cleaned.coverImage = form.coverImage.trim();
 
@@ -210,6 +217,8 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
           </div>
         </div>
 
+        <LangToggle lang={lang} onChange={setLang} hasEnContent={!!(form.title_en?.trim())} />
+
         <div className="flex items-center gap-2">
           <button
             onClick={handleSave}
@@ -236,14 +245,23 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
             <div>
               <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                 <Briefcase className="w-3 h-3 inline mr-1" />
-                Poste / Titre *
+                {lang === 'fr' ? 'Poste / Titre du role (FR) *' : 'Job Title / Role (EN)'}
               </label>
-              <input
-                value={form.title}
-                onChange={e => handleChange('title', e.target.value)}
-                placeholder="Ex: Developpeur Fullstack Senior"
-                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
-              />
+              {lang === 'fr' ? (
+                <input
+                  value={form.title}
+                  onChange={e => handleChange('title', e.target.value)}
+                  placeholder="Ex: Developpeur Fullstack Senior"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                />
+              ) : (
+                <input
+                  value={form.title_en || ''}
+                  onChange={e => handleChange('title_en', e.target.value)}
+                  placeholder="E.g.: Senior Fullstack Developer"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                />
+              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
@@ -319,11 +337,12 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
           </div>
 
           {/* Description (Markdown Editor) */}
-          <MarkdownEditor
-            label="Description / Contexte"
-            value={form.description || ''}
-            onChange={v => handleChange('description', v)}
-            placeholder="Decrivez le contexte de la mission, le role, les responsabilites...
+          {lang === 'fr' ? (
+            <MarkdownEditor
+              label="Description / Contexte (FR)"
+              value={form.description || ''}
+              onChange={v => handleChange('description', v)}
+              placeholder="Decrivez le contexte de la mission, le role, les responsabilites...
 
 # Contexte du projet
 
@@ -333,8 +352,26 @@ Du texte avec du **gras** et de l'*italique*.
 const api = express();
 api.listen(3000);
 ```"
-            minHeight="250px"
-          />
+              minHeight="250px"
+            />
+          ) : (
+            <MarkdownEditor
+              label="Description / Context (EN)"
+              value={form.description_en || ''}
+              onChange={v => handleChange('description_en', v)}
+              placeholder="Describe the mission context, role, and responsibilities...
+
+# Project Context
+
+Text with **bold** and *italic*.
+
+```javascript
+const api = express();
+api.listen(3000);
+```"
+              minHeight="250px"
+            />
+          )}
 
           {/* Details (bullet points) */}
           <DynamicListSection

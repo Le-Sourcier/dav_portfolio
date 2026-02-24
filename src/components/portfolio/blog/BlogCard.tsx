@@ -3,6 +3,7 @@ import { Calendar, Clock, ArrowRight, User, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { BlogPost } from '@/types/admin.types';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -12,6 +13,7 @@ interface BlogCardProps {
 
 export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps) {
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const date = post.createdAt
     ? new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
     : '-';
@@ -57,12 +59,12 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
 
           <Link to={`/blog/${post.id}`}>
             <h2 className="text-3xl lg:text-4xl font-black leading-tight mb-4 group-hover:text-primary transition-colors tracking-tight">
-              {post.title}
+              {localize(post.title, post.title_en)}
             </h2>
           </Link>
 
           <p className="text-muted-foreground mb-8 line-clamp-3 font-medium leading-relaxed text-lg">
-            {post.excerpt}
+            {localize(post.excerpt, post.excerpt_en)}
           </p>
 
           <div className="flex items-center justify-between">
@@ -119,12 +121,12 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
 
         <Link to={`/blog/${post.id}`}>
           <h2 className="text-2xl font-bold leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">
-            {post.title}
+            {localize(post.title, post.title_en)}
           </h2>
         </Link>
 
         <p className="text-muted-foreground mb-8 line-clamp-2 font-medium leading-relaxed">
-          {post.excerpt}
+          {localize(post.excerpt, post.excerpt_en)}
         </p>
 
         <div className="mt-auto pt-6 border-t border-border flex justify-between items-center">

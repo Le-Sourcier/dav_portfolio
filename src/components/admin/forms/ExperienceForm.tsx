@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateExperience, useUpdateExperience } from '@/hooks/queries';
 import type { Experience, ExperienceFormData } from '@/types/admin.types';
+import { LangToggle } from '@/components/admin/shared/LangToggle';
 
 interface ExperienceFormProps {
   initialData?: Experience | null;
@@ -26,21 +27,24 @@ export function ExperienceForm({ initialData, onClose }: ExperienceFormProps) {
   const isEditing = !!initialData;
   const createMutation = useCreateExperience();
   const updateMutation = useUpdateExperience();
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   const [formData, setFormData] = useState<ExperienceFormData>(() => {
     if (initialData) {
       return {
         title: initialData.title,
+        title_en: initialData.title_en || '',
         company: initialData.company,
         location: initialData.location || '',
         dates: initialData.dates,
         description: initialData.description || '',
+        description_en: initialData.description_en || '',
         stack: initialData.stack?.length ? initialData.stack : [''],
         challenges: initialData.challenges?.length ? initialData.challenges : [''],
         achievements: initialData.achievements || [],
       };
     }
-    return { ...defaultFormData };
+    return { ...defaultFormData, title_en: '', description_en: '' };
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -58,10 +62,7 @@ export function ExperienceForm({ initialData, onClose }: ExperienceFormProps) {
   };
 
   const removeArrayItem = (index: number, field: 'stack' | 'challenges') => {
-    setFormData({
-      ...formData,
-      [field]: (formData[field] || []).filter((_, i) => i !== index),
-    });
+    setFormData({ ...formData, [field]: (formData[field] || []).filter((_, i) => i !== index) });
   };
 
   const handleSubmit = () => {
@@ -70,18 +71,15 @@ export function ExperienceForm({ initialData, onClose }: ExperienceFormProps) {
       stack: formData.stack?.filter((s) => s.trim()) || [],
       challenges: formData.challenges?.filter((c) => c.trim()) || [],
     };
-
     if (isEditing && initialData) {
-      updateMutation.mutate(
-        { id: initialData.id, data: cleaned },
-        { onSuccess: onClose }
-      );
+      updateMutation.mutate({ id: initialData.id, data: cleaned }, { onSuccess: onClose });
     } else {
       createMutation.mutate(cleaned, { onSuccess: onClose });
     }
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const hasEnContent = !!(formData.title_en?.trim());
 
   return (
     <div className="space-y-6">
@@ -94,11 +92,21 @@ export function ExperienceForm({ initialData, onClose }: ExperienceFormProps) {
         </button>
       </div>
 
+      <LangToggle lang={lang} onChange={setLang} hasEnContent={hasEnContent} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Poste</label>
-          <Input name="title" value={formData.title} onChange={handleChange} className="rounded-xl" />
-        </div>
+        {lang === 'fr' ? (
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Poste (FR)</label>
+            <Input name="title" value={formData.title} onChange={handleChange} className="rounded-xl" />
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Job Title (EN)</label>
+            <Input name="title_en" value={formData.title_en || ''} onChange={handleChange} className="rounded-xl" placeholder="English job title..." />
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Entreprise</label>
           <Input name="company" value={formData.company} onChange={handleChange} className="rounded-xl" />
@@ -111,10 +119,18 @@ export function ExperienceForm({ initialData, onClose }: ExperienceFormProps) {
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Lieu</label>
           <Input name="location" value={formData.location} onChange={handleChange} className="rounded-xl" />
         </div>
-        <div className="space-y-1.5 md:col-span-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description</label>
-          <Textarea name="description" value={formData.description} onChange={handleChange} className="rounded-xl min-h-[80px]" />
-        </div>
+
+        {lang === 'fr' ? (
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description (FR)</label>
+            <Textarea name="description" value={formData.description} onChange={handleChange} className="rounded-xl min-h-[80px]" />
+          </div>
+        ) : (
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description (EN)</label>
+            <Textarea name="description_en" value={formData.description_en || ''} onChange={handleChange} className="rounded-xl min-h-[80px]" placeholder="Role description in English..." />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

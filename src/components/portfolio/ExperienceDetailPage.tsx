@@ -12,6 +12,7 @@ import { useExperience } from '@/hooks/queries';
 import { toast } from 'sonner';
 import type { Experience } from '@/types/admin.types';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 // ======================== COMPONENT ========================
 
@@ -19,6 +20,7 @@ export function ExperienceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { scrollY } = useScroll();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const { data: apiExperience, isLoading, isError } = useExperience(id || '');
@@ -122,7 +124,7 @@ export function ExperienceDetailPage() {
               </div>
 
               <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6 uppercase leading-[0.9]">
-                {experience.title}
+                {localize(experience.title, experience.title_en)}
               </h1>
 
               <div className="flex flex-wrap gap-6 text-white/60">
@@ -158,7 +160,7 @@ export function ExperienceDetailPage() {
                 <motion.div id="contexte" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <SectionHeader label={t('experience.context')} />
                   <div className="text-lg md:text-xl font-medium leading-relaxed text-muted-foreground">
-                    <MarkdownRenderer content={experience.description} />
+                    <MarkdownRenderer content={localize(experience.description, experience.description_en)} />
                   </div>
                 </motion.div>
               )}

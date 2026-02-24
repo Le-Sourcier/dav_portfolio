@@ -5,11 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
 import { useExperiences } from '@/hooks/queries';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 export function About() {
   const navigate = useNavigate();
   const profile = useProfile();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const { data: experiences = [] } = useExperiences();
   const profileImage = profile.avatar;
 
@@ -223,7 +225,7 @@ ${t('about.cvEducation')}
                   <span className="text-xs font-black text-primary/40 group-hover:text-primary transition-colors tracking-widest">{exp.dates}</span>
                   <AwardIcon className="w-6 h-6 text-primary/20 group-hover:text-primary transition-colors" />
                 </div>
-                <h4 className="font-black text-xl mb-3 group-hover:text-primary transition-colors uppercase tracking-tight leading-tight">{exp.title}</h4>
+                <h4 className="font-black text-xl mb-3 group-hover:text-primary transition-colors uppercase tracking-tight leading-tight">{localize(exp.title, exp.title_en)}</h4>
                 <p className="text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-60 mb-8">{exp.company}</p>
                 <div className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">
                   {t('about.viewDetails')}

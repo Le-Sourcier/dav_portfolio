@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useVisibleTestimonials } from '@/hooks/queries';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 const ITEMS_PER_PAGE = 4;
 
 export function Testimonials() {
   const { data: testimonials = [], isLoading } = useVisibleTestimonials();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
   const [page, setPage] = useState(0);
 
   const totalPages = Math.ceil(testimonials.length / ITEMS_PER_PAGE);
@@ -87,7 +89,7 @@ export function Testimonials() {
                 )}
 
                 <p className="text-lg md:text-2xl font-medium leading-snug mb-8 md:mb-12 relative z-10 line-clamp-6">
-                  "{t.content}"
+                  "{localize(t.content, t.content_en)}"
                 </p>
 
                 <div className="flex items-center gap-4 md:gap-6 relative z-10 pt-6 md:pt-8 border-t border-white/10">
@@ -103,7 +105,7 @@ export function Testimonials() {
                   <div className="min-w-0">
                     <h4 className="font-bold text-base md:text-lg truncate">{t.name}</h4>
                     <p className="text-primary-foreground/50 font-medium text-sm truncate">
-                      {t.role}{t.company ? ` - ${t.company}` : ''}
+                      {localize(t.role, t.role_en)}{t.company ? ` - ${t.company}` : ''}
                     </p>
                   </div>
                 </div>

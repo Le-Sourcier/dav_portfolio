@@ -7,6 +7,7 @@ import { useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } fro
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
+import { LangToggle } from '@/components/admin/shared/LangToggle';
 import type { BlogPost, BlogPostFormData } from '@/types/admin.types';
 
 // ======================== BLOG CATEGORIES ========================
@@ -25,13 +26,17 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
   const updateMutation = useUpdateBlogPost();
   const sendNewsletterMutation = useSendArticleToSubscribers();
   const [saved, setSaved] = useState(false);
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   const [formData, setFormData] = useState<BlogPostFormData>(() => {
     if (initialData) {
       return {
         title: initialData.title,
+        title_en: initialData.title_en || '',
         excerpt: initialData.excerpt,
+        excerpt_en: initialData.excerpt_en || '',
         content: initialData.content,
+        content_en: initialData.content_en || '',
         category: initialData.category,
         imageUrl: initialData.imageUrl || '',
         author: initialData.author || '',
@@ -41,8 +46,11 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
     }
     return {
       title: '',
+      title_en: '',
       excerpt: '',
+      excerpt_en: '',
       content: '',
+      content_en: '',
       category: 'Tech',
       imageUrl: '',
       author: '',
@@ -76,8 +84,11 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
 
     const cleaned: BlogPostFormData = {
       title: formData.title.trim(),
+      title_en: formData.title_en?.trim() || '',
       excerpt: formData.excerpt?.trim() || '',
+      excerpt_en: formData.excerpt_en?.trim() || '',
       content: formData.content,
+      content_en: formData.content_en || '',
       category: formData.category,
       imageUrl: formData.imageUrl?.trim() || '',
       author: formData.author || '',
@@ -125,6 +136,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
             </p>
           </div>
         </div>
+
+        <LangToggle lang={lang} onChange={setLang} hasEnContent={!!(formData.title_en?.trim())} />
 
         <div className="flex items-center gap-2">
           <button
@@ -178,13 +191,24 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         <div className="flex-1 min-w-0 space-y-4">
           {/* Title */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
-            <label className="block text-[11px] font-medium text-zinc-400 mb-2">Titre de l'article</label>
-            <input
-              value={formData.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="Ex: Comment deployer une app React en production"
-              className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
-            />
+            <label className="block text-[11px] font-medium text-zinc-400 mb-2">
+              {lang === 'fr' ? "Titre de l'article (FR)" : 'Article Title (EN)'}
+            </label>
+            {lang === 'fr' ? (
+              <input
+                value={formData.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                placeholder="Ex: Comment deployer une app React en production"
+                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+              />
+            ) : (
+              <input
+                value={formData.title_en || ''}
+                onChange={(e) => handleChange('title_en', e.target.value)}
+                placeholder="E.g.: How to deploy a React app in production"
+                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+              />
+            )}
           </div>
 
           {/* Cover image */}
@@ -226,24 +250,46 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
 
           {/* Excerpt */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
-            <label className="block text-[11px] font-medium text-zinc-400 mb-2">Extrait / Resume</label>
-            <textarea
-              value={formData.excerpt}
-              onChange={(e) => handleChange('excerpt', e.target.value)}
-              placeholder="Un court resume qui apparaitra dans la liste des articles..."
-              rows={2}
-              className="w-full bg-transparent text-sm text-zinc-700 dark:text-zinc-300 resize-none outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
-            />
+            <label className="block text-[11px] font-medium text-zinc-400 mb-2">
+              {lang === 'fr' ? 'Extrait / Resume (FR)' : 'Excerpt / Summary (EN)'}
+            </label>
+            {lang === 'fr' ? (
+              <textarea
+                value={formData.excerpt}
+                onChange={(e) => handleChange('excerpt', e.target.value)}
+                placeholder="Un court resume qui apparaitra dans la liste des articles..."
+                rows={2}
+                className="w-full bg-transparent text-sm text-zinc-700 dark:text-zinc-300 resize-none outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
+              />
+            ) : (
+              <textarea
+                value={formData.excerpt_en || ''}
+                onChange={(e) => handleChange('excerpt_en', e.target.value)}
+                placeholder="A short summary that will appear in the article list..."
+                rows={2}
+                className="w-full bg-transparent text-sm text-zinc-700 dark:text-zinc-300 resize-none outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
+              />
+            )}
           </div>
 
           {/* Content editor */}
-          <MarkdownEditor
-            label="Contenu de l'article"
-            value={formData.content}
-            onChange={(v) => handleChange('content', v)}
-            placeholder="Ecrivez votre article en Markdown..."
-            minHeight="400px"
-          />
+          {lang === 'fr' ? (
+            <MarkdownEditor
+              label="Contenu de l'article (FR)"
+              value={formData.content}
+              onChange={(v) => handleChange('content', v)}
+              placeholder="Ecrivez votre article en Markdown..."
+              minHeight="400px"
+            />
+          ) : (
+            <MarkdownEditor
+              label="Article Content (EN)"
+              value={formData.content_en || ''}
+              onChange={(v) => handleChange('content_en', v)}
+              placeholder="Write your article in English (Markdown)..."
+              minHeight="400px"
+            />
+          )}
         </div>
 
         {/* Right: Metadata sidebar */}

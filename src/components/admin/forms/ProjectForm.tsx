@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateProject, useUpdateProject } from '@/hooks/queries';
 import type { Project, ProjectFormData } from '@/types/admin.types';
+import { LangToggle } from '@/components/admin/shared/LangToggle';
 
 interface ProjectFormProps {
   initialData?: Project | null;
@@ -31,26 +32,29 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
   const isEditing = !!initialData;
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject();
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   const [formData, setFormData] = useState<ProjectFormData>(() => {
     if (initialData) {
       return {
         title: initialData.title,
+        title_en: initialData.title_en || '',
         category: initialData.category,
         image: initialData.image || '',
         description: initialData.description || '',
+        description_en: initialData.description_en || '',
         problem: initialData.problem || '',
+        problem_en: initialData.problem_en || '',
         solution: initialData.solution || '',
+        solution_en: initialData.solution_en || '',
         results: initialData.results?.length ? initialData.results : [''],
-        metrics: initialData.metrics?.length
-          ? initialData.metrics
-          : [{ name: '', value: 0, previousValue: 0, unit: '%' }],
+        metrics: initialData.metrics?.length ? initialData.metrics : [{ name: '', value: 0, previousValue: 0, unit: '%' }],
         chartData: initialData.chartData || [],
         technologies: initialData.technologies?.length ? initialData.technologies : [''],
         url: initialData.url || '',
       };
     }
-    return { ...defaultFormData };
+    return { ...defaultFormData, title_en: '', description_en: '', problem_en: '', solution_en: '' };
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -68,10 +72,7 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
   };
 
   const removeArrayItem = (index: number, field: 'results' | 'technologies') => {
-    setFormData({
-      ...formData,
-      [field]: (formData[field] || []).filter((_, i) => i !== index),
-    });
+    setFormData({ ...formData, [field]: (formData[field] || []).filter((_, i) => i !== index) });
   };
 
   const handleMetricChange = (index: number, key: string, value: string | number) => {
@@ -81,39 +82,29 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
   };
 
   const addMetric = () => {
-    setFormData({
-      ...formData,
-      metrics: [...(formData.metrics || []), { name: '', value: 0, previousValue: 0, unit: '%' }],
-    });
+    setFormData({ ...formData, metrics: [...(formData.metrics || []), { name: '', value: 0, previousValue: 0, unit: '%' }] });
   };
 
   const removeMetric = (index: number) => {
-    setFormData({
-      ...formData,
-      metrics: (formData.metrics || []).filter((_, i) => i !== index),
-    });
+    setFormData({ ...formData, metrics: (formData.metrics || []).filter((_, i) => i !== index) });
   };
 
   const handleSubmit = () => {
-    // Clean empty items
     const cleaned = {
       ...formData,
       results: formData.results?.filter((r) => r.trim()) || [],
       technologies: formData.technologies?.filter((t) => t.trim()) || [],
       metrics: formData.metrics?.filter((m) => m.name.trim()) || [],
     };
-
     if (isEditing && initialData) {
-      updateMutation.mutate(
-        { id: initialData.id, data: cleaned },
-        { onSuccess: onClose }
-      );
+      updateMutation.mutate({ id: initialData.id, data: cleaned }, { onSuccess: onClose });
     } else {
       createMutation.mutate(cleaned, { onSuccess: onClose });
     }
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const hasEnContent = !!(formData.title_en?.trim());
 
   return (
     <div className="space-y-6">
@@ -126,24 +117,30 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
         </button>
       </div>
 
+      <LangToggle lang={lang} onChange={setLang} hasEnContent={hasEnContent} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Titre</label>
-          <Input name="title" value={formData.title} onChange={handleChange} className="rounded-xl" />
-        </div>
+        {lang === 'fr' ? (
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Titre (FR)</label>
+            <Input name="title" value={formData.title} onChange={handleChange} className="rounded-xl" />
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Title (EN)</label>
+            <Input name="title_en" value={formData.title_en || ''} onChange={handleChange} className="rounded-xl" placeholder="English title..." />
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Categorie</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm"
-          >
+          <select name="category" value={formData.category} onChange={handleChange} className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm">
             {categories.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
+
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Image URL</label>
           <Input name="image" value={formData.image} onChange={handleChange} className="rounded-xl" />
@@ -152,18 +149,38 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">URL du projet</label>
           <Input name="url" value={formData.url} onChange={handleChange} className="rounded-xl" placeholder="https://..." />
         </div>
-        <div className="space-y-1.5 md:col-span-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description</label>
-          <Textarea name="description" value={formData.description} onChange={handleChange} className="rounded-xl min-h-[80px]" />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Probleme</label>
-          <Textarea name="problem" value={formData.problem} onChange={handleChange} className="rounded-xl" />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Solution</label>
-          <Textarea name="solution" value={formData.solution} onChange={handleChange} className="rounded-xl" />
-        </div>
+
+        {lang === 'fr' ? (
+          <>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description (FR)</label>
+              <Textarea name="description" value={formData.description} onChange={handleChange} className="rounded-xl min-h-[80px]" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Probleme (FR)</label>
+              <Textarea name="problem" value={formData.problem} onChange={handleChange} className="rounded-xl" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Solution (FR)</label>
+              <Textarea name="solution" value={formData.solution} onChange={handleChange} className="rounded-xl" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Description (EN)</label>
+              <Textarea name="description_en" value={formData.description_en || ''} onChange={handleChange} className="rounded-xl min-h-[80px]" placeholder="English description..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Problem (EN)</label>
+              <Textarea name="problem_en" value={formData.problem_en || ''} onChange={handleChange} className="rounded-xl" placeholder="Problem statement in English..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Solution (EN)</label>
+              <Textarea name="solution_en" value={formData.solution_en || ''} onChange={handleChange} className="rounded-xl" placeholder="Solution description in English..." />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Technologies */}
@@ -225,9 +242,7 @@ export function ProjectForm({ initialData, onClose }: ProjectFormProps) {
       </div>
 
       <div className="flex justify-end gap-3 pt-4">
-        <Button variant="ghost" onClick={onClose} className="rounded-xl font-bold">
-          Annuler
-        </Button>
+        <Button variant="ghost" onClick={onClose} className="rounded-xl font-bold">Annuler</Button>
         <Button onClick={handleSubmit} disabled={isPending || !formData.title.trim()} className="rounded-xl font-black px-8">
           {isPending ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -114,11 +114,15 @@ export type ProjectCategory =
 export interface Project {
   id: string;
   title: string;
+  title_en?: string;
   category: ProjectCategory;
   image: string;
   description: string;
+  description_en?: string;
   problem: string;
+  problem_en?: string;
   solution: string;
+  solution_en?: string;
   results: string[];
   metrics: ProjectMetric[];
   chartData: ChartDataPoint[];
@@ -149,10 +153,12 @@ export interface ExperienceLink {
 export interface Experience {
   id: string;
   title: string;
+  title_en?: string;
   company: string;
   location?: string;
   dates: string;
   description: string;
+  description_en?: string;
   details?: string[];
   links?: ExperienceLink[];
   coverImage?: string;
@@ -186,9 +192,12 @@ export interface BlogComment {
 export interface BlogPost {
   id: string;
   title: string;
+  title_en?: string;
   slug: string;
   excerpt: string;
+  excerpt_en?: string;
   content: string;
+  content_en?: string;
   category: string;
   imageUrl: string;
   readTime: string;
@@ -284,9 +293,11 @@ export interface Testimonial {
   id: string;
   name: string;
   role: string;
+  role_en?: string;
   company?: string;
   avatar?: string;
   content: string;
+  content_en?: string;
   rating?: number;
   visible: boolean;
   createdAt?: string;
