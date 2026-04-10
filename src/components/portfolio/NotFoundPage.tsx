@@ -30,7 +30,7 @@ export function NotFoundPage() {
                 <div className="pt-6">
                   <Link
                     to="/"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-xl hover:shadow-primary/20 transition-all"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl font-black text-sm uppercase tracking-widest hover:shadow-xl hover:shadow-primary/20 transition-all"
                   >
                     <Home className="w-4 h-4" />
                     {t('notFound.backHome')}

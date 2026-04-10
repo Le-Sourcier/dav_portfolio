@@ -81,7 +81,7 @@ export function ProjectGallery() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="break-inside-avoid group relative overflow-hidden rounded-3xl bg-secondary"
+                className="break-inside-avoid group relative overflow-hidden rounded-xl bg-secondary"
               >
                 <Link to={`/work/${project.id}`} className="block">
                   <div className={`relative overflow-hidden ${idx % 2 === 0 ? 'aspect-[4/5]' : 'aspect-square'}`}>

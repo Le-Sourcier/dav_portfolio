@@ -69,14 +69,14 @@ export function AdminLogin() {
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary/20">
+          <div className="w-20 h-20 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-6 border border-primary/20">
             <Lock className="w-10 h-10 text-primary" />
           </div>
           <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">Espace Admin</h1>
           <p className="text-muted-foreground font-medium italic">Acces restreint aux administrateurs uniquement</p>
         </div>
 
-        <div className="bg-card border border-border p-8 md:p-10 rounded-[3rem] shadow-2xl">
+        <div className="bg-card border border-border p-8 md:p-10 rounded-xl shadow-2xl">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary ml-1">Email</label>
@@ -87,7 +87,7 @@ export function AdminLogin() {
                   placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-14 bg-secondary/50 border-none rounded-2xl font-medium focus-visible:ring-primary"
+                  className="pl-12 h-14 bg-secondary/50 border-none rounded-xl font-medium focus-visible:ring-primary"
                   required
                 />
               </div>
@@ -102,7 +102,7 @@ export function AdminLogin() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 h-14 bg-secondary/50 border-none rounded-2xl font-medium focus-visible:ring-primary"
+                  className="pl-12 h-14 bg-secondary/50 border-none rounded-xl font-medium focus-visible:ring-primary"
                   required
                 />
               </div>
@@ -110,7 +110,7 @@ export function AdminLogin() {
 
             <Button
               type="submit"
-              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-sm group"
+              className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-sm group"
               disabled={loading}
             >
               {loading ? (

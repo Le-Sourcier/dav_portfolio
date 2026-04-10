@@ -98,11 +98,11 @@ export function AppointmentBooking() {
   };
 
   return (
-    <div id="booking" className="p-6 sm:p-8 md:p-12 rounded-[1.5rem] sm:rounded-[2.5rem] bg-card border border-border shadow-2xl overflow-hidden relative">
+    <div id="booking" className="p-6 sm:p-8 md:p-10 rounded-xl bg-card border border-border shadow-2xl overflow-hidden relative">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-8 sm:mb-12 text-center sm:text-left">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
           <CalendarIcon className="w-6 h-6 sm:w-7 sm:h-7" />
         </div>
         <div>
@@ -115,7 +115,7 @@ export function AppointmentBooking() {
       {existingRdv.length > 0 && step === 1 && (() => {
         const hasPending = existingRdv.some((r) => r.status === 'pending');
         return (
-          <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 ${hasPending ? 'bg-destructive/10 border border-destructive/20' : 'bg-amber-500/10 border border-amber-500/20'}`}>
+          <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${hasPending ? 'bg-destructive/10 border border-destructive/20' : 'bg-amber-500/10 border border-amber-500/20'}`}>
             <Info className={`w-5 h-5 shrink-0 mt-0.5 ${hasPending ? 'text-destructive' : 'text-amber-500'}`} />
             <div>
               <p className={`text-sm font-bold mb-1 ${hasPending ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}`}>
@@ -149,7 +149,7 @@ export function AppointmentBooking() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 <div className="space-y-4">
                   <label className="text-[10px] font-black uppercase tracking-widest text-primary block text-center lg:text-left">{t('appointment.step1')}</label>
-                  <div className="bg-background border border-border rounded-3xl p-2 sm:p-4 shadow-inner flex justify-center w-full max-w-sm mx-auto lg:max-w-none">
+                  <div className="bg-background border border-border rounded-xl p-2 sm:p-4 shadow-inner flex justify-center w-full max-w-sm mx-auto lg:max-w-none">
                     <Calendar
                       mode="single"
                       selected={date}
@@ -226,7 +226,7 @@ export function AppointmentBooking() {
               <button
                 onClick={handleNextToStep2}
                 disabled={otpStatus === 'sending'}
-                className="w-full py-4 sm:py-5 bg-primary text-primary-foreground rounded-2xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all uppercase tracking-widest text-sm disabled:opacity-60"
+                className="w-full py-4 sm:py-5 bg-primary text-primary-foreground rounded-xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all uppercase tracking-widest text-sm disabled:opacity-60"
               >
                 {t('appointment.chooseTime')} <ChevronRight className="w-4 h-4" />
               </button>
@@ -274,7 +274,7 @@ export function AppointmentBooking() {
                     <button
                       key={time}
                       onClick={() => setSelectedTime(time)}
-                      className={`py-4 sm:py-5 rounded-xl sm:rounded-2xl font-bold transition-all border text-sm sm:text-base ${
+                      className={`py-4 sm:py-5 rounded-xl font-bold transition-all border text-sm sm:text-base ${
                         selectedTime === time
                           ? 'bg-primary text-primary-foreground border-primary shadow-lg scale-[1.02]'
                           : 'bg-background border-border hover:border-primary/50'
@@ -288,14 +288,14 @@ export function AppointmentBooking() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 py-4 sm:py-5 border border-border rounded-xl sm:rounded-2xl font-bold hover:bg-secondary transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2"
+                  className="flex-1 py-4 sm:py-5 border border-border rounded-xl font-bold hover:bg-secondary transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('appointment.back')}
                 </button>
                 <button
                   disabled={!selectedTime || createMutation.isPending}
                   onClick={handleBook}
-                  className="flex-[2] py-4 sm:py-5 bg-primary text-primary-foreground rounded-xl sm:rounded-2xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 uppercase tracking-widest text-sm"
+                  className="flex-[2] py-4 sm:py-5 bg-primary text-primary-foreground rounded-xl font-black flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 uppercase tracking-widest text-sm"
                 >
                   {createMutation.isPending ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -319,7 +319,7 @@ export function AppointmentBooking() {
               </div>
               <div className="space-y-4">
                 <h4 className="text-2xl sm:text-3xl font-black tracking-tight px-4">{t('appointment.successTitle', { name: nom })}</h4>
-                <div className="bg-secondary/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border max-w-md mx-auto space-y-3">
+                <div className="bg-secondary/50 p-4 sm:p-6 rounded-xl border border-border max-w-md mx-auto space-y-3">
                   <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{t('appointment.summary')}</p>
                   <p className="text-foreground font-bold text-base sm:text-lg leading-tight px-2">
                     "{sujet}"
@@ -342,7 +342,7 @@ export function AppointmentBooking() {
               </div>
               <button
                 onClick={resetForm}
-                className="px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-foreground rounded-xl sm:rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-secondary/80 transition-all"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-foreground rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-secondary/80 transition-all"
               >
                 {t('appointment.bookAnother')}
               </button>

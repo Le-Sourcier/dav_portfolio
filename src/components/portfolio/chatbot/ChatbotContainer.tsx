@@ -29,13 +29,14 @@ export const ChatbotContainer: React.FC = () => {
     <>
       {/* Floating Trigger Button - hidden on mobile when chat is open */}
       <motion.button
-        initial={{ scale: 0, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        whileHover={{ scale: 1.05, y: -2 }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         onClick={toggleChat}
         className={cn(
-          "fixed bottom-6 right-6 md:right-12 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center z-[110] transition-all duration-300 shadow-2xl group overflow-hidden",
+          "fixed bottom-6 right-6 md:right-12 w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center z-[110] shadow-2xl group overflow-hidden",
           isOpen
             ? "bg-background border border-border text-foreground hidden sm:flex"
             : "bg-primary text-primary-foreground"
@@ -45,13 +46,13 @@ export const ChatbotContainer: React.FC = () => {
 
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div key="close" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.15 }}>
               <X className="w-6 h-6" />
             </motion.div>
           ) : (
-            <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }} className="relative flex items-center justify-center">
+            <motion.div key="open" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.15 }} className="relative flex items-center justify-center">
               <Bot className="w-6 h-6 md:w-7 md:h-7 relative z-10" />
-              <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute -top-1 -right-1 z-20">
+              <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }} transition={{ repeat: Infinity, duration: 2.5 }} className="absolute -top-1 -right-1 z-20">
                 <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-yellow-400" />
               </motion.div>
             </motion.div>

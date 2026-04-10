@@ -83,14 +83,14 @@ export function BlogPostDetail() {
           <div className="flex items-center justify-center gap-4">
             <Link
               to="/blog"
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
               {t('blogPost.viewAll')}
             </Link>
             {isError && (
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all"
+                className="px-6 py-3 border border-border rounded-xl font-bold text-sm hover:bg-secondary transition-all"
               >
                 {t('blogPost.retry')}
               </button>
@@ -209,7 +209,7 @@ export function BlogPostDetail() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="relative aspect-video rounded-[2.5rem] overflow-hidden mb-16 shadow-2xl border border-border"
+            className="relative aspect-video rounded-xl overflow-hidden mb-16 shadow-2xl border border-border"
           >
             <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
           </motion.div>
@@ -258,7 +258,7 @@ export function BlogPostDetail() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="p-8 rounded-3xl bg-secondary/20 border border-transparent hover:border-border transition-all"
+                    className="p-8 rounded-xl bg-secondary/20 border border-transparent hover:border-border transition-all"
                   >
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-3">
@@ -285,7 +285,7 @@ export function BlogPostDetail() {
           {/* Comment form */}
           {isVerified ? (
             /* ---- VERIFIED: show simple comment box ---- */
-            <form onSubmit={handleSubmitComment} className="p-8 rounded-3xl bg-card border border-border shadow-lg">
+            <form onSubmit={handleSubmitComment} className="p-8 rounded-xl bg-card border border-border shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-xs">
@@ -318,7 +318,7 @@ export function BlogPostDetail() {
                 <button
                   type="submit"
                   disabled={addCommentMutation.isPending}
-                  className="flex items-center gap-3 px-8 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
+                  className="flex items-center gap-3 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
                 >
                   {addCommentMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -333,7 +333,7 @@ export function BlogPostDetail() {
             </form>
           ) : otpStatus === 'sent' || otpStatus === 'verifying' || otpStatus === 'error' || needsReverification ? (
             /* ---- OTP VERIFICATION ---- */
-            <div className="p-8 rounded-3xl bg-card border border-border shadow-lg">
+            <div className="p-8 rounded-xl bg-card border border-border shadow-lg">
               <OtpVerification
                 email={session?.email || identifyForm.email}
                 otpStatus={otpStatus}
@@ -346,7 +346,7 @@ export function BlogPostDetail() {
             </div>
           ) : (
             /* ---- NOT IDENTIFIED: show identification form ---- */
-            <form onSubmit={handleIdentify} className="p-8 rounded-3xl bg-card border border-border shadow-lg">
+            <form onSubmit={handleIdentify} className="p-8 rounded-xl bg-card border border-border shadow-lg">
               <h4 className="text-sm font-black uppercase tracking-widest mb-2">{t('blogPost.joinDiscussion')}</h4>
               <p className="text-[12px] text-muted-foreground mb-6">
                 {t('blogPost.identifyDesc')}
@@ -388,7 +388,7 @@ export function BlogPostDetail() {
                 <button
                   type="submit"
                   disabled={otpStatus === 'sending'}
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
+                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-black hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-60"
                 >
                   {otpStatus === 'sending' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   {t('blogPost.getCode')}

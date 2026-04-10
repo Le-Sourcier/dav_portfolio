@@ -24,7 +24,7 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-card/50 backdrop-blur-sm border border-border rounded-[2.5rem] overflow-hidden hover:border-primary/50 transition-all duration-500"
+        className="group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-card/50 backdrop-blur-sm border border-border rounded-xl lg:rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
       >
         <Link to={`/blog/${post.id}`} className="relative aspect-video lg:aspect-auto overflow-hidden">
           <img
@@ -76,7 +76,7 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
             </div>
             <Link
               to={`/blog/${post.id}`}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
               {t('blog.readArticle')}
               <ArrowRight className="w-4 h-4" />
@@ -92,7 +92,7 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group flex flex-col bg-card/50 backdrop-blur-sm border border-border rounded-[2.5rem] overflow-hidden hover:border-primary/50 transition-all duration-500 hover:-translate-y-2"
+      className="group flex flex-col bg-card/50 backdrop-blur-sm border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
     >
       <Link to={`/blog/${post.id}`} className="relative aspect-video overflow-hidden">
         <img
@@ -138,7 +138,7 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
           </div>
           <Link
             to={`/blog/${post.id}`}
-            className="p-3 rounded-2xl bg-secondary text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+            className="p-3 rounded-xl bg-secondary text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all"
           >
             <ArrowRight className="w-4 h-4" />
           </Link>

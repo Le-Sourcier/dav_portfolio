@@ -93,10 +93,10 @@ ${t('about.cvEducation')}
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="absolute -bottom-10 -right-6 md:-right-12 bg-card/80 backdrop-blur-2xl border border-border p-8 rounded-[2.5rem] shadow-2xl max-w-[260px] hidden sm:block"
+              className="absolute -bottom-10 -right-6 md:-right-12 bg-card/80 backdrop-blur-2xl border border-border p-8 rounded-xl shadow-2xl max-w-[260px] hidden sm:block"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl shadow-primary/20">
+                <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl shadow-primary/20">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
                 <h4 className="font-black text-4xl tracking-tighter text-primary">5+</h4>
@@ -178,12 +178,12 @@ ${t('about.cvEducation')}
             <div className="flex flex-wrap gap-8">
               <button 
                 onClick={handleDownloadResume}
-                className="group flex items-center gap-4 px-10 py-5 bg-primary text-primary-foreground rounded-[2rem] font-black hover:shadow-2xl hover:shadow-primary/30 transition-all hover:-translate-y-1 active:scale-95"
+                className="group flex items-center gap-4 px-10 py-5 bg-primary text-primary-foreground rounded-xl font-black hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-95"
               >
                 <Download className="w-5 h-5 group-hover:animate-bounce" />
                 {t('about.downloadCv')}
               </button>
-              <a href="#contact" className="flex items-center gap-4 px-10 py-5 border-2 border-border rounded-[2rem] font-black hover:bg-secondary transition-all hover:border-primary/30">
+              <a href="#contact" className="flex items-center gap-4 px-10 py-5 border-2 border-border rounded-xl font-black hover:bg-secondary transition-all hover:border-primary/30">
                 {t('about.contactMe')}
                 <ExternalLink className="w-5 h-5" />
               </a>
@@ -219,7 +219,7 @@ ${t('about.cvEducation')}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 onClick={() => handleExperienceClick(exp.id)}
-                className="p-10 rounded-[3rem] bg-secondary/20 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-500 group relative cursor-pointer active:scale-[0.98]"
+                className="p-10 rounded-xl bg-secondary/20 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-500 group relative cursor-pointer active:scale-[0.98]"
               >
                 <div className="flex justify-between items-start mb-12">
                   <span className="text-xs font-black text-primary/40 group-hover:text-primary transition-colors tracking-widest">{exp.dates}</span>

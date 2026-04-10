@@ -97,7 +97,7 @@ export function Contact() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="p-8 md:p-12 rounded-[3rem] bg-background border border-border shadow-2xl relative"
+            className="p-8 md:p-10 rounded-xl bg-background border border-border shadow-2xl relative"
           >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -105,7 +105,7 @@ export function Contact() {
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.fullName')}</label>
                   <input
                     {...register('name', { required: t('contact.nameRequired') })}
-                    className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
+                    className="w-full bg-secondary/30 border-border rounded-xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
                     placeholder={t('contact.namePlaceholder')}
                   />
                   {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
@@ -118,7 +118,7 @@ export function Contact() {
                       pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('contact.emailInvalid') }
                     })}
                     type="email"
-                    className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
+                    className="w-full bg-secondary/30 border-border rounded-xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium"
                     placeholder={t('contact.emailPlaceholder')}
                   />
                   {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
@@ -129,7 +129,7 @@ export function Contact() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('contact.subject')}</label>
                 <select
                   {...register('subject')}
-                  className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium appearance-none"
+                  className="w-full bg-secondary/30 border-border rounded-xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all font-medium appearance-none"
                 >
                   <option>{t('contact.subjectNew')}</option>
                   <option>{t('contact.subjectCollab')}</option>
@@ -142,7 +142,7 @@ export function Contact() {
                 <textarea
                   {...register('message', { required: t('contact.messageRequired') })}
                   rows={5}
-                  className="w-full bg-secondary/30 border-border rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all resize-none font-medium"
+                  className="w-full bg-secondary/30 border-border rounded-xl px-6 py-5 focus:ring-2 focus:ring-primary transition-all resize-none font-medium"
                   placeholder={t('contact.messagePlaceholder')}
                 />
                 {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
@@ -150,7 +150,7 @@ export function Contact() {
 
               <button
                 disabled={sendMutation.isPending}
-                className="w-full py-6 bg-primary text-primary-foreground rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-70 active:scale-[0.98]"
+                className="w-full py-6 bg-primary text-primary-foreground rounded-xl font-black text-lg flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-70 active:scale-[0.98]"
               >
                 {sendMutation.isPending ? (
                   <Loader2 className="w-6 h-6 animate-spin" />

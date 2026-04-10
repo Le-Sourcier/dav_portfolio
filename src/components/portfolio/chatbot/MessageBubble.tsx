@@ -36,7 +36,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
       <div className={cn("max-w-[85%] flex flex-col gap-1.5", isAssistant ? "items-start" : "items-end")}>
         <div className={cn(
-          "px-4 py-3 rounded-2xl text-[13px] leading-relaxed shadow-sm transition-all",
+          "px-4 py-3 rounded-xl text-[13px] leading-relaxed shadow-sm transition-all",
           isAssistant
             ? "bg-secondary/40 border border-border/50 text-foreground rounded-tl-none hover:bg-secondary/60"
             : "bg-primary text-primary-foreground rounded-tr-none shadow-primary/20"
@@ -349,7 +349,7 @@ function AppointmentPicker({ times }: { times: string[] }) {
           onClick={() => { setSelectedTime(time); setStep('info'); }}
           className="border bg-background/50 hover:bg-primary/10 border-border/50 hover:border-primary/50 text-foreground px-3 py-2.5 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-2 group"
         >
-          <Calendar className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+          <Calendar className="w-3.5 h-3.5 text-primary group-hover:scale-105 transition-transform" />
           {time}
         </motion.button>
       ))}

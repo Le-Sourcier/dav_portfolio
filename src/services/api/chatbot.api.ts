@@ -7,9 +7,27 @@ export interface QuickAction {
   prompt: string;
 }
 
+// Unique session ID per browser tab (persists in sessionStorage)
+function getSessionId(): string {
+  const key = 'chatbot-session-id';
+  let id = sessionStorage.getItem(key);
+  if (!id) {
+    id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    sessionStorage.setItem(key, id);
+  }
+  return id;
+}
+
 export const chatbotApi = {
-  async sendMessage(content: string): Promise<Message> {
-    return apiClient.post<Message>('/chatbot/message', { content });
+  async sendMessage(
+    content: string,
+    history?: Array<{ role: 'user' | 'assistant'; content: string }>,
+  ): Promise<Message> {
+    return apiClient.post<Message>('/chatbot/message', {
+      content,
+      history,
+      sessionId: getSessionId(),
+    });
   },
 
   async getQuickActions(): Promise<QuickAction[]> {

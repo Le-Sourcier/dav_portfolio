@@ -66,11 +66,11 @@ export function ProjectDetailPage() {
               : t('projectDetail.notFoundDesc')}
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
+            <Link to="/" className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
               {t('projectDetail.viewAll')}
             </Link>
             {isError && (
-              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
+              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-xl font-bold text-sm hover:bg-secondary transition-all">
                 {t('projectDetail.retry')}
               </button>
             )}
@@ -199,7 +199,7 @@ export function ProjectDetailPage() {
 
           <div className="lg:col-span-4">
             <div className="sticky top-32 space-y-12">
-              <div className="p-8 rounded-[3rem] bg-card border border-border">
+              <div className="p-8 rounded-xl bg-card border border-border">
                 <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-10 flex items-center gap-3"><Trophy className="w-5 h-5" />{t('projectDetail.keyWins')}</h4>
                 <ul className="space-y-8 mb-12">
                   {project.results.map((result, i) => (
@@ -210,8 +210,8 @@ export function ProjectDetailPage() {
                   ))}
                 </ul>
                 <div className="flex flex-col gap-4">
-                  <button onClick={handleLaunch} className="w-full py-5 bg-primary text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all">{t('projectDetail.launch')}</button>
-                  <button onClick={handleShare} className="w-full py-5 bg-secondary text-foreground rounded-2xl font-black text-sm uppercase tracking-widest">{t('projectDetail.share')}</button>
+                  <button onClick={handleLaunch} className="w-full py-5 bg-primary text-primary-foreground rounded-xl font-black text-sm uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all">{t('projectDetail.launch')}</button>
+                  <button onClick={handleShare} className="w-full py-5 bg-secondary text-foreground rounded-xl font-black text-sm uppercase tracking-widest">{t('projectDetail.share')}</button>
                 </div>
               </div>
             </div>

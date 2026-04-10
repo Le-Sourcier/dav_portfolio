@@ -18,8 +18,6 @@ export const processUserMessage = async (content: string): Promise<Partial<Messa
   const NL = String.fromCharCode(10);
   const firstNameLower = firstName.toLowerCase();
 
-  await new Promise(resolve => setTimeout(resolve, 800));
-
   if (
     input.includes('qui es-tu') ||
     input.includes(`qui est ${firstNameLower}`) ||

@@ -7,8 +7,8 @@ export function AuthorCard() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-6 p-8 rounded-[2rem] bg-secondary/30 border border-border">
-      <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-primary/20 shrink-0">
+    <div className="flex flex-col sm:flex-row items-start gap-6 p-8 rounded-xl bg-secondary/30 border border-border">
+      <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-primary/20 shrink-0">
         <img src={profile.avatar} alt={profile.name} className="w-full h-full object-cover" />
       </div>
 

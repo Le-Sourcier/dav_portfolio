@@ -37,7 +37,7 @@ export function ProjectMetrics({ metrics, chartData, category }: ProjectMetricsP
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-secondary/50 backdrop-blur-sm border border-border p-6 rounded-3xl"
+              className="bg-secondary/50 backdrop-blur-sm border border-border p-6 rounded-xl"
             >
               <div className="flex justify-between items-start mb-4">
                 <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
@@ -58,7 +58,7 @@ export function ProjectMetrics({ metrics, chartData, category }: ProjectMetricsP
       </div>
 
       {/* Chart Visualization */}
-      <div className="bg-secondary/30 border border-border p-8 rounded-[2rem] overflow-hidden">
+      <div className="bg-secondary/30 border border-border p-8 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h4 className="text-lg font-bold mb-1">Impact Visuel</h4>

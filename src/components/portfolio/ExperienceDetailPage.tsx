@@ -65,11 +65,11 @@ export function ExperienceDetailPage() {
               : t('experience.notFoundDesc')}
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Link to="/#about" className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
+            <Link to="/#about" className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all">
               {t('experience.viewProfile')}
             </Link>
             {isError && (
-              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-2xl font-bold text-sm hover:bg-secondary transition-all">
+              <button onClick={() => window.location.reload()} className="px-6 py-3 border border-border rounded-xl font-bold text-sm hover:bg-secondary transition-all">
                 {t('experience.retry')}
               </button>
             )}
@@ -171,7 +171,7 @@ export function ExperienceDetailPage() {
                   <SectionHeader label={t('experience.responsibilities')} />
                   <div className="grid gap-6">
                     {experience.details.map((detail, idx) => (
-                      <div key={idx} className="flex gap-4 p-6 rounded-2xl bg-secondary/30 border border-border/50">
+                      <div key={idx} className="flex gap-4 p-6 rounded-xl bg-secondary/30 border border-border/50">
                         <div className="mt-1"><ChevronRight className="w-5 h-5 text-primary" /></div>
                         <p className="font-medium">{detail}</p>
                       </div>
@@ -186,8 +186,8 @@ export function ExperienceDetailPage() {
                   <SectionHeader label={t('experience.techStack')} />
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                     {experience.stack.map((tech, idx) => (
-                      <div key={idx} className="flex flex-col items-center justify-center p-6 rounded-3xl bg-card border border-border hover:border-primary/30 transition-all group">
-                        <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <div key={idx} className="flex flex-col items-center justify-center p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all group">
+                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                           <Cpu className="w-6 h-6 text-primary" />
                         </div>
                         <span className="font-black text-sm uppercase tracking-tighter">{tech}</span>
@@ -220,7 +220,7 @@ export function ExperienceDetailPage() {
                   <SectionHeader label={t('experience.gallery')} />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {experience.illustrativeImages.map((img, idx) => (
-                      <div key={idx} className="rounded-2xl overflow-hidden border border-border shadow-lg">
+                      <div key={idx} className="rounded-xl overflow-hidden border border-border shadow-lg">
                         <img src={img} alt={`Illustration ${idx + 1}`} className="w-full h-64 object-cover" />
                       </div>
                     ))}
@@ -235,7 +235,7 @@ export function ExperienceDetailPage() {
 
                 {/* Table of contents */}
                 {tocItems.length > 1 && (
-                  <div className="p-6 rounded-[2rem] bg-card border border-border shadow-sm">
+                  <div className="p-6 rounded-xl bg-card border border-border shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                       <Layers className="w-5 h-5 text-primary" />
                       <h3 className="text-sm font-black uppercase tracking-tight">{t('experience.toc')}</h3>
@@ -256,7 +256,7 @@ export function ExperienceDetailPage() {
                 )}
 
                 {/* Quick info card */}
-                <div className="p-6 rounded-[2rem] bg-secondary/20 border border-border">
+                <div className="p-6 rounded-xl bg-secondary/20 border border-border">
                   <h3 className="text-sm font-black uppercase tracking-tight mb-6">{t('experience.quickInfo')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -304,7 +304,7 @@ export function ExperienceDetailPage() {
 
                 {/* Achievements */}
                 {experience.achievements && experience.achievements.length > 0 && (
-                  <div className="p-6 rounded-[2rem] bg-card border border-border shadow-sm">
+                  <div className="p-6 rounded-xl bg-card border border-border shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                       <Trophy className="w-5 h-5 text-primary" />
                       <h3 className="text-sm font-black uppercase tracking-tight">{t('experience.achievements')}</h3>
@@ -325,7 +325,7 @@ export function ExperienceDetailPage() {
 
                 {/* Links */}
                 {experience.links && experience.links.length > 0 && (
-                  <div className="p-6 rounded-[2rem] bg-secondary/30 border border-border">
+                  <div className="p-6 rounded-xl bg-secondary/30 border border-border">
                     <h3 className="text-sm font-black uppercase tracking-tight mb-6">{t('experience.usefulLinks')}</h3>
                     <div className="space-y-3">
                       {experience.links.map((link, idx) => (

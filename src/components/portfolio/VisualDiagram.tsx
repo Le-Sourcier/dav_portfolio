@@ -46,7 +46,7 @@ const SolutionDiagram = ({ data }: { data: SolutionDiagramData }) => {
   }, [data]);
 
   return (
-    <div className="relative w-full min-h-[400px] flex flex-col items-center justify-between gap-12 p-8 bg-background/50 rounded-3xl border border-border/50 overflow-hidden">
+    <div className="relative w-full min-h-[400px] flex flex-col items-center justify-between gap-12 p-8 bg-background/50 rounded-xl border border-border/50 overflow-hidden">
       {/* Background Decorative Lines */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-primary via-secondary to-transparent" />
@@ -100,7 +100,7 @@ const ImpactRadar = ({ data }: { data: ImpactData[] }) => {
   const polygonPath = points.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-12 p-8 bg-background/50 rounded-3xl border border-border/50">
+    <div className="flex flex-col md:flex-row items-center gap-12 p-8 bg-background/50 rounded-xl border border-border/50">
       <div className="relative w-[300px] h-[300px]">
         <svg width={size} height={size} className="overflow-visible">
           {/* Grid Circles */}

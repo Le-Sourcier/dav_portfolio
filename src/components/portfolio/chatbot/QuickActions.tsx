@@ -43,9 +43,9 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ quickActions, onActi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               onClick={() => onAction(action.prompt || action.label)}
-              className="flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-full border border-border/50 bg-secondary/20 hover:bg-primary/10 hover:border-primary/30 transition-all text-[11px] font-semibold tracking-tight text-muted-foreground hover:text-primary active:scale-95 group shadow-sm"
+              className="flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl border border-border/50 bg-secondary/20 hover:bg-primary/10 hover:border-primary/30 transition-all text-[11px] font-semibold tracking-tight text-muted-foreground hover:text-primary active:scale-95 group shadow-sm"
             >
-              <Icon className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
+              <Icon className="w-3.5 h-3.5 transition-transform group-hover:scale-105" />
               {action.label}
             </motion.button>
           );

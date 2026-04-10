@@ -118,7 +118,7 @@ export function ContactsPage() {
           onClick={() => setViewingContact(null)}
         >
           <div
-            className="bg-card border border-border w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-card border border-border w-full max-w-2xl rounded-xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-6">
@@ -135,7 +135,7 @@ export function ContactsPage() {
             {viewingContact.subject && (
               <p className="text-sm font-bold mb-4">Sujet : {viewingContact.subject}</p>
             )}
-            <div className="bg-secondary/30 rounded-2xl p-6">
+            <div className="bg-secondary/30 rounded-xl p-6">
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{viewingContact.message}</p>
             </div>
             <p className="text-xs text-muted-foreground mt-4">
@@ -156,7 +156,7 @@ export function ContactsPage() {
                     <MessageSquareReply className="w-4 h-4 text-emerald-500" />
                     <span className="text-sm font-bold text-emerald-500">Reponse envoyee</span>
                   </div>
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-6">
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{viewingContact.reply}</p>
                   </div>
                   {viewingContact.repliedAt && (

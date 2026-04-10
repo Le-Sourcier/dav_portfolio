@@ -137,7 +137,7 @@ export function AppointmentsPage() {
           onClick={() => setViewingItem(null)}
         >
           <div
-            className="bg-card border border-border w-full max-w-lg rounded-[2rem] p-8 shadow-2xl"
+            className="bg-card border border-border w-full max-w-lg rounded-xl p-8 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

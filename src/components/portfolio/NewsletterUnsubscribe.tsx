@@ -34,7 +34,7 @@ export function NewsletterUnsubscribe() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="p-8 rounded-[2.5rem] bg-card border border-border shadow-2xl text-center">
+        <div className="p-8 rounded-xl bg-card border border-border shadow-2xl text-center">
           {status === 'done' ? (
             <>
               <div className="w-20 h-20 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -50,7 +50,7 @@ export function NewsletterUnsubscribe() {
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-black hover:shadow-lg transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Retour a l'accueil
@@ -67,7 +67,7 @@ export function NewsletterUnsubscribe() {
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-black hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-black hover:shadow-lg transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Retour a l'accueil

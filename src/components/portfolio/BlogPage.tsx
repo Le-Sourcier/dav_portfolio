@@ -119,7 +119,7 @@ export function BlogPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('blog.searchPlaceholder')}
-                className="w-full pl-11 pr-10 py-3 bg-card border border-border rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                className="w-full pl-11 pr-10 py-3 bg-card border border-border rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary transition-all"
               />
               {search && (
                 <button
@@ -195,7 +195,7 @@ export function BlogPage() {
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all"
             >
               {t('blog.retry')}
             </button>

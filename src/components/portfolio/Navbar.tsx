@@ -111,7 +111,7 @@ export function Navbar() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={handleLetsTalk}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-black text-[10px] uppercase tracking-widest hover:shadow-xl hover:shadow-primary/20 transition-all flex items-center gap-2 group"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:shadow-xl hover:shadow-primary/20 transition-all flex items-center gap-2 group"
             >
               {t('nav.cta')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

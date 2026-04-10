@@ -82,13 +82,13 @@ export function Hero() {
             transition={{ delay: 0.6, duration: 0.8 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24"
           >
-            <a href="#work" className="group relative px-10 py-5 bg-primary text-primary-foreground rounded-2xl font-black text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl">
+            <a href="#work" className="group relative px-10 py-5 bg-primary text-primary-foreground rounded-xl font-black text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl">
               <span className="relative z-10 flex items-center gap-3">
                 {t('hero.projects')} <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </a>
-            <button className="flex items-center gap-3 px-10 py-5 bg-secondary text-secondary-foreground rounded-2xl font-black text-lg hover:bg-secondary/80 transition-all border border-border">
+            <button className="flex items-center gap-3 px-10 py-5 bg-secondary text-secondary-foreground rounded-xl font-black text-lg hover:bg-secondary/80 transition-all border border-border">
               {t('hero.showreel')} <PlayCircle className="w-6 h-6" />
             </button>
           </motion.div>

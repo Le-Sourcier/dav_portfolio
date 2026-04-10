@@ -46,7 +46,7 @@ export function LatestBlogPosts() {
           >
             <Link
               to="/blog"
-              className="group flex items-center gap-3 px-8 py-4 bg-secondary hover:bg-primary hover:text-primary-foreground rounded-2xl font-black text-sm uppercase tracking-widest transition-all border border-border"
+              className="group flex items-center gap-3 px-8 py-4 bg-secondary hover:bg-primary hover:text-primary-foreground rounded-xl font-black text-sm uppercase tracking-widest transition-all border border-border"
             >
               {t('latestPosts.viewAll')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>

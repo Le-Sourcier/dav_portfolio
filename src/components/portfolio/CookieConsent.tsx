@@ -26,7 +26,7 @@ export function CookieConsent() {
         transition={{ type: 'spring', damping: 25, stiffness: 200, delay: 1.5 }}
         className="fixed bottom-0 left-0 right-0 z-[90] p-4 md:p-6"
       >
-        <div className="max-w-3xl mx-auto bg-card/95 backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl shadow-2xl shadow-black/10 overflow-hidden">
+        <div className="max-w-3xl mx-auto bg-card/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl shadow-black/10 overflow-hidden">
           {/* Main bar */}
           <div className="p-5 md:p-6">
             <div className="flex items-start gap-4">

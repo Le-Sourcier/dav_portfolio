@@ -79,8 +79,14 @@ export function useChatbot() {
     store.addMessage(userMessage);
     setIsTyping(true);
 
+    // Build conversation history for the AI
+    const history = [...store.messages, userMessage]
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .slice(-16)
+      .map(m => ({ role: m.role, content: m.content }));
+
     try {
-      const response = await chatbotApi.sendMessage(content);
+      const response = await chatbotApi.sendMessage(content, history);
       store.addMessage({
         id: response.id || (Date.now() + 1).toString(),
         role: 'assistant',
