@@ -25,6 +25,7 @@ import { ThemeProvider } from './components/portfolio/ThemeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatbotContainer } from './components/portfolio/chatbot/ChatbotContainer';
 import { useProfile } from './hooks/useProfile';
+import { useLocalizedField } from './hooks/useLocalizedField';
 import { envConfig } from './config/env';
 import { SeoHead } from './components/shared/SeoHead';
 import { CookieConsent } from './components/portfolio/CookieConsent';
@@ -71,6 +72,8 @@ function HomePage() {
 function Layout({ children, hideNavFooter = false }: { children: React.ReactNode; hideNavFooter?: boolean }) {
   const profile = useProfile();
   const { t } = useTranslation();
+  const localize = useLocalizedField();
+  const title = localize(profile.title, profile.title_en);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans antialiased transition-colors duration-500">
@@ -87,7 +90,7 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
                 {profile.brand}<span className="text-primary">.</span>
               </Link>
               <p className="text-muted-foreground font-medium text-center md:text-left">
-                {profile.title}<br /> base a {profile.location}.
+                {title}<br /> {t('footer.baseAt')} {profile.location}.
               </p>
             </div>
 
