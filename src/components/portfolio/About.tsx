@@ -42,8 +42,8 @@ ${t('about.cvSkills')}
 ${t('about.cvEducation')}
 `;
     profile.education.forEach(edu => {
-      content += `- ${edu.degree} en ${edu.field}
-  ${edu.description}
+      content += `- ${localize(edu.degree, edu.degree_en)} en ${localize(edu.field, edu.field_en)}
+  ${localize(edu.description, edu.description_en)}
 `;
     });
     
@@ -170,8 +170,8 @@ ${t('about.cvEducation')}
                 <div className="space-y-4">
                   {profile.education.map((edu) => (
                     <div key={edu.id} className="min-w-0">
-                      <p className="font-black text-sm leading-snug">{edu.degree}</p>
-                      <p className="text-xs text-muted-foreground font-bold italic">{edu.field}</p>
+                      <p className="font-black text-sm leading-snug">{localize(edu.degree, edu.degree_en)}</p>
+                      <p className="text-xs text-muted-foreground font-bold italic">{localize(edu.field, edu.field_en)}</p>
                     </div>
                   ))}
                 </div>

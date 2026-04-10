@@ -225,9 +225,12 @@ export const cvData = {
   ],
   education: [
     {
-      degree: "Autodidacte & Formations Sp\u00e9cialis\u00e9es",
-      field: "G\u00e9nie Logiciel & Fullstack Development",
-      description: "Apprentissage intensif des technologies web modernes, de l'architecture logicielle et des principes de d\u00e9veloppement agile."
+      degree: "Autodidacte & Formations Spécialisées",
+      degree_en: "Self-taught & Specialized Training",
+      field: "Génie Logiciel & Fullstack Development",
+      field_en: "Software Engineering & Fullstack Development",
+      description: "Apprentissage intensif des technologies web modernes, de l'architecture logicielle et des principes de développement agile.",
+      description_en: "Intensive learning of modern web technologies, software architecture, and agile development principles."
     }
   ],
   skills: {
