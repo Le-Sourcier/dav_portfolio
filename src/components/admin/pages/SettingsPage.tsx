@@ -10,6 +10,8 @@ import { useUpdateSettings, useApiSettings } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { cvData } from '@/data/cvData';
+import { useTranslation } from 'react-i18next';
+import { LangToggle } from '../shared/LangToggle';
 
 type Section = 'profile' | 'security' | 'appearance' | 'seo' | 'chatbot' | 'expertise';
 
@@ -90,9 +92,11 @@ function useSaveFeedback() {
 const VALID_SECTIONS: Section[] = ['profile', 'expertise', 'security', 'appearance', 'seo', 'chatbot'];
 
 export function SettingsPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const settings = useSettingsStore();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   // Sync section with URL ?section= param
   const urlSection = searchParams.get('section') as Section | null;
@@ -291,7 +295,7 @@ export function SettingsPage() {
 
   const handleAddEducation = () => {
     const newId = String(Date.now());
-    setEducationForm([...educationForm, { id: newId, degree: '', field: '', description: '' }]);
+    setEducationForm([...educationForm, { id: newId, degree: '', degree_en: '', field: '', field_en: '', description: '', description_en: '' }]);
   };
 
   const handleRemoveEducation = (id: string) => {
@@ -317,7 +321,7 @@ export function SettingsPage() {
     toast.success('Preference mise a jour');
   };
 
-  const charCount = seoForm.metaDescription.length;
+  const charCount = (lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length;
   const charStatus = charCount <= 160 ? 'success' : 'danger';
 
   return (
@@ -358,7 +362,7 @@ export function SettingsPage() {
         {/* ===== PROFILE ===== */}
         {activeSection === 'profile' && (
           <>
-            <SectionCard title="Informations personnelles" description="Ces informations sont affichees sur votre portfolio.">
+            <SectionCard title={t('settings.profile.personalInfo')} description={t('settings.profile.personalInfoDesc')}>
               <div className="space-y-5">
                 {/* Avatar */}
                 <div className="flex items-center gap-4">
@@ -378,49 +382,64 @@ export function SettingsPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{profileForm.name}</p>
-                    <p className="text-[12px] text-zinc-400">Cliquez sur l'icone pour changer</p>
+                    <p className="text-[12px] text-zinc-400">{t('settings.profile.changePhoto')}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <FieldLabel>Nom complet</FieldLabel>
+                    <FieldLabel>{t('settings.profile.fullName')}</FieldLabel>
                     <FieldInput value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} />
                   </div>
                   <div>
-                    <FieldLabel>Email</FieldLabel>
+                    <FieldLabel>{t('settings.profile.email')}</FieldLabel>
                     <FieldInput value={profileForm.email} onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })} type="email" />
                   </div>
-                  <div>
-                    <FieldLabel>Titre professionnel</FieldLabel>
-                    <FieldInput value={profileForm.title} onChange={(e) => setProfileForm({ ...profileForm, title: e.target.value })} />
+                  <div className="md:col-span-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <FieldLabel>{t('settings.profile.professionalTitle')}</FieldLabel>
+                      <LangToggle lang={lang} onChange={setLang} hasEnContent={!!profileForm.title_en} />
+                    </div>
+                    <FieldInput 
+                      value={lang === 'fr' ? profileForm.title : profileForm.title_en} 
+                      onChange={(e) => setProfileForm({ 
+                        ...profileForm, 
+                        [lang === 'fr' ? 'title' : 'title_en']: e.target.value 
+                      })} 
+                    />
                   </div>
                   <div>
-                    <FieldLabel>Localisation</FieldLabel>
+                    <FieldLabel>{t('settings.profile.location')}</FieldLabel>
                     <FieldInput value={profileForm.location} onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })} />
                   </div>
                   <div>
-                    <FieldLabel>Nom de la marque (Brand)</FieldLabel>
-                    <FieldInput value={profileForm.brand} onChange={(e) => setProfileForm({ ...profileForm, brand: e.target.value })} placeholder="Ex: CREATIVE" />
+                    <FieldLabel>{t('settings.profile.brandName')}</FieldLabel>
+                    <FieldInput value={profileForm.brand} onChange={(e) => setProfileForm({ ...profileForm, brand: e.target.value })} placeholder={t('settings.profile.brandPlaceholder')} />
                   </div>
                   <div>
-                    <FieldLabel>Telephone</FieldLabel>
-                    <FieldInput value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="+228 00000000" />
+                    <FieldLabel>{t('settings.profile.phone')}</FieldLabel>
+                    <FieldInput value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder={t('settings.profile.phonePlaceholder')} />
                   </div>
                   <div>
-                    <FieldLabel>Annees d'experience</FieldLabel>
-                    <FieldInput value={profileForm.yearsExperience} onChange={(e) => setProfileForm({ ...profileForm, yearsExperience: e.target.value })} placeholder="Ex: 5+" />
+                    <FieldLabel>{t('settings.profile.yearsExperience')}</FieldLabel>
+                    <FieldInput value={profileForm.yearsExperience} onChange={(e) => setProfileForm({ ...profileForm, yearsExperience: e.target.value })} placeholder={t('settings.profile.yearsPlaceholder')} />
                   </div>
                 </div>
 
                 <div>
-                  <FieldLabel>Bio</FieldLabel>
+                  <div className="flex items-center justify-between mb-1">
+                    <FieldLabel>{t('settings.profile.bio')}</FieldLabel>
+                    <LangToggle lang={lang} onChange={setLang} hasEnContent={!!profileForm.bio_en} />
+                  </div>
                   <Textarea
-                    value={profileForm.bio}
-                    onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                    value={lang === 'fr' ? profileForm.bio : profileForm.bio_en}
+                    onChange={(e) => setProfileForm({ 
+                      ...profileForm, 
+                      [lang === 'fr' ? 'bio' : 'bio_en']: e.target.value 
+                    })}
                     className="min-h-[80px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
                   />
-                  <p className="text-[11px] text-zinc-400 mt-1">{profileForm.bio.length}/300 caracteres</p>
+                  <p className="text-[11px] text-zinc-400 mt-1">{(lang === 'fr' ? profileForm.bio : profileForm.bio_en ?? '').length}{t('settings.profile.bioCount')}</p>
                 </div>
 
                 <div className="flex justify-end pt-2">
@@ -429,23 +448,23 @@ export function SettingsPage() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Liens sociaux" description="Vos profils sur les reseaux.">
+            <SectionCard title={t('settings.profile.socialLinks')} description={t('settings.profile.socialLinksDesc')}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <FieldLabel>GitHub</FieldLabel>
-                  <FieldInput value={socialForm.github} onChange={(e) => setSocialForm({ ...socialForm, github: e.target.value })} placeholder="https://github.com/..." />
+                  <FieldLabel>{t('settings.profile.github')}</FieldLabel>
+                  <FieldInput value={socialForm.github} onChange={(e) => setSocialForm({ ...socialForm, github: e.target.value })} placeholder={t('settings.profile.githubPlaceholder')} />
                 </div>
                 <div>
-                  <FieldLabel>LinkedIn</FieldLabel>
-                  <FieldInput value={socialForm.linkedin} onChange={(e) => setSocialForm({ ...socialForm, linkedin: e.target.value })} placeholder="https://linkedin.com/in/..." />
+                  <FieldLabel>{t('settings.profile.linkedin')}</FieldLabel>
+                  <FieldInput value={socialForm.linkedin} onChange={(e) => setSocialForm({ ...socialForm, linkedin: e.target.value })} placeholder={t('settings.profile.linkedinPlaceholder')} />
                 </div>
                 <div>
-                  <FieldLabel>Twitter / X</FieldLabel>
-                  <FieldInput value={socialForm.twitter} onChange={(e) => setSocialForm({ ...socialForm, twitter: e.target.value })} placeholder="https://x.com/..." />
+                  <FieldLabel>{t('settings.profile.twitter')}</FieldLabel>
+                  <FieldInput value={socialForm.twitter} onChange={(e) => setSocialForm({ ...socialForm, twitter: e.target.value })} placeholder={t('settings.profile.twitterPlaceholder')} />
                 </div>
                 <div>
-                  <FieldLabel>Site personnel</FieldLabel>
-                  <FieldInput value={socialForm.website} onChange={(e) => setSocialForm({ ...socialForm, website: e.target.value })} placeholder="https://..." />
+                  <FieldLabel>{t('settings.profile.website')}</FieldLabel>
+                  <FieldInput value={socialForm.website} onChange={(e) => setSocialForm({ ...socialForm, website: e.target.value })} placeholder={t('settings.profile.websitePlaceholder')} />
                 </div>
               </div>
               <div className="flex justify-end pt-4">
@@ -458,10 +477,10 @@ export function SettingsPage() {
         {/* ===== EXPERTISE ===== */}
         {activeSection === 'expertise' && (
           <>
-            <SectionCard title="Competences techniques" description="Les competences affichees dans la section Expertise de votre portfolio.">
+            <SectionCard title={t('settings.expertise.skills')} description={t('settings.expertise.skillsDesc')}>
               <div className="space-y-6">
                 {(['frontend', 'backend', 'tools'] as const).map((category) => {
-                  const labels = { frontend: 'Frontend', backend: 'Backend', tools: 'Outils' };
+                  const labels = { frontend: t('settings.expertise.frontend'), backend: t('settings.expertise.backend'), tools: t('settings.expertise.tools') };
                   return (
                     <div key={category}>
                       <FieldLabel>{labels[category]}</FieldLabel>
@@ -483,7 +502,7 @@ export function SettingsPage() {
                           value={newSkillInputs[category]}
                           onChange={(e) => setNewSkillInputs({ ...newSkillInputs, [category]: e.target.value })}
                           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(category); } }}
-                          placeholder={`Ajouter une competence ${labels[category].toLowerCase()}...`}
+                          placeholder={t('settings.expertise.addSkill')}
                           className="flex-1"
                         />
                         <button
@@ -503,34 +522,43 @@ export function SettingsPage() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Formation" description="Votre parcours academique et vos certifications.">
+            <SectionCard title={t('settings.expertise.education')} description={t('settings.expertise.educationDesc')}>
               <div className="space-y-3">
                 {educationForm.map((edu) => (
                   <div key={edu.id} className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 space-y-3">
                         <div>
-                          <FieldLabel>Diplome / Titre</FieldLabel>
+                          <div className="flex items-center justify-between mb-1">
+                            <FieldLabel>{t('settings.expertise.degree')}</FieldLabel>
+                            <LangToggle lang={lang} onChange={setLang} hasEnContent={!!edu.degree_en} />
+                          </div>
                           <FieldInput
-                            value={edu.degree}
-                            onChange={(e) => handleUpdateEducation(edu.id, 'degree', e.target.value)}
-                            placeholder="Ex: Licence en Informatique"
+                            value={lang === 'fr' ? edu.degree : edu.degree_en}
+                            onChange={(e) => handleUpdateEducation(edu.id, lang === 'fr' ? 'degree' : 'degree_en', e.target.value)}
+                            placeholder={t('settings.expertise.degreePlaceholder')}
                           />
                         </div>
                         <div>
-                          <FieldLabel>Domaine</FieldLabel>
+                          <div className="flex items-center justify-between mb-1">
+                            <FieldLabel>{t('settings.expertise.field')}</FieldLabel>
+                            <LangToggle lang={lang} onChange={setLang} hasEnContent={!!edu.field_en} />
+                          </div>
                           <FieldInput
-                            value={edu.field}
-                            onChange={(e) => handleUpdateEducation(edu.id, 'field', e.target.value)}
-                            placeholder="Ex: Genie Logiciel"
+                            value={lang === 'fr' ? edu.field : edu.field_en}
+                            onChange={(e) => handleUpdateEducation(edu.id, lang === 'fr' ? 'field' : 'field_en', e.target.value)}
+                            placeholder={t('settings.expertise.fieldPlaceholder')}
                           />
                         </div>
                         <div>
-                          <FieldLabel>Description</FieldLabel>
+                          <div className="flex items-center justify-between mb-1">
+                            <FieldLabel>{t('settings.expertise.description')}</FieldLabel>
+                            <LangToggle lang={lang} onChange={setLang} hasEnContent={!!edu.description_en} />
+                          </div>
                           <FieldInput
-                            value={edu.description}
-                            onChange={(e) => handleUpdateEducation(edu.id, 'description', e.target.value)}
-                            placeholder="Breve description..."
+                            value={lang === 'fr' ? edu.description : edu.description_en}
+                            onChange={(e) => handleUpdateEducation(edu.id, lang === 'fr' ? 'description' : 'description_en', e.target.value)}
+                            placeholder={t('settings.expertise.descriptionPlaceholder')}
                           />
                         </div>
                       </div>
@@ -548,7 +576,7 @@ export function SettingsPage() {
                   onClick={handleAddEducation}
                   className="w-full py-2.5 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors flex items-center justify-center gap-2 text-[12px] font-medium"
                 >
-                  <GraduationCap className="w-3.5 h-3.5" /> Ajouter une formation
+                  <GraduationCap className="w-3.5 h-3.5" /> {t('settings.expertise.addFormation')}
                 </button>
 
                 <div className="flex justify-end pt-2">
@@ -731,42 +759,66 @@ export function SettingsPage() {
         {/* ===== SEO ===== */}
         {activeSection === 'seo' && (
           <>
-            <SectionCard title="Metadonnees du site" description="Ces informations apparaissent dans les resultats de recherche.">
+            <SectionCard title={t('settings.seo.metadata')} description={t('settings.seo.metadataDesc')}>
               <div className="space-y-4">
                 <div>
-                  <FieldLabel>Titre du site</FieldLabel>
-                  <FieldInput value={seoForm.siteTitle} onChange={(e) => setSeoForm({ ...seoForm, siteTitle: e.target.value })} />
-                  <p className="text-[11px] text-zinc-400 mt-1">{seoForm.siteTitle.length}/70 caracteres</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <FieldLabel>{t('settings.seo.siteTitle')}</FieldLabel>
+                    <LangToggle lang={lang} onChange={setLang} hasEnContent={!!seoForm.siteTitle_en} />
+                  </div>
+                  <FieldInput 
+                    value={lang === 'fr' ? seoForm.siteTitle : (seoForm.siteTitle_en ?? '')} 
+                    onChange={(e) => setSeoForm({ 
+                      ...seoForm, 
+                      [lang === 'fr' ? 'siteTitle' : 'siteTitle_en']: e.target.value 
+                    })} 
+                  />
+                  <p className="text-[11px] text-zinc-400 mt-1">{(lang === 'fr' ? seoForm.siteTitle : seoForm.siteTitle_en ?? '').length}/70 caracteres</p>
                 </div>
                 <div>
-                  <FieldLabel>Meta description</FieldLabel>
+                  <div className="flex items-center justify-between mb-1">
+                    <FieldLabel>{t('settings.seo.metaDescription')}</FieldLabel>
+                    <LangToggle lang={lang} onChange={setLang} hasEnContent={!!seoForm.metaDescription_en} />
+                  </div>
                   <Textarea
-                    value={seoForm.metaDescription}
-                    onChange={(e) => setSeoForm({ ...seoForm, metaDescription: e.target.value })}
+                    value={lang === 'fr' ? seoForm.metaDescription : (seoForm.metaDescription_en ?? '')}
+                    onChange={(e) => setSeoForm({ 
+                      ...seoForm, 
+                      [lang === 'fr' ? 'metaDescription' : 'metaDescription_en']: e.target.value 
+                    })}
                     className="min-h-[70px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
                   />
                   <p className={cn('text-[11px] mt-1', charStatus === 'success' ? 'text-emerald-500' : 'text-red-500')}>
-                    {charCount}/160 caracteres {charCount > 160 && '(trop long)'}
+                    {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length}/160 caracteres {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length > 160 && '(trop long)'}
                   </p>
                 </div>
                 <div>
-                  <FieldLabel>Mots-cles</FieldLabel>
-                  <FieldInput value={seoForm.keywords} onChange={(e) => setSeoForm({ ...seoForm, keywords: e.target.value })} />
-                  <p className="text-[11px] text-zinc-400 mt-1">{seoForm.keywords.split(',').filter(Boolean).length} mots-cles</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <FieldLabel>{t('settings.seo.keywords')}</FieldLabel>
+                    <LangToggle lang={lang} onChange={setLang} hasEnContent={!!seoForm.keywords_en} />
+                  </div>
+                  <FieldInput 
+                    value={lang === 'fr' ? seoForm.keywords : (seoForm.keywords_en ?? '')} 
+                    onChange={(e) => setSeoForm({ 
+                      ...seoForm, 
+                      [lang === 'fr' ? 'keywords' : 'keywords_en']: e.target.value 
+                    })} 
+                  />
+                  <p className="text-[11px] text-zinc-400 mt-1">{(lang === 'fr' ? seoForm.keywords : seoForm.keywords_en ?? '').split(',').filter(Boolean).length} mots-cles</p>
                 </div>
 
                 {/* Live Google preview */}
                 <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-800">
-                  <p className="text-[11px] font-medium text-zinc-400 mb-2 uppercase tracking-wider">Apercu Google</p>
+                  <p className="text-[11px] font-medium text-zinc-400 mb-2 uppercase tracking-wider">{t('settings.seo.googlePreview')}</p>
                   <div className="space-y-0.5">
                     <p className="text-blue-600 dark:text-blue-400 text-base font-medium truncate">
-                      {seoForm.siteTitle || 'Titre du site'}
+                      {(lang === 'fr' ? seoForm.siteTitle : (seoForm.siteTitle_en ?? '')) || (lang === 'fr' ? 'Titre du site' : 'Site title')}
                     </p>
                     <p className="text-[12px] text-emerald-700 dark:text-emerald-500 truncate">
                       https://yaologan.dev
                     </p>
                     <p className="text-[13px] text-zinc-500 line-clamp-2">
-                      {seoForm.metaDescription || 'Description du site...'}
+                      {(lang === 'fr' ? seoForm.metaDescription : (seoForm.metaDescription_en ?? '')) || (lang === 'fr' ? 'Description du site...' : 'Site description...')}
                     </p>
                   </div>
                 </div>
@@ -777,7 +829,7 @@ export function SettingsPage() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Open Graph" description="Images et donnees pour le partage sur les reseaux sociaux.">
+            <SectionCard title={t('settings.seo.openGraph')} description={t('settings.seo.openGraphDesc')}>
               <div className="space-y-4">
                 <div>
                   <FieldLabel>Image OG (1200x630)</FieldLabel>
@@ -821,13 +873,12 @@ export function SettingsPage() {
         {/* ===== CHATBOT ===== */}
         {activeSection === 'chatbot' && (
           <>
-            <SectionCard title="Configuration du chatbot" description="Activez ou desactivez le chatbot et personnalisez son comportement.">
+            <SectionCard title={t('settings.chatbot.config')} description={t('settings.chatbot.configDesc')}>
               <div className="space-y-6">
-                {/* Enable/Disable toggle */}
                 <label className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors">
                   <div>
-                    <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">Activer le chatbot</p>
-                    <p className="text-[11px] text-zinc-400">Affiche le bouton chatbot sur le site public</p>
+                    <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">{t('settings.chatbot.enableChatbot')}</p>
+                    <p className="text-[11px] text-zinc-400">{t('settings.chatbot.enableChatbotDesc')}</p>
                   </div>
                   <button
                     onClick={() => setChatbotForm({ ...chatbotForm, enabled: !chatbotForm.enabled })}
@@ -845,16 +896,21 @@ export function SettingsPage() {
                   </button>
                 </label>
 
-                {/* Welcome message */}
                 <div>
-                  <FieldLabel>Message de bienvenue</FieldLabel>
+                  <div className="flex items-center justify-between mb-1">
+                    <FieldLabel>{t('settings.chatbot.welcomeMessage')}</FieldLabel>
+                    <LangToggle lang={lang} onChange={setLang} hasEnContent={!!chatbotForm.welcomeMessage_en} />
+                  </div>
                   <Textarea
-                    value={chatbotForm.welcomeMessage}
-                    onChange={(e) => setChatbotForm({ ...chatbotForm, welcomeMessage: e.target.value })}
+                    value={lang === 'fr' ? chatbotForm.welcomeMessage : chatbotForm.welcomeMessage_en}
+                    onChange={(e) => setChatbotForm({ 
+                      ...chatbotForm, 
+                      [lang === 'fr' ? 'welcomeMessage' : 'welcomeMessage_en']: e.target.value 
+                    })}
                     className="min-h-[100px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
-                    placeholder="Bonjour ! Comment puis-je vous aider ?"
+                    placeholder={t('settings.chatbot.welcomeMessagePlaceholder')}
                   />
-                  <p className="text-[11px] text-zinc-400 mt-1">Supporte le Markdown (**gras**, *italique*, liens)</p>
+                  <p className="text-[11px] text-zinc-400 mt-1">{t('settings.chatbot.welcomeMessageHint')}</p>
                 </div>
 
                 <div className="flex justify-end pt-2">
@@ -863,26 +919,32 @@ export function SettingsPage() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Actions rapides" description="Les boutons proposes en bas du chatbot pour guider les visiteurs.">
+            <SectionCard title={t('settings.chatbot.quickActions')} description={t('settings.chatbot.quickActionsDesc')}>
               <div className="space-y-3">
-                {chatbotForm.quickActions.map((action, index) => (
+                {chatbotForm.quickActions.map((action) => (
                   <div key={action.id} className="flex items-start gap-2 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
                     <GripVertical className="w-4 h-4 text-zinc-300 dark:text-zinc-600 mt-2 shrink-0" />
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <FieldLabel>Label</FieldLabel>
+                        <div className="flex items-center justify-between mb-1">
+                          <FieldLabel>{t('settings.chatbot.label')}</FieldLabel>
+                          <LangToggle lang={lang} onChange={setLang} hasEnContent={!!action.label_en} />
+                        </div>
                         <FieldInput
-                          value={action.label}
-                          onChange={(e) => handleUpdateQuickAction(action.id, 'label', e.target.value)}
-                          placeholder="Ex: Mes Projets"
+                          value={lang === 'fr' ? action.label : action.label_en}
+                          onChange={(e) => handleUpdateQuickAction(action.id, lang === 'fr' ? 'label' : 'label_en', e.target.value)}
+                          placeholder={t('settings.chatbot.labelPlaceholder')}
                         />
                       </div>
                       <div>
-                        <FieldLabel>Message envoye</FieldLabel>
+                        <div className="flex items-center justify-between mb-1">
+                          <FieldLabel>{t('settings.chatbot.messageSent')}</FieldLabel>
+                          <LangToggle lang={lang} onChange={setLang} hasEnContent={!!action.prompt_en} />
+                        </div>
                         <FieldInput
-                          value={action.prompt}
-                          onChange={(e) => handleUpdateQuickAction(action.id, 'prompt', e.target.value)}
-                          placeholder="Ex: Montre-moi tes projets"
+                          value={lang === 'fr' ? action.prompt : action.prompt_en}
+                          onChange={(e) => handleUpdateQuickAction(action.id, lang === 'fr' ? 'prompt' : 'prompt_en', e.target.value)}
+                          placeholder={t('settings.chatbot.messageSentPlaceholder')}
                         />
                       </div>
                     </div>
@@ -899,7 +961,7 @@ export function SettingsPage() {
                   onClick={handleAddQuickAction}
                   className="w-full py-2.5 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors flex items-center justify-center gap-2 text-[12px] font-medium"
                 >
-                  <Plus className="w-3.5 h-3.5" /> Ajouter une action
+                  <Plus className="w-3.5 h-3.5" /> {t('settings.chatbot.addAction')}
                 </button>
 
                 <div className="flex justify-end pt-2">

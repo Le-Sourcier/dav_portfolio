@@ -8,8 +8,10 @@ export interface ProfileData {
   name: string;
   email: string;
   title: string;
+  title_en: string;
   location: string;
   bio: string;
+  bio_en: string;
   avatar: string;
   brand: string;
   phone: string;
@@ -25,10 +27,14 @@ export interface SocialLinks {
 
 export interface SeoData {
   siteTitle: string;
+  siteTitle_en: string;
   metaDescription: string;
+  metaDescription_en: string;
   keywords: string;
+  keywords_en: string;
   ogImage: string;
   ogTitle: string;
+  ogTitle_en: string;
   ogType: string;
 }
 
@@ -41,12 +47,15 @@ export interface DisplayPreferences {
 export interface ChatbotQuickAction {
   id: string;
   label: string;
+  label_en: string;
   prompt: string;
+  prompt_en: string;
 }
 
 export interface ChatbotSettings {
   enabled: boolean;
   welcomeMessage: string;
+  welcomeMessage_en: string;
   quickActions: ChatbotQuickAction[];
 }
 
@@ -59,8 +68,11 @@ export interface SkillsData {
 export interface EducationEntry {
   id: string;
   degree: string;
+  degree_en: string;
   field: string;
+  field_en: string;
   description: string;
+  description_en: string;
 }
 
 export interface EducationData {
@@ -97,8 +109,10 @@ const defaultProfile: ProfileData = {
   name: envConfig.owner.name,
   email: envConfig.owner.email,
   title: envConfig.owner.title,
+  title_en: '',
   location: envConfig.owner.location,
   bio: envConfig.owner.bio,
+  bio_en: '',
   avatar: envConfig.owner.avatar,
   brand: envConfig.appBrand,
   phone: envConfig.owner.phone,
@@ -114,10 +128,14 @@ const defaultSocialLinks: SocialLinks = {
 
 const defaultSeo: SeoData = {
   siteTitle: envConfig.appName,
+  siteTitle_en: '',
   metaDescription: envConfig.appDescription,
+  metaDescription_en: '',
   keywords: '',
+  keywords_en: '',
   ogImage: '',
   ogTitle: envConfig.appName,
+  ogTitle_en: '',
   ogType: 'website',
 };
 
@@ -130,13 +148,14 @@ const defaultDisplay: DisplayPreferences = {
 const defaultChatbot: ChatbotSettings = {
   enabled: envConfig.features.chatbot,
   welcomeMessage: envConfig.chatbot.welcomeMessage,
+  welcomeMessage_en: '',
   quickActions: [
-    { id: '1', label: 'Mes Projets', prompt: 'Montre-moi tes projets' },
-    { id: '2', label: 'Rendez-vous', prompt: 'Je veux prendre rendez-vous' },
-    { id: '3', label: 'Mon Profil', prompt: `Qui est ${envConfig.owner.name.split(' ').pop()} ?` },
-    { id: '4', label: 'Competences', prompt: 'Quelles sont tes competences ?' },
-    { id: '5', label: 'Lire le Blog', prompt: 'Montre-moi le blog' },
-    { id: '6', label: 'Contact', prompt: 'Comment te contacter ?' },
+    { id: '1', label: 'Mes Projets', label_en: 'My Projects', prompt: 'Montre-moi tes projets', prompt_en: 'Show me your projects' },
+    { id: '2', label: 'Rendez-vous', label_en: 'Book Appointment', prompt: 'Je veux prendre rendez-vous', prompt_en: 'I want to book an appointment' },
+    { id: '3', label: 'Mon Profil', label_en: 'My Profile', prompt: `Qui est ${envConfig.owner.name.split(' ').pop()} ?`, prompt_en: `Who is ${envConfig.owner.name.split(' ').pop()}?` },
+    { id: '4', label: 'Competences', label_en: 'Skills', prompt: 'Quelles sont tes competences ?', prompt_en: 'What are your skills?' },
+    { id: '5', label: 'Lire le Blog', label_en: 'Read Blog', prompt: 'Montre-moi le blog', prompt_en: 'Show me the blog' },
+    { id: '6', label: 'Contact', label_en: 'Contact', prompt: 'Comment te contacter ?', prompt_en: 'How to contact you?' },
   ],
 };
 
