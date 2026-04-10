@@ -53,7 +53,7 @@ export function useChatbot() {
     const init = async () => {
       try {
         const [initialMsg, actions] = await Promise.all([
-          chatbotApi.getInitialMessage(),
+          chatbotApi.getInitialMessage(lang),
           chatbotApi.getQuickActions(),
         ]);
         store.setMessages([{ ...initialMsg, timestamp: new Date() }]);
@@ -106,7 +106,7 @@ export function useChatbot() {
       .map(m => ({ role: m.role, content: m.content }));
 
     try {
-      const response = await chatbotApi.sendMessage(content, history);
+      const response = await chatbotApi.sendMessage(content, history, lang);
       store.addMessage({
         id: response.id || (Date.now() + 1).toString(),
         role: 'assistant',
@@ -145,12 +145,12 @@ export function useChatbot() {
 
   const resetChat = useCallback(async () => {
     try {
-      const initialMsg = await chatbotApi.getInitialMessage();
+      const initialMsg = await chatbotApi.getInitialMessage(lang);
       store.setMessages([{ ...initialMsg, timestamp: new Date() }]);
     } catch {
       store.setMessages([buildWelcomeMessage()]);
     }
-  }, [store, buildWelcomeMessage]);
+  }, [store, buildWelcomeMessage, lang]);
 
   return {
     isOpen: store.isOpen,

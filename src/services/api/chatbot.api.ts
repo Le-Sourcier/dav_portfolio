@@ -22,11 +22,13 @@ export const chatbotApi = {
   async sendMessage(
     content: string,
     history?: Array<{ role: 'user' | 'assistant'; content: string }>,
+    lang: 'fr' | 'en' = 'fr',
   ): Promise<Message> {
     return apiClient.post<Message>('/chatbot/message', {
       content,
       history,
       sessionId: getSessionId(),
+      lang,
     });
   },
 
@@ -34,7 +36,7 @@ export const chatbotApi = {
     return apiClient.get<QuickAction[]>('/chatbot/quick-actions');
   },
 
-  async getInitialMessage(): Promise<Message> {
-    return apiClient.get<Message>('/chatbot/initial');
+  async getInitialMessage(lang: 'fr' | 'en' = 'fr'): Promise<Message> {
+    return apiClient.get<Message>(`/chatbot/initial?lang=${lang}`);
   },
 };
