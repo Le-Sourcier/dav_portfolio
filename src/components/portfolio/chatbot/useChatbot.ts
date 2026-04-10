@@ -41,7 +41,9 @@ export function useChatbot() {
   const buildWelcomeMessage = useCallback((): Message => ({
     id: '1',
     role: 'assistant',
-    content: lang === 'en' && chatbotSettings.welcomeMessage_en ? chatbotSettings.welcomeMessage_en : chatbotSettings.welcomeMessage,
+    content: lang === 'en' 
+      ? (chatbotSettings.welcomeMessage_en || chatbotSettings.welcomeMessage || "Hello! I'm the assistant. How can I help you?")
+      : (chatbotSettings.welcomeMessage || "Bonjour ! Je suis l'assistant. Comment puis-je vous aider ?"),
     timestamp: new Date(),
     type: 'text',
   }), [chatbotSettings.welcomeMessage, chatbotSettings.welcomeMessage_en, lang]);
