@@ -102,7 +102,7 @@ ${t('about.cvEducation')}
                 <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl shadow-primary/20">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h4 className="font-black text-4xl tracking-tighter text-primary">5+</h4>
+                <h4 className="font-black text-4xl tracking-tighter text-primary">{profile.yearsExperience || '5+'}</h4>
               </div>
               <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] leading-relaxed">
                 {t('about.yearsExp')}
