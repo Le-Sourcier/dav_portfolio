@@ -563,16 +563,17 @@
       "messageSent": "Message Sent",
       "messageSentPlaceholder": "E.g: Show me your projects",
       "addAction": "Add Action"
-    },
-    "chatbot": {
-      "assistant": "Assistant",
-      "online": "Online",
-      "offline": "Offline mode",
-      "newConversation": "New conversation",
-      "errorMessage": "Sorry, I encountered an error.",
-      "notAvailable": "Sorry, I'm not available at the moment. Contact me by email."
-    },
-    "common": {
+    }
+  },
+  "chatbot": {
+    "assistant": "Assistant",
+    "online": "Online",
+    "offline": "Offline mode",
+    "newConversation": "New conversation",
+    "errorMessage": "Sorry, I encountered an error.",
+    "notAvailable": "Sorry, I'm not available at the moment. Contact me by email."
+  },
+  "common": {
       "save": "Save",
       "saved": "Saved!",
       "lastSaved": "Last saved:"
