@@ -7,7 +7,7 @@ import { useChatbotStore } from '@/stores/chatbotStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 export function useChatbot() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const lang = i18n.language.startsWith('en') ? 'en' : 'fr';
   const store = useChatbotStore();
   const chatbotSettings = useSettingsStore((s) => s.chatbot);
@@ -110,7 +110,7 @@ export function useChatbot() {
       store.addMessage({
         id: response.id || (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.content || "Desole, j'ai rencontre une erreur.",
+        content: response.content || t('chatbot.errorMessage'),
         timestamp: new Date(),
         type: response.type || 'text',
         metadata: response.metadata,
@@ -119,11 +119,11 @@ export function useChatbot() {
     } catch {
       // Fallback to local engine
       try {
-        const localResponse = await processUserMessage(content);
+        const localResponse = await processUserMessage(content, lang);
         store.addMessage({
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: localResponse.content || "Desole, j'ai rencontre une erreur.",
+          content: localResponse.content || t('chatbot.errorMessage'),
           timestamp: new Date(),
           type: (localResponse.type as Message['type']) || 'text',
           metadata: localResponse.metadata,
@@ -133,7 +133,7 @@ export function useChatbot() {
         store.addMessage({
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: "Desole, je ne suis pas disponible pour le moment. Contactez-moi par email.",
+          content: t('chatbot.notAvailable'),
           timestamp: new Date(),
           type: 'text',
         });
@@ -141,7 +141,7 @@ export function useChatbot() {
     } finally {
       setIsTyping(false);
     }
-  }, [store]);
+  }, [store, t]);
 
   const resetChat = useCallback(async () => {
     try {

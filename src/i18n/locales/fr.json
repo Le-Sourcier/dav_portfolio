@@ -468,7 +468,9 @@
       "fullName": "Nom complet",
       "email": "Email",
       "professionalTitle": "Titre professionnel",
-      "location": "Localisation",
+      "location": "Ville",
+      "locationSuffix": "Suffixe localisation",
+      "locationSuffixPlaceholder": "Ex: TOGO",
       "brandName": "Nom de la marque (Brand)",
       "brandPlaceholder": "Ex: CREATIVE",
       "phone": "Telephone",
@@ -561,6 +563,14 @@
       "messageSent": "Message envoye",
       "messageSentPlaceholder": "Ex: Montre-moi tes projets",
       "addAction": "Ajouter une action"
+    },
+    "chatbot": {
+      "assistant": "Assistant",
+      "online": "En ligne",
+      "offline": "Mode hors-ligne",
+      "newConversation": "Nouvelle conversation",
+      "errorMessage": "Desole, j'ai rencontre une erreur.",
+      "notAvailable": "Desole, je ne suis pas disponible pour le moment. Contactez-moi par email."
     },
     "common": {
       "save": "Enregistrer",

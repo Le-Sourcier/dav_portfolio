@@ -8,6 +8,7 @@ import { Message, QuickAction } from './types';
 import { ScrollArea } from '../../ui/scroll-area';
 import { cn } from '../../../lib/utils';
 import { envConfig } from '@/config/env';
+import { useTranslation } from 'react-i18next';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -30,6 +31,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   onSendMessage,
   onReset,
 }) => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative">
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden border-2 border-primary/20 bg-primary/10">
-              <img src={AI_AVATAR} alt="AI Assistant" className="w-full h-full object-cover" />
+              <img src={AI_AVATAR} alt={t('chatbot.assistant')} className="w-full h-full object-cover" />
             </div>
             <motion.span
               animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
@@ -78,24 +80,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm md:text-base tracking-tight">Assistant</h3>
+              <h3 className="font-bold text-sm md:text-base tracking-tight">{t('chatbot.assistant')}</h3>
               <ShieldCheck className="w-3.5 h-3.5 text-primary" />
             </div>
             <div className="flex items-center gap-2">
-              {isOffline ? (
-                <span className="text-[10px] md:text-[11px] text-orange-400 font-medium flex items-center gap-1">
-                  <WifiOff className="w-3 h-3" /> Mode hors-ligne
-                </span>
-              ) : (
-                <span className="text-[10px] md:text-[11px] text-muted-foreground font-medium">
-                  En ligne
-                </span>
-              )}
+                {isOffline ? (
+                  <span className="text-[10px] md:text-[11px] text-orange-400 font-medium flex items-center gap-1">
+                    <WifiOff className="w-3 h-3" /> {t('chatbot.offline')}
+                  </span>
+                ) : (
+                  <span className="text-[10px] md:text-[11px] text-muted-foreground font-medium">
+                    {t('chatbot.online')}
+                  </span>
+                )}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={onReset} className="p-2 md:p-2.5 rounded-full hover:bg-secondary/80 transition-all text-muted-foreground active:scale-90" title="Nouvelle conversation">
+          <button onClick={onReset} className="p-2 md:p-2.5 rounded-full hover:bg-secondary/80 transition-all text-muted-foreground active:scale-90" title={t('chatbot.newConversation')}>
             <RotateCcw className="w-4 h-4" />
           </button>
           <button onClick={onClose} className="p-2 md:p-2.5 rounded-full hover:bg-secondary/80 transition-all text-muted-foreground active:scale-90">

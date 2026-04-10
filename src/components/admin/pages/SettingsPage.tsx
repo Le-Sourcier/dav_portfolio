@@ -413,6 +413,20 @@ export function SettingsPage() {
                     <FieldInput value={profileForm.location} onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })} />
                   </div>
                   <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <FieldLabel>{t('settings.profile.locationSuffix')}</FieldLabel>
+                      <LangToggle lang={lang} onChange={setLang} hasEnContent={!!profileForm.locationSuffix_en} />
+                    </div>
+                    <FieldInput 
+                      value={lang === 'fr' ? profileForm.locationSuffix : profileForm.locationSuffix_en} 
+                      onChange={(e) => setProfileForm({ 
+                        ...profileForm, 
+                        [lang === 'fr' ? 'locationSuffix' : 'locationSuffix_en']: e.target.value 
+                      })} 
+                      placeholder={t('settings.profile.locationSuffixPlaceholder')}
+                    />
+                  </div>
+                  <div>
                     <FieldLabel>{t('settings.profile.brandName')}</FieldLabel>
                     <FieldInput value={profileForm.brand} onChange={(e) => setProfileForm({ ...profileForm, brand: e.target.value })} placeholder={t('settings.profile.brandPlaceholder')} />
                   </div>

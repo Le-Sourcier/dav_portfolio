@@ -10,6 +10,8 @@ export interface ProfileData {
   title: string;
   title_en: string;
   location: string;
+  locationSuffix: string;
+  locationSuffix_en: string;
   bio: string;
   bio_en: string;
   avatar: string;
@@ -111,6 +113,8 @@ const defaultProfile: ProfileData = {
   title: envConfig.owner.title,
   title_en: '',
   location: envConfig.owner.location,
+  locationSuffix: 'TOGO',
+  locationSuffix_en: 'TOGO',
   bio: envConfig.owner.bio,
   bio_en: '',
   avatar: envConfig.owner.avatar,

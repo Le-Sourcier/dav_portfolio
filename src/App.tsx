@@ -71,9 +71,10 @@ function HomePage() {
 
 function Layout({ children, hideNavFooter = false }: { children: React.ReactNode; hideNavFooter?: boolean }) {
   const profile = useProfile();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const localize = useLocalizedField();
   const title = localize(profile.title, profile.title_en);
+  const locationSuffix = localize(profile.locationSuffix, profile.locationSuffix_en);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans antialiased transition-colors duration-500">
@@ -90,7 +91,7 @@ function Layout({ children, hideNavFooter = false }: { children: React.ReactNode
                 {profile.brand}<span className="text-primary">.</span>
               </Link>
               <p className="text-muted-foreground font-medium text-center md:text-left">
-                {title}<br /> {t('footer.baseAt')} {profile.location}.
+                {title}<br /> {t('footer.baseAt')} {profile.location}{locationSuffix ? `, ${locationSuffix}` : ''}.
               </p>
             </div>
 

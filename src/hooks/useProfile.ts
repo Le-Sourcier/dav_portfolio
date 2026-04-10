@@ -38,6 +38,8 @@ export function useProfile() {
     title: pick(apiProfile?.title, storeProfile.title, env.title),
     title_en: pick(apiProfile?.title_en, storeProfile.title_en, ''),
     location: pick(apiProfile?.location, storeProfile.location, env.location),
+    locationSuffix: pick(apiProfile?.locationSuffix, storeProfile.locationSuffix, ''),
+    locationSuffix_en: pick(apiProfile?.locationSuffix_en, storeProfile.locationSuffix_en, ''),
     bio: pick(apiProfile?.bio, storeProfile.bio, env.bio),
     bio_en: pick(apiProfile?.bio_en, storeProfile.bio_en, ''),
     avatar: pick(apiProfile?.avatar, storeProfile.avatar, env.avatar),
