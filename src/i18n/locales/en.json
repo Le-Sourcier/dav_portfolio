@@ -244,7 +244,10 @@
     "viewAll": "Read all blog"
   },
   "common": {
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "save": "Save",
+    "saved": "Saved!",
+    "lastSaved": "Last saved:"
   },
   "legal": {
     "title": "Legal",
@@ -572,11 +575,6 @@
     "newConversation": "New conversation",
     "errorMessage": "Sorry, I encountered an error.",
     "notAvailable": "Sorry, I'm not available at the moment. Contact me by email."
-  },
-  "common": {
-      "save": "Save",
-      "saved": "Saved!",
-      "lastSaved": "Last saved:"
-    }
   }
-}
+  }
+

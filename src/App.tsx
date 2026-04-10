@@ -85,7 +85,7 @@ function Layout({
   hideNavFooter?: boolean;
 }) {
   const profile = useProfile();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const localize = useLocalizedField();
   const title = localize(profile.title, profile.title_en);
   const locationSuffix = localize(

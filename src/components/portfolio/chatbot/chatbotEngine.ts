@@ -87,10 +87,18 @@ const TRIGGERS: Record<string, { fr: string[]; en: string[] }> = {
   },
 };
 
-export const getInitialMessage = (): Message => ({
+interface ChatbotConfig {
+  avatar: string;
+  welcomeMessage: string;
+  welcomeMessage_en?: string;
+}
+
+export const getInitialMessage = (lang: 'fr' | 'en' = 'fr'): Message => ({
   id: '1',
   role: 'assistant',
-  content: envConfig.chatbot.welcomeMessage,
+  content: lang === 'en' && (envConfig.chatbot as ChatbotConfig).welcomeMessage_en
+    ? (envConfig.chatbot as ChatbotConfig).welcomeMessage_en
+    : envConfig.chatbot.welcomeMessage,
   timestamp: new Date(),
   type: 'text',
 });

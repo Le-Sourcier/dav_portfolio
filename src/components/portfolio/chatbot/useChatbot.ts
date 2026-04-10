@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Message, QuickAction } from './types';
-import { processUserMessage } from './chatbotEngine';
+import { processUserMessage, getInitialMessage } from './chatbotEngine';
 import { chatbotApi } from '@/services/api/chatbot.api';
 import { useChatbotStore } from '@/stores/chatbotStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -37,17 +37,6 @@ export function useChatbot() {
     }
   }, [chatbotSettings.quickActions, lang]);
 
-  // Build welcome message from settings (bilingual)
-  const buildWelcomeMessage = useCallback((): Message => ({
-    id: '1',
-    role: 'assistant',
-    content: lang === 'en' 
-      ? (chatbotSettings.welcomeMessage_en || chatbotSettings.welcomeMessage || "Hello! I'm the assistant. How can I help you?")
-      : (chatbotSettings.welcomeMessage || "Bonjour ! Je suis l'assistant. Comment puis-je vous aider ?"),
-    timestamp: new Date(),
-    type: 'text',
-  }), [chatbotSettings.welcomeMessage, chatbotSettings.welcomeMessage_en, lang]);
-
   // Initialize on first load (no cached messages)
   useEffect(() => {
     if (store.messages.length > 0) return;
@@ -62,12 +51,12 @@ export function useChatbot() {
         if (actions?.length) setQuickActions(actions);
         store.setOffline(false);
       } catch {
-        store.setMessages([buildWelcomeMessage()]);
+        store.setMessages([getInitialMessage(lang)]);
         store.setOffline(true);
       }
     };
     init();
-  }, []);
+  }, [lang]);
 
   // Keep welcome message in sync with settings changes
   useEffect(() => {
@@ -78,7 +67,7 @@ export function useChatbot() {
     if (first.content === currentWelcome) return;
     // Replace the welcome message, keep rest of conversation
     store.setMessages([
-      buildWelcomeMessage(),
+      getInitialMessage(lang),
       ...store.messages.slice(1),
     ]);
   }, [chatbotSettings.welcomeMessage, chatbotSettings.welcomeMessage_en, lang]);
@@ -150,9 +139,9 @@ export function useChatbot() {
       const initialMsg = await chatbotApi.getInitialMessage(lang);
       store.setMessages([{ ...initialMsg, timestamp: new Date() }]);
     } catch {
-      store.setMessages([buildWelcomeMessage()]);
+      store.setMessages([getInitialMessage(lang)]);
     }
-  }, [store, buildWelcomeMessage, lang]);
+  }, [store, lang]);
 
   return {
     isOpen: store.isOpen,

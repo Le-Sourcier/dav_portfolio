@@ -244,7 +244,10 @@
     "viewAll": "Lire tout le blog"
   },
   "common": {
-    "backHome": "Retour a l'accueil"
+    "backHome": "Retour a l'accueil",
+    "save": "Enregistrer",
+    "saved": "Enregistre !",
+    "lastSaved": "Derniere sauvegarde :"
   },
   "legal": {
     "title": "Mentions",
@@ -572,11 +575,5 @@
     "newConversation": "Nouvelle conversation",
     "errorMessage": "Desole, j'ai rencontre une erreur.",
     "notAvailable": "Desole, je ne suis pas disponible pour le moment. Contactez-moi par email."
-  },
-  "common": {
-      "save": "Enregistrer",
-      "saved": "Enregistre !",
-      "lastSaved": "Derniere sauvegarde :"
   }
-}
 }
