@@ -15,8 +15,11 @@ export function About() {
   const { data: experiences = [] } = useExperiences();
   const profileImage = profile.avatar;
 
+  const title = localize(profile.title, profile.title_en);
+  const bio = localize(profile.bio, profile.bio_en);
+
   const handleDownloadResume = () => {
-    let content = `CV ${profile.name} - ${profile.title}
+    let content = `CV ${profile.name} - ${title}
 
 `;
     content += `${t('about.cvExperience')}
@@ -122,7 +125,7 @@ ${t('about.cvEducation')}
                 {firstName} <br /><span className="text-primary italic">{lastName}</span>
               </h2>
               <p className="text-2xl md:text-3xl text-muted-foreground leading-tight font-medium">
-                {profile.title.split('&')[0]} & Expert en <span className="text-foreground border-b-4 border-primary/20">{t('about.scalable')}</span>
+                {title.split('&')[0]} & Expert en <span className="text-foreground border-b-4 border-primary/20">{t('about.scalable')}</span>
               </p>
             </motion.div>
             
@@ -133,7 +136,7 @@ ${t('about.cvEducation')}
               transition={{ delay: 0.1 }}
               className="text-lg text-muted-foreground leading-relaxed mb-16 max-w-2xl font-medium"
             >
-              {profile.bio}
+              {bio}
             </motion.p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 mb-20">

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Message, QuickAction } from './types';
 import { processUserMessage } from './chatbotEngine';
 import { chatbotApi } from '@/services/api/chatbot.api';
@@ -6,26 +7,44 @@ import { useChatbotStore } from '@/stores/chatbotStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 export function useChatbot() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language.startsWith('en') ? 'en' : 'fr';
   const store = useChatbotStore();
   const chatbotSettings = useSettingsStore((s) => s.chatbot);
   const [isTyping, setIsTyping] = useState(false);
-  const [quickActions, setQuickActions] = useState<QuickAction[]>(chatbotSettings.quickActions);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>(
+    chatbotSettings.quickActions.map((a) => ({
+      id: a.id,
+      label: lang === 'en' && a.label_en ? a.label_en : a.label,
+      label_en: a.label_en,
+      prompt: lang === 'en' && a.prompt_en ? a.prompt_en : a.prompt,
+      prompt_en: a.prompt_en,
+    }))
+  );
 
-  // Sync quick actions when settings change
+  // Sync quick actions when settings or language change
   useEffect(() => {
     if (chatbotSettings.quickActions.length > 0) {
-      setQuickActions(chatbotSettings.quickActions);
+      setQuickActions(
+        chatbotSettings.quickActions.map((a) => ({
+          id: a.id,
+          label: lang === 'en' && a.label_en ? a.label_en : a.label,
+          label_en: a.label_en,
+          prompt: lang === 'en' && a.prompt_en ? a.prompt_en : a.prompt,
+          prompt_en: a.prompt_en,
+        }))
+      );
     }
-  }, [chatbotSettings.quickActions]);
+  }, [chatbotSettings.quickActions, lang]);
 
-  // Build welcome message from settings
+  // Build welcome message from settings (bilingual)
   const buildWelcomeMessage = useCallback((): Message => ({
     id: '1',
     role: 'assistant',
-    content: chatbotSettings.welcomeMessage,
+    content: lang === 'en' && chatbotSettings.welcomeMessage_en ? chatbotSettings.welcomeMessage_en : chatbotSettings.welcomeMessage,
     timestamp: new Date(),
     type: 'text',
-  }), [chatbotSettings.welcomeMessage]);
+  }), [chatbotSettings.welcomeMessage, chatbotSettings.welcomeMessage_en, lang]);
 
   // Initialize on first load (no cached messages)
   useEffect(() => {
@@ -53,13 +72,14 @@ export function useChatbot() {
     if (store.messages.length === 0) return;
     const first = store.messages[0];
     if (first.role !== 'assistant' || first.id !== '1') return;
-    if (first.content === chatbotSettings.welcomeMessage) return;
+    const currentWelcome = lang === 'en' && chatbotSettings.welcomeMessage_en ? chatbotSettings.welcomeMessage_en : chatbotSettings.welcomeMessage;
+    if (first.content === currentWelcome) return;
     // Replace the welcome message, keep rest of conversation
     store.setMessages([
       buildWelcomeMessage(),
       ...store.messages.slice(1),
     ]);
-  }, [chatbotSettings.welcomeMessage]);
+  }, [chatbotSettings.welcomeMessage, chatbotSettings.welcomeMessage_en, lang]);
 
   const toggleChat = useCallback(() => {
     store.toggleOpen();

@@ -3,10 +3,13 @@ import { ChevronLeft, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 export function PrivacyPolicy() {
   const profile = useProfile();
   const { t, i18n } = useTranslation();
+  const localize = useLocalizedField();
+  const title = localize(profile.title, profile.title_en);
 
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-screen bg-background">
@@ -39,7 +42,7 @@ export function PrivacyPolicy() {
               <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">{t('privacy.s1Title')}</h2>
               <p>
                 {t('privacy.s1Intro')}<br />
-                <strong className="text-foreground">{profile.name}</strong>, {profile.title}.<br />
+                <strong className="text-foreground">{profile.name}</strong>, {title}.<br />
                 {profile.email && <>{t('privacy.emailLabel')} <a href={`mailto:${profile.email}`} className="text-primary hover:underline">{profile.email}</a><br /></>}
                 {profile.location && <>{t('privacy.locationLabel')} {profile.location}.</>}
               </p>

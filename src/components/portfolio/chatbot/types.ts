@@ -21,5 +21,7 @@ export interface Message {
 export interface QuickAction {
   id: string;
   label: string;
+  label_en: string;
   prompt: string;
+  prompt_en: string;
 }

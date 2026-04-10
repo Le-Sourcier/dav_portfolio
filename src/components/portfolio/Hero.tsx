@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 export function Hero() {
   const profile = useProfile();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.startsWith('en') ? 'en' : 'fr';
   const [firstName] = profile.name.split(' ');
 
   return (

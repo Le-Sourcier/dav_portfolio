@@ -3,10 +3,13 @@ import { ChevronLeft, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedField } from '@/hooks/useLocalizedField';
 
 export function LegalMentions() {
   const profile = useProfile();
   const { t, i18n } = useTranslation();
+  const localize = useLocalizedField();
+  const title = localize(profile.title, profile.title_en);
 
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-screen bg-background">
@@ -39,7 +42,7 @@ export function LegalMentions() {
               <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">{t('legal.s1Title')}</h2>
               <p>
                 {t('legal.s1Intro')}<br />
-                <strong className="text-foreground">{profile.name}</strong>, {profile.title}.<br />
+                <strong className="text-foreground">{profile.name}</strong>, {title}.<br />
                 {profile.location && <>{t('legal.location')} {profile.location}.<br /></>}
                 {profile.email && <>{t('legal.contactEmail')} <a href={`mailto:${profile.email}`} className="text-primary hover:underline">{profile.email}</a><br /></>}
                 {profile.phone && <>{t('legal.phone')} {profile.phone}<br /></>}

@@ -36,8 +36,10 @@ export function useProfile() {
     name: pick(apiProfile?.name, storeProfile.name, env.name),
     email: pick(apiProfile?.email, storeProfile.email, env.email),
     title: pick(apiProfile?.title, storeProfile.title, env.title),
+    title_en: pick(apiProfile?.title_en, storeProfile.title_en, ''),
     location: pick(apiProfile?.location, storeProfile.location, env.location),
     bio: pick(apiProfile?.bio, storeProfile.bio, env.bio),
+    bio_en: pick(apiProfile?.bio_en, storeProfile.bio_en, ''),
     avatar: pick(apiProfile?.avatar, storeProfile.avatar, env.avatar),
     phone: pick(apiProfile?.phone, storeProfile.phone, env.phone),
     yearsExperience: pick(apiProfile?.yearsExperience, storeProfile.yearsExperience, ''),
@@ -54,10 +56,14 @@ export function useProfile() {
     // SEO
     seo: {
       siteTitle: pick(apiSeo?.siteTitle, storeSeo.siteTitle, envConfig.appName),
+      siteTitle_en: pick(apiSeo?.siteTitle_en, storeSeo.siteTitle_en, ''),
       metaDescription: pick(apiSeo?.metaDescription, storeSeo.metaDescription, envConfig.appDescription),
+      metaDescription_en: pick(apiSeo?.metaDescription_en, storeSeo.metaDescription_en, ''),
       keywords: pick(apiSeo?.keywords, storeSeo.keywords, ''),
+      keywords_en: pick(apiSeo?.keywords_en, storeSeo.keywords_en, ''),
       ogImage: pick(apiSeo?.ogImage, storeSeo.ogImage, ''),
       ogTitle: pick(apiSeo?.ogTitle, storeSeo.ogTitle, envConfig.appName),
+      ogTitle_en: pick(apiSeo?.ogTitle_en, storeSeo.ogTitle_en, ''),
       ogType: pick(apiSeo?.ogType, storeSeo.ogType, 'website'),
     },
 
