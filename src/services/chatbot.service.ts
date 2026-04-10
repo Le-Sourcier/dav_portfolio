@@ -89,7 +89,6 @@ class ChatbotService {
     const isFr = lang === 'fr';
     try {
       const chatbot = await settingsService.getByKey('chatbot') as ChatbotSettings | null;
-      if (chatbot?.welcomeMessage) return chatbot.welcomeMessage;
       if (isFr && chatbot?.welcomeMessage) return chatbot.welcomeMessage;
       if (!isFr && (chatbot as any)?.welcomeMessage_en) return (chatbot as any).welcomeMessage_en;
     } catch { /* fallback */ }
