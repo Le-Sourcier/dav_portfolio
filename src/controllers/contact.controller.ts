@@ -13,7 +13,7 @@ export const getAllContacts = async (_req: Request, res: Response, next: NextFun
 
 export const getContactById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const contact = await contactService.findById(req.params.id);
+    const contact = await contactService.findById(req.params.id!);
     sendSuccess(res, contact, 'Contact retrieved successfully');
   } catch (error) {
     next(error);
@@ -31,7 +31,7 @@ export const createContact = async (req: Request, res: Response, next: NextFunct
 
 export const markAsRead = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const contact = await contactService.markAsRead(req.params.id);
+    const contact = await contactService.markAsRead(req.params.id!);
     sendSuccess(res, contact, 'Contact marked as read');
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export const markAsRead = async (req: Request, res: Response, next: NextFunction
 
 export const deleteContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await contactService.delete(req.params.id);
+    await contactService.delete(req.params.id!);
     sendSuccess(res, null, 'Contact deleted successfully');
   } catch (error) {
     next(error);
@@ -49,7 +49,7 @@ export const deleteContact = async (req: Request, res: Response, next: NextFunct
 
 export const replyToContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const contact = await contactService.reply(req.params.id, req.body.reply);
+    const contact = await contactService.reply(req.params.id!, req.body.reply);
     sendSuccess(res, contact, 'Reply sent successfully');
   } catch (error) {
     next(error);

@@ -23,7 +23,7 @@ export const getVisibleTestimonials = async (_req: Request, res: Response, next:
 export const getTestimonialById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const hasAuth = !!req.headers.authorization;
-    const testimonial = await testimonialService.findById(req.params.id, !hasAuth);
+    const testimonial = await testimonialService.findById(req.params.id!, !hasAuth);
     sendSuccess(res, testimonial, 'Testimonial retrieved successfully');
   } catch (error) {
     next(error);
@@ -41,7 +41,7 @@ export const createTestimonial = async (req: Request, res: Response, next: NextF
 
 export const updateTestimonial = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const testimonial = await testimonialService.update(req.params.id, req.body);
+    const testimonial = await testimonialService.update(req.params.id!, req.body);
     sendSuccess(res, testimonial, 'Testimonial updated successfully');
   } catch (error) {
     next(error);
@@ -50,7 +50,7 @@ export const updateTestimonial = async (req: Request, res: Response, next: NextF
 
 export const deleteTestimonial = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await testimonialService.delete(req.params.id);
+    await testimonialService.delete(req.params.id!);
     sendSuccess(res, null, 'Testimonial deleted successfully');
   } catch (error) {
     next(error);
@@ -59,7 +59,7 @@ export const deleteTestimonial = async (req: Request, res: Response, next: NextF
 
 export const toggleVisibility = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const testimonial = await testimonialService.toggleVisibility(req.params.id);
+    const testimonial = await testimonialService.toggleVisibility(req.params.id!);
     sendSuccess(res, testimonial, 'Testimonial visibility toggled');
   } catch (error) {
     next(error);

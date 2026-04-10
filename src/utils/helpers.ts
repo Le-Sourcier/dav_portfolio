@@ -51,6 +51,27 @@ export const formatDate = (date: Date, locale = 'fr-FR'): string => {
   }).format(date);
 };
 
+/**
+ * Returns today's date as YYYY-MM-DD in local timezone (not UTC).
+ */
+export const todayLocal = (): string => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+/**
+ * Formats a Date to YYYY-MM-DD in local timezone.
+ */
+export const dateToLocal = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);

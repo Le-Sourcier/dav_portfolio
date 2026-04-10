@@ -65,7 +65,7 @@ class VisitorService {
     // Generate visitor JWT
     const payload: VisitorPayload = { email, name, type: 'visitor' };
     const expiresIn = remember ? config.visitor.jwtRememberExpiresIn : config.visitor.jwtExpiresIn;
-    const token = jwt.sign(payload, config.visitor.jwtSecret, { expiresIn });
+    const token = jwt.sign(payload, config.visitor.jwtSecret, { expiresIn: expiresIn as string & jwt.SignOptions['expiresIn'] });
 
     return { token };
   }

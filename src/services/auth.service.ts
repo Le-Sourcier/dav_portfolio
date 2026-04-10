@@ -8,11 +8,11 @@ import { ErrorCode, HttpStatus } from '../types/response.types.js';
 class AuthService {
   private generateTokens(payload: JwtPayload): TokenPair {
     const accessToken = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
+      expiresIn: config.jwt.expiresIn as string & jwt.SignOptions['expiresIn'],
     });
 
     const refreshToken = jwt.sign(payload, config.jwt.refreshSecret, {
-      expiresIn: config.jwt.refreshExpiresIn,
+      expiresIn: config.jwt.refreshExpiresIn as string & jwt.SignOptions['expiresIn'],
     });
 
     return { accessToken, refreshToken };
@@ -61,7 +61,7 @@ class AuthService {
       };
 
       const accessToken = jwt.sign(payload, config.jwt.secret, {
-        expiresIn: config.jwt.expiresIn,
+        expiresIn: config.jwt.expiresIn as string & jwt.SignOptions['expiresIn'],
       });
 
       return { token: accessToken };

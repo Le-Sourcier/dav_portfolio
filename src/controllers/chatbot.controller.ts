@@ -5,8 +5,8 @@ import { generateId } from '../utils/helpers.js';
 
 export const sendMessage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { content } = req.body;
-    const response = await chatbotService.processMessage(content);
+    const { content, history, sessionId } = req.body;
+    const response = await chatbotService.processMessage(content, history, sessionId || 'default');
 
     const message = {
       id: generateId(),

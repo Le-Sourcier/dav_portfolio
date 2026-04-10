@@ -51,6 +51,10 @@ export interface IProject {
   url?: string;
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];
+  title_en?: string;
+  description_en?: string;
+  problem_en?: string;
+  solution_en?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -85,6 +89,8 @@ export interface IExperience {
   achievements?: ExperienceAchievement[];
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];
+  title_en?: string;
+  description_en?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -114,6 +120,9 @@ export interface IBlogPost {
   published: boolean;
   viewCount: number;
   shareCount: number;
+  title_en?: string;
+  excerpt_en?: string;
+  content_en?: string;
   comments?: IBlogComment[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -176,6 +185,8 @@ export interface ITestimonial {
   avatar?: string;
   content: string;
   rating?: number;
+  content_en?: string;
+  role_en?: string;
   visible: boolean;
   createdAt?: Date;
 }

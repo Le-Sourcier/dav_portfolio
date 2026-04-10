@@ -13,7 +13,7 @@ export const getAllProjects = async (_req: Request, res: Response, next: NextFun
 
 export const getProjectById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const project = await projectService.findById(req.params.id);
+    const project = await projectService.findById(req.params.id!);
     sendSuccess(res, project, 'Project retrieved successfully');
   } catch (error) {
     next(error);
@@ -31,7 +31,7 @@ export const createProject = async (req: Request, res: Response, next: NextFunct
 
 export const updateProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const project = await projectService.update(req.params.id, req.body);
+    const project = await projectService.update(req.params.id!, req.body);
     sendSuccess(res, project, 'Project updated successfully');
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export const updateProject = async (req: Request, res: Response, next: NextFunct
 
 export const deleteProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await projectService.delete(req.params.id);
+    await projectService.delete(req.params.id!);
     sendSuccess(res, null, 'Project deleted successfully');
   } catch (error) {
     next(error);

@@ -13,6 +13,22 @@ const messageValidator = [
     .withMessage('Message content is required')
     .isLength({ max: 1000 })
     .withMessage('Message must be less than 1000 characters'),
+  body('history')
+    .optional()
+    .isArray({ max: 20 })
+    .withMessage('History must be an array of max 20 messages'),
+  body('history.*.role')
+    .optional()
+    .isIn(['user', 'assistant'])
+    .withMessage('Role must be user or assistant'),
+  body('history.*.content')
+    .optional()
+    .isString()
+    .isLength({ max: 2000 }),
+  body('sessionId')
+    .optional()
+    .isString()
+    .isLength({ max: 100 }),
 ];
 
 /**

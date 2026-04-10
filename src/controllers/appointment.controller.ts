@@ -22,7 +22,7 @@ export const getUpcomingAppointments = async (_req: Request, res: Response, next
 
 export const getAppointmentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const appointment = await appointmentService.findById(req.params.id);
+    const appointment = await appointmentService.findById(req.params.id!);
     sendSuccess(res, appointment, 'Appointment retrieved successfully');
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
 
 export const updateStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const appointment = await appointmentService.updateStatus(req.params.id, req.body.status);
+    const appointment = await appointmentService.updateStatus(req.params.id!, req.body.status);
     sendSuccess(res, appointment, 'Appointment status updated');
   } catch (error) {
     next(error);
@@ -49,7 +49,7 @@ export const updateStatus = async (req: Request, res: Response, next: NextFuncti
 
 export const deleteAppointment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await appointmentService.delete(req.params.id);
+    await appointmentService.delete(req.params.id!);
     sendSuccess(res, null, 'Appointment deleted successfully');
   } catch (error) {
     next(error);

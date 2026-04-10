@@ -1,17 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger.js';
 import { sendError } from '../utils/response.util.js';
-import { ErrorCode, HttpStatus } from '../types/response.types.js';
+import { ErrorCode, HttpStatus, HttpStatusCode } from '../types/response.types.js';
 import { config } from '../config/index.js';
 
 export class AppError extends Error {
-  statusCode: number;
+  statusCode: HttpStatusCode;
   code: ErrorCode;
   isOperational: boolean;
 
   constructor(
     message: string,
-    statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR,
+    statusCode: HttpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR,
     code: ErrorCode = ErrorCode.INTERNAL_ERROR
   ) {
     super(message);

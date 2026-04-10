@@ -6,6 +6,7 @@ import { sendEmail } from '../helpers/mailer.js';
 import { appointmentConfirmationTemplate } from '../views/emails/appointment.template.js';
 import { Op } from 'sequelize';
 import { logger } from '../utils/logger.js';
+import { todayLocal, dateToLocal } from '../utils/helpers.js';
 
 // Valid status transitions (state machine)
 const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
@@ -46,20 +47,37 @@ class AppointmentService {
   }
 
   async create(data: Omit<IAppointment, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<IAppointment> {
-    // Block past dates
-    const today = new Date().toISOString().split('T')[0];
+    // Block past dates (local timezone)
+    const today = todayLocal();
     if (String(data.date) < today) {
       throw new AppError('Impossible de reserver un creneau dans le passe', HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR);
     }
 
-    // Block if visitor already has a pending RDV
-    const pendingByEmail = await Appointment.findOne({
+    // Auto-cancel past pending RDVs for this email, then check for future pending
+    const pendingByEmail = await Appointment.findAll({
       where: {
         email: data.email,
         status: 'pending',
       },
     });
-    if (pendingByEmail) {
+
+    for (const pending of pendingByEmail) {
+      if (String(pending.date) < today) {
+        // Past pending → auto-cancel (was never honoured)
+        await pending.update({ status: 'cancelled' });
+        logger.info(`Auto-cancelled past pending RDV ${pending.id} for ${data.email}`);
+      }
+    }
+
+    // Check if there's still an active future pending RDV
+    const futurePending = await Appointment.findOne({
+      where: {
+        email: data.email,
+        status: 'pending',
+        date: { [Op.gte]: today },
+      },
+    });
+    if (futurePending) {
       throw new AppError(
         'Vous avez deja un rendez-vous en attente de confirmation. Veuillez patienter ou nous contacter pour l\'annuler.',
         HttpStatus.CONFLICT,
@@ -135,6 +153,68 @@ class AppointmentService {
     await appointment.destroy();
   }
 
+  /**
+   * Cancel all pending appointments for an email.
+   * Returns the number of cancelled appointments.
+   */
+  async cancelPendingByEmail(email: string): Promise<number> {
+    const [count] = await Appointment.update(
+      { status: 'cancelled' },
+      { where: { email, status: 'pending' } },
+    );
+    return count;
+  }
+
+  /**
+   * Reschedule an existing pending appointment to a new date/time.
+   */
+  async reschedule(id: string, newDate: Date, newTime: string): Promise<IAppointment> {
+    const appointment = await Appointment.findByPk(id);
+    if (!appointment) {
+      throw new AppError('Appointment not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    if (appointment.status !== 'pending' && appointment.status !== 'confirmed') {
+      throw new AppError('Seuls les RDV pending ou confirmed peuvent être reprogrammés', HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR);
+    }
+    // Block past dates
+    const today = todayLocal();
+    const dateStr = dateToLocal(newDate);
+    if (dateStr < today) {
+      throw new AppError('Impossible de reprogrammer dans le passé', HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR);
+    }
+    // Check slot
+    const existing = await Appointment.findOne({
+      where: {
+        date: newDate,
+        time: newTime,
+        status: { [Op.in]: ['pending', 'confirmed'] },
+        id: { [Op.ne]: id },
+      },
+    });
+    if (existing) {
+      throw new AppError('Ce créneau est déjà réservé', HttpStatus.CONFLICT, ErrorCode.CONFLICT);
+    }
+    await appointment.update({ date: newDate, time: newTime });
+
+    // Send confirmation email
+    try {
+      await sendEmail({
+        to: appointment.email,
+        subject: 'Rendez-vous reprogrammé',
+        html: appointmentConfirmationTemplate({
+          name: appointment.name,
+          date: new Date(newDate).toLocaleDateString('fr-FR', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+          }),
+          time: newTime,
+          subject: appointment.subject,
+        }),
+      });
+    } catch { /* silent */ }
+
+    return appointment;
+  }
+
   async getAvailableSlots(date: Date): Promise<string[]> {
     const bookedSlots = await Appointment.findAll({
       where: {
@@ -175,7 +255,7 @@ class AppointmentService {
       {
         where: {
           status: 'pending',
-          date: { [Op.lt]: twoDaysAgo.toISOString().split('T')[0] },
+          date: { [Op.lt]: dateToLocal(twoDaysAgo) },
         },
       }
     );
@@ -185,7 +265,7 @@ class AppointmentService {
       {
         where: {
           status: 'confirmed',
-          date: { [Op.lt]: oneDayAgo.toISOString().split('T')[0] },
+          date: { [Op.lt]: dateToLocal(oneDayAgo) },
         },
       }
     );
