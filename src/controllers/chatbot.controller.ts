@@ -5,8 +5,8 @@ import { generateId } from '../utils/helpers.js';
 
 export const sendMessage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { content, history, sessionId } = req.body;
-    const response = await chatbotService.processMessage(content, history, sessionId || 'default');
+    const { content, history, sessionId, lang = 'fr' } = req.body;
+    const response = await chatbotService.processMessage(content, history, sessionId || 'default', lang);
 
     const message = {
       id: generateId(),
@@ -30,9 +30,10 @@ export const getQuickActions = async (_req: Request, res: Response, next: NextFu
   }
 };
 
-export const getInitialMessage = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getInitialMessage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const message = await chatbotService.getInitialMessage();
+    const lang = (req.query.lang as string) === 'en' ? 'en' : 'fr';
+    const message = await chatbotService.getInitialMessage(lang);
     sendSuccess(res, message, 'Initial message retrieved');
   } catch (error) {
     next(error);

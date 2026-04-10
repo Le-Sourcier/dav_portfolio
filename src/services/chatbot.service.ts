@@ -85,30 +85,36 @@ class ChatbotService {
     ];
   }
 
-  private async getWelcomeMessage(): Promise<string> {
+  private async getWelcomeMessage(lang: 'fr' | 'en' = 'fr'): Promise<string> {
+    const isFr = lang === 'fr';
     try {
       const chatbot = await settingsService.getByKey('chatbot') as ChatbotSettings | null;
       if (chatbot?.welcomeMessage) return chatbot.welcomeMessage;
+      if (isFr && chatbot?.welcomeMessage) return chatbot.welcomeMessage;
+      if (!isFr && (chatbot as any)?.welcomeMessage_en) return (chatbot as any).welcomeMessage_en;
     } catch { /* fallback */ }
-    return `Bonjour ! Je suis l'assistant de **${config.owner.name}**. Comment puis-je vous aider ?`;
+    return isFr
+      ? `Bonjour ! Je suis l'assistant de **${config.owner.name}**. Comment puis-je vous aider ?`
+      : `Hello! I'm **${config.owner.name}'s** assistant. How can I help you?`;
   }
 
   async processMessage(
     content: string,
     history: Array<{ role: 'user' | 'assistant'; content: string }> = [],
     sessionId: string = 'default',
+    lang: 'fr' | 'en' = 'fr',
   ): Promise<Partial<ChatMessage>> {
     const input = content.toLowerCase().trim();
 
     // Quick intents with rich types → always use local engine (fast + rich UI)
-    const richIntent = await this.tryRichIntent(input);
+    const richIntent = await this.tryRichIntent(input, lang);
     if (richIntent) return richIntent;
 
     // Free conversation → AI with tools, fallback to local
     if (openaiService.isEnabled()) {
       try {
         const verifiedEmails = this.getVerifiedEmails(sessionId);
-        const aiResponse = await openaiService.chat(content, history, verifiedEmails);
+        const aiResponse = await openaiService.chat(content, history, verifiedEmails, lang);
         if (aiResponse) {
           return { content: aiResponse, type: 'text' as MessageType };
         }
@@ -124,34 +130,44 @@ class ChatbotService {
         // If there's conversation history, the user is mid-conversation → transparent error
         if (history && history.length > 2) {
           return {
-            content: `Désolé, je rencontre un problème technique temporaire. Veuillez réessayer dans quelques secondes. Si le problème persiste, vous pouvez utiliser le formulaire de contact.`,
+            content: lang === 'fr' 
+              ? `Désolé, je rencontre un problème technique temporaire. Veuillez réessayer dans quelques secondes. Si le problème persiste, vous pouvez utiliser le formulaire de contact.`
+              : `Sorry, I'm experiencing a temporary technical issue. Please try again in a few seconds. If the problem persists, you can use the contact form.`,
             type: 'text' as MessageType,
           };
         }
       }
     }
 
-    return this.processMessageLocal(content);
+    return this.processMessageLocal(content, lang);
   }
 
   /**
    * Quick intents that return rich message types (project_link, experience_link, etc.)
    * These bypass the AI and return immediately for fast, rich UI responses.
    */
-  private async tryRichIntent(input: string): Promise<Partial<ChatMessage> | null> {
+  private async tryRichIntent(input: string, lang: 'fr' | 'en' = 'fr'): Promise<Partial<ChatMessage> | null> {
     const info = await this.getPersonalInfo();
+    const firstName = info.name.split(' ').pop() || info.name;
 
+    const isFr = lang === 'fr';
+    const experienceTriggers = isFr 
+      ? ['experience', 'parcours', 'travaille', 'job', 'carriere', 'entreprise']
+      : ['experience', 'career', 'work', 'job', 'background', 'company'];
+    
     // Experience
-    if (this.matchesIntent(input, ['experience', 'parcours', 'travaille', 'job', 'carriere', 'entreprise'])) {
+    if (this.matchesIntent(input, experienceTriggers)) {
       const experiences = await experienceService.findAll();
       if (experiences.length === 0) {
-        return null; // let AI handle "no experiences"
+        return null;
       }
       const expList = experiences.slice(0, 4).map(exp =>
         `- **${exp.company}** : ${exp.title} (${exp.dates})`
       ).join('\n');
       return {
-        content: `Voici le parcours professionnel :\n\n${expList}\n\nCliquez sur une experience pour en savoir plus.`,
+        content: isFr 
+          ? `Voici le parcours professionnel :\n\n${expList}\n\nCliquez sur une experience pour en savoir plus.`
+          : `Here's the professional background:\n\n${expList}\n\nClick on an experience to learn more.`,
         type: 'experience_link' as MessageType,
         metadata: {
           experienceId: experiences[0]!.id,
@@ -160,24 +176,32 @@ class ChatbotService {
       };
     }
 
+    const projectTriggers = isFr
+      ? ['projet', 'portfolio', 'realisation', 'travaux', 'creation', 'mes projets']
+      : ['project', 'portfolio', 'work', 'creation', 'my projects'];
+    
     // Projects
-    if (this.matchesIntent(input, ['projet', 'portfolio', 'realisation', 'travaux', 'creation', 'mes projets'])) {
+    if (this.matchesIntent(input, projectTriggers)) {
       const projects = await projectService.findAll();
       if (projects.length === 0) return null;
       const list = projects.slice(0, 3).map(p => `- **${p.title}** (${p.category})`).join('\n');
       return {
-        content: `Projets recents :\n\n${list}`,
+        content: isFr ? `Projets recents :\n\n${list}` : `Recent projects:\n\n${list}`,
         type: 'project_link' as MessageType,
         metadata: { projectId: projects[0]!.id, projectTitle: projects[0]!.title },
       };
     }
 
+    const blogTriggers = isFr
+      ? ['blog', 'article', 'lire', 'publication', 'newsletter']
+      : ['blog', 'article', 'read', 'publication', 'newsletter'];
+    
     // Blog
-    if (this.matchesIntent(input, ['blog', 'article', 'lire', 'publication', 'newsletter'])) {
+    if (this.matchesIntent(input, blogTriggers)) {
       const posts = await blogService.findAll(true);
       if (posts.length === 0) return null;
       return {
-        content: `Voici les derniers articles du blog :`,
+        content: isFr ? `Voici les derniers articles du blog :` : `Here are the latest blog articles:`,
         type: 'blog_link' as MessageType,
         metadata: {
           posts: posts.slice(0, 3).map(p => ({ id: p.id, title: p.title, slug: (p as any).slug })),
@@ -185,16 +209,20 @@ class ChatbotService {
       };
     }
 
+    const contactTriggers = isFr
+      ? ['contact', 'email', 'telephone', 'joindre', 'linkedin', 'github', 'ecrire', 'message']
+      : ['contact', 'email', 'phone', 'reach', 'linkedin', 'github', 'write', 'message'];
+    
     // Contact
-    if (this.matchesIntent(input, ['contact', 'email', 'telephone', 'joindre', 'linkedin', 'github', 'ecrire', 'message'])) {
+    if (this.matchesIntent(input, contactTriggers)) {
       const lines = [
-        `Coordonnees de ${info.name} :`,
+        isFr ? `Coordonnees de ${info.name} :` : `${info.name}'s contact info:`,
         info.email ? `- **Email** : ${info.email}` : '',
-        info.phone ? `- **Telephone** : ${info.phone}` : '',
+        info.phone ? `- **Phone** : ${info.phone}` : '',
         info.linkedin ? `- **LinkedIn** : ${info.linkedin}` : '',
         info.github ? `- **GitHub** : ${info.github}` : '',
         '',
-        'Ou envoyez un message rapide ci-dessous :',
+        isFr ? 'Ou envoyez un message rapide ci-dessous :' : 'Or send a quick message below:',
       ].filter(Boolean).join('\n');
       return { content: lines, type: 'contact_form' as MessageType };
     }
@@ -206,39 +234,64 @@ class ChatbotService {
    * Fallback local — text-only responses when AI is unavailable.
    * Rich intents (projects, blog, contact, experience) are handled by tryRichIntent() above.
    */
-  private async processMessageLocal(content: string): Promise<Partial<ChatMessage>> {
+  private async processMessageLocal(content: string, lang: 'fr' | 'en' = 'fr'): Promise<Partial<ChatMessage>> {
     const input = content.toLowerCase().trim();
     const info = await this.getPersonalInfo();
     const firstName = info.name.split(' ').pop() || info.name;
+    const isFr = lang === 'fr';
 
+    const greetingTriggers = isFr
+      ? ['bonjour', 'salut', 'hello', 'hey', 'bonsoir', 'coucou']
+      : ['hello', 'hi', 'hey', 'good morning', 'good evening', 'hey there'];
+    
     // Greetings
-    if (this.matchesIntent(input, ['bonjour', 'salut', 'hello', 'hey', 'bonsoir', 'coucou'])) {
+    if (this.matchesIntent(input, greetingTriggers)) {
       return {
-        content: `Bonjour ! Je suis l'assistant de **${info.name}**. Comment puis-je vous aider ?\n\nJe peux vous parler de son parcours, ses competences, ses projets ou vous aider a prendre rendez-vous.`,
+        content: isFr
+          ? `Bonjour ! Je suis l'assistant de **${info.name}**. Comment puis-je vous aider ?\n\nJe peux vous parler de son parcours, ses competences, ses projets ou vous aider a prendre rendez-vous.`
+          : `Hello! I'm **${info.name}'s** assistant. How can I help you?\n\nI can tell you about their background, skills, projects, or help you book an appointment.`,
         type: 'text' as MessageType,
       };
     }
 
+    const identityTriggers = isFr
+      ? ['qui es-tu', 'presente-toi', 'parle-moi de toi', 'ton profil', 'identite', 'mon profil']
+      : ['who are you', 'introduce yourself', 'tell me about yourself', 'your profile', 'about you', 'identity'];
+    
     // Identity
-    if (this.matchesIntent(input, ['qui es-tu', `qui est ${firstName.toLowerCase()}`, 'presente-toi', 'parle-moi de toi', 'ton profil', 'identite', 'mon profil'])) {
+    if (this.matchesIntent(input, identityTriggers) || this.matchesIntent(input, [`qui est ${firstName.toLowerCase()}`])) {
       return {
-        content: `**${info.name}** est un **${info.title || 'professionnel'}** base a **${info.location}**.\n\nPassionne par la creation de solutions logicielles robustes et evolutives, il met en oeuvre des technologies modernes pour concevoir des applications performantes.`,
+        content: isFr
+          ? `**${info.name}** est un **${info.title || 'professionnel'}** base a **${info.location}**.\n\nPassionne par la creation de solutions logicielles robustes et evolutives, il met en oeuvre des technologies modernes pour concevoir des applications performantes.`
+          : `**${info.name}** is a **${info.title || 'professional'}** based in **${info.location}**.\n\nPassionate about creating robust and scalable software solutions, they use modern technologies to build high-performance applications.`,
         type: 'text' as MessageType,
       };
     }
 
+    const skillTriggers = isFr
+      ? ['competence', 'stack', 'techno', 'langage', 'sais-tu faire', 'expertise', 'domaine']
+      : ['skill', 'stack', 'technology', 'language', 'can you do', 'expertise', 'domain', 'technologies'];
+    
     // Skills
-    if (this.matchesIntent(input, ['competence', 'stack', 'techno', 'langage', 'sais-tu faire', 'expertise', 'domaine'])) {
+    if (this.matchesIntent(input, skillTriggers)) {
       return {
-        content: `${firstName} possede une expertise variee en tant que ${info.title || 'developpeur'}. Consultez la section "A Propos" pour voir la liste complete de ses competences techniques.`,
+        content: isFr
+          ? `${firstName} possede une expertise variee en tant que ${info.title || 'developpeur'}. Consultez la section "A Propos" pour voir la liste complete de ses competences techniques.`
+          : `${firstName} has varied expertise as a ${info.title || 'developer'}. Visit the "About" section to see the complete list of their technical skills.`,
         type: 'text' as MessageType,
       };
     }
 
+    const apptTriggers = isFr
+      ? ['rendez-vous', 'disponibilite', 'reserver', 'rdv', 'rencontrer']
+      : ['appointment', 'availability', 'book', 'schedule', 'meet', 'booking'];
+    
     // Appointment (fallback — simple text when AI is down)
-    if (this.matchesIntent(input, ['rendez-vous', 'disponibilite', 'reserver', 'rdv', 'rencontrer'])) {
+    if (this.matchesIntent(input, apptTriggers)) {
       return {
-        content: `${firstName} serait ravi d'echanger avec vous. Voici les creneaux disponibles :`,
+        content: isFr
+          ? `${firstName} serait ravi d'echanger avec vous. Voici les creneaux disponibles :`
+          : `${firstName} would be happy to discuss with you. Here are the available time slots:`,
         type: 'appointment_picker' as MessageType,
         metadata: {
           availableTimes: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'],
@@ -247,25 +300,39 @@ class ChatbotService {
       };
     }
 
+    const locationTriggers = isFr
+      ? ['ou est', 'ou vit', 'habite', 'ville', 'localisation', 'pays']
+      : ['where', 'live', 'city', 'location', 'country', 'based'];
+    
     // Location
-    if (this.matchesIntent(input, ['ou est', 'ou vit', 'habite', 'ville', 'localisation', 'pays'])) {
+    if (this.matchesIntent(input, locationTriggers)) {
       return {
-        content: `${firstName} est base a **${info.location}**. Il est disponible pour des missions en presentiel ou en remote.`,
+        content: isFr
+          ? `${firstName} est base a **${info.location}**. Il est disponible pour des missions en presentiel ou en remote.`
+          : `${firstName} is based in **${info.location}**. They are available for on-site or remote work.`,
         type: 'text' as MessageType,
       };
     }
 
+    const thanksTriggers = isFr
+      ? ['merci', 'thanks', 'super', 'genial', 'parfait', 'cool']
+      : ['thanks', 'thank you', 'great', 'awesome', 'perfect', 'cool'];
+    
     // Thanks
-    if (this.matchesIntent(input, ['merci', 'thanks', 'super', 'genial', 'parfait', 'cool'])) {
+    if (this.matchesIntent(input, thanksTriggers)) {
       return {
-        content: `Avec plaisir ! N'hesitez pas si vous avez d'autres questions.`,
+        content: isFr
+          ? `Avec plaisir ! N'hesitez pas si vous avez d'autres questions.`
+          : `You're welcome! Feel free to ask if you have more questions.`,
         type: 'text' as MessageType,
       };
     }
 
     // Default
     return {
-      content: `Je peux vous renseigner sur :\n\n- **Parcours** professionnel\n- **Competences** techniques\n- **Projets** realises\n- **Blog** et articles\n- **Contact** et coordonnees\n- **Rendez-vous** pour discuter\n\nQue souhaitez-vous savoir ?`,
+      content: isFr
+        ? `Je peux vous renseigner sur :\n\n- **Parcours** professionnel\n- **Competences** techniques\n- **Projets** realises\n- **Blog** et articles\n- **Contact** et coordonnees\n- **Rendez-vous** pour discuter\n\nQue souhaitez-vous savoir ?`
+        : `I can help you with:\n\n- **Background** & professional experience\n- **Skills** & technical expertise\n- **Projects** & work samples\n- **Blog** & articles\n- **Contact** info\n- **Appointment** booking\n\nWhat would you like to know?`,
       type: 'text' as MessageType,
     };
   }
@@ -274,8 +341,8 @@ class ChatbotService {
     return keywords.some(keyword => input.includes(keyword));
   }
 
-  async getInitialMessage(): Promise<ChatMessage> {
-    const welcome = await this.getWelcomeMessage();
+  async getInitialMessage(lang: 'fr' | 'en' = 'fr'): Promise<ChatMessage> {
+    const welcome = await this.getWelcomeMessage(lang);
     return {
       id: generateId(),
       role: 'assistant',
