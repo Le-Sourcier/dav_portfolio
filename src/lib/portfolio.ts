@@ -38,19 +38,36 @@ export const proofStats = [
 
 export const services = [
   {
+    eyebrow: "Produit",
     title: "Architecture SaaS",
+    headline: "Structurer une plateforme claire avant qu'elle ne devienne difficile à maintenir.",
     description:
       "Backends Node.js/TypeScript, RBAC, paiements, files d'attente, dashboards et APIs maintenables.",
+    points: ["Découpage métier", "Contrats API", "Parcours critiques"],
   },
   {
+    eyebrow: "Interface",
     title: "Produit web & mobile",
+    headline: "Construire des interfaces rapides, lisibles et pensées pour l'usage réel.",
     description:
       "Interfaces React, Next.js et React Native avec hiérarchie claire, performance et finition produit.",
+    points: ["Next.js", "React Native", "Design systems"],
   },
   {
+    eyebrow: "Ops",
     title: "Automatisation métier",
+    headline: "Réduire les tâches répétitives sans créer de dépendance fragile.",
     description:
       "Workflows n8n/Make, enrichissement de données, batchs et outils internes pour réduire les opérations manuelles.",
+    points: ["n8n", "Batchs", "Data enrichment"],
+  },
+  {
+    eyebrow: "Qualité",
+    title: "Performance & sécurité",
+    headline: "Stabiliser les temps de réponse et protéger les flux sensibles.",
+    description:
+      "Optimisation API, cache, permissions, validation des entrées, monitoring et durcissement des parcours critiques.",
+    points: ["Redis", "RBAC", "Monitoring"],
   },
 ];
 
@@ -124,22 +141,28 @@ export const experience = [
     company: "Nexus Corporation",
     role: "Développeur Fullstack & Software Engineer",
     period: "Août 2025 - Présent",
+    focus: "Architecture SaaS",
     summary:
       "Plateforme d'investissement web et mobile, backend modulaire, authentification, paiements, RBAC et dashboards analytiques.",
+    points: ["Backend modulaire", "Paiements & RBAC", "Dashboards analytiques"],
   },
   {
     company: "Ubuntu Consulting SARL",
     role: "Software Engineer - Automatisation & SaaS",
     period: "Février 2025 - Octobre 2025",
+    focus: "Automatisation métier",
     summary:
       "Solutions SaaS B2B, prospection, enrichissement de données, IA et optimisation de traitements batch.",
+    points: ["Workflows IA", "Enrichissement data", "Traitements batch"],
   },
   {
     company: "Groupe Drapeau",
     role: "Développeur Fullstack & Chef de projet",
     period: "Avril 2024 - Juillet 2024",
+    focus: "Plateforme métier",
     summary:
       "Plateforme web pour génie civil, location d'équipements et immobilier, avec déploiement et coordination d'équipe.",
+    points: ["Interface métier", "Déploiement", "Coordination produit"],
   },
 ];
 

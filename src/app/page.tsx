@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ContactSection } from "@/components/ContactSection";
+import { ExpertiseCarousel } from "@/components/ExpertiseCarousel";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
-import { blogPosts, experience, proofStats, projects, services, site, stack, testimonials } from "@/lib/portfolio";
+import { blogPosts, experience, proofStats, projects, site, stack, testimonials } from "@/lib/portfolio";
 
 const featuredProjects = projects.filter((project) => project.featured);
 
@@ -89,20 +90,7 @@ export default function Home() {
         ))}
       </section>
 
-      <section id="expertise" className="section split-section">
-        <div>
-          <p className="section-kicker">Expertise</p>
-          <h2>Un profil produit, architecture et exécution.</h2>
-        </div>
-        <div className="service-grid">
-          {services.map((service) => (
-            <article key={service.title} className="service-card">
-              <h3>{service.title}</h3>
-              <p>{service.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ExpertiseCarousel />
 
       <section id="projets" className="section projects-section">
         <div className="section-heading">
@@ -139,41 +127,70 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="parcours" className="section split-section">
-        <div>
+      <section id="parcours" className="section parcours-section">
+        <div className="parcours-copy">
           <p className="section-kicker">Parcours</p>
-          <h2>Expérience récente sur produits SaaS, automatisation et plateformes métier.</h2>
+          <h2>Un parcours construit autour du produit, de la performance et de l&apos;automatisation.</h2>
+          <p>
+            Chaque expérience renforce le même socle: transformer une contrainte métier en plateforme claire,
+            maintenable et prête à évoluer.
+          </p>
+          <div className="parcours-proof">
+            <span>Produit</span>
+            <span>Backend</span>
+            <span>Automatisation</span>
+            <span>SEO</span>
+          </div>
         </div>
-        <div className="timeline">
-          {experience.map((item) => (
-            <article key={`${item.company}-${item.period}`}>
-              <span>{item.period}</span>
-              <h3>{item.role}</h3>
-              <p className="company">{item.company}</p>
-              <p>{item.summary}</p>
+
+        <div className="parcours-timeline">
+          {experience.map((item, index) => (
+            <article className="parcours-card" key={`${item.company}-${item.period}`}>
+              <div className="parcours-marker" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+              <div>
+                <span>{item.period}</span>
+                <p className="parcours-focus">{item.focus}</p>
+                <h3>{item.role}</h3>
+                <p className="company">{item.company}</p>
+                <p>{item.summary}</p>
+                <div className="parcours-tags">
+                  {item.points.map((point) => (
+                    <small key={point}>{point}</small>
+                  ))}
+                </div>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
       <section className="section stack-section">
-        <div>
+        <div className="stack-intro">
           <p className="section-kicker">Stack</p>
-          <h2>Technologies utilisées pour livrer des produits fiables.</h2>
+          <h2>Un écosystème technique calibré pour produire, scaler et maintenir.</h2>
+          <p>
+            Les outils ne sont pas une collection de logos. Ils forment une chaîne de production cohérente: interface,
+            API, données, déploiement et automatisation.
+          </p>
+          <div className="stack-principles">
+            <span>Produit</span>
+            <span>Scalabilité</span>
+            <span>Maintenance</span>
+          </div>
         </div>
-        <div className="stack-list">
-          {stack.map((item) => (
-            <article key={item.name} className="stack-brand-card">
-              <div className="stack-logo">
-                <Image src={item.icon} alt="" width={34} height={34} aria-hidden="true" />
-              </div>
-              <div>
-                <strong>{item.name}</strong>
-                <span>{item.role}</span>
-              </div>
-              <small>{item.category}</small>
-            </article>
-          ))}
+        <div className="stack-brand-showcase">
+          <div className="stack-marquee" aria-label="Technologies principales">
+            <div className="stack-marquee-track">
+              {[...stack, ...stack].map((item, index) => (
+                <div className="stack-logo-tile" key={`${item.name}-${index}`} tabIndex={0}>
+                  <Image src={item.icon} alt={item.name} width={42} height={42} />
+                  <span className="stack-tooltip">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
