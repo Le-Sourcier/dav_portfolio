@@ -22,6 +22,10 @@
   --accent-strong: #0b4f49;
   --gold: #b8842f;
   --cream: #fff7e9;
+  --readiness-border-soft: rgba(15, 118, 110, 0.2);
+  --readiness-border-strong: rgba(11, 79, 73, 0.95);
+  --readiness-border-tail: rgba(184, 132, 47, 0.32);
+  --readiness-border-glow: rgba(15, 118, 110, 0.34);
   --body-background:
     linear-gradient(135deg, rgba(15, 118, 110, 0.08), transparent 34rem),
     linear-gradient(315deg, rgba(184, 132, 47, 0.1), transparent 28rem),
@@ -45,6 +49,10 @@
   --accent-strong: #f2c96b;
   --gold: #d7b464;
   --cream: #fff7e9;
+  --readiness-border-soft: rgba(215, 180, 100, 0.22);
+  --readiness-border-strong: rgba(215, 180, 100, 1);
+  --readiness-border-tail: rgba(215, 180, 100, 0.36);
+  --readiness-border-glow: rgba(215, 180, 100, 0.4);
   --body-background:
     radial-gradient(circle at 18% 22%, rgba(215, 180, 100, 0.12), transparent 26rem),
     radial-gradient(circle at 88% 14%, rgba(45, 212, 191, 0.08), transparent 24rem),
@@ -455,20 +463,6 @@ main {
   background: radial-gradient(circle, rgba(215, 180, 100, 0.13), transparent 68%);
 }
 
-:root[data-theme="dark"] .saas-readiness-card::after {
-  background:
-    conic-gradient(
-      from var(--readiness-border-angle) at 50% 50%,
-      transparent 0deg,
-      transparent 12deg,
-      rgba(215, 180, 100, 0.22) 28deg,
-      rgba(215, 180, 100, 1) 48deg,
-      rgba(215, 180, 100, 0.36) 68deg,
-      transparent 92deg,
-      transparent 360deg
-    );
-}
-
 :root[data-theme="dark"] .readiness-header p {
   border-color: rgba(215, 180, 100, 0.2);
   background: rgba(215, 180, 100, 0.1);
@@ -781,14 +775,14 @@ main {
       from var(--readiness-border-angle) at 50% 50%,
       transparent 0deg,
       transparent 12deg,
-      rgba(244, 195, 107, 0.18) 28deg,
-      rgba(244, 195, 107, 0.92) 48deg,
-      rgba(244, 195, 107, 0.32) 68deg,
+      var(--readiness-border-soft) 28deg,
+      var(--readiness-border-strong) 48deg,
+      var(--readiness-border-tail) 68deg,
       transparent 92deg,
       transparent 360deg
     );
   content: "";
-  filter: drop-shadow(0 0 14px rgba(244, 195, 107, 0.4));
+  filter: drop-shadow(0 0 14px var(--readiness-border-glow));
   opacity: 0;
   pointer-events: none;
   transition: opacity 520ms ease;
