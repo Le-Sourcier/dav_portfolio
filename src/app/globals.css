@@ -461,33 +461,27 @@ main {
   color: var(--gold);
 }
 
-:root[data-theme="dark"] .readiness-score-panel,
-:root[data-theme="dark"] .readiness-check,
-:root[data-theme="dark"] .readiness-architecture {
-  background: rgba(255, 247, 233, 0.055);
-  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.06);
-}
-
-:root[data-theme="dark"] .readiness-ring {
-  background:
-    conic-gradient(var(--gold) 0 302deg, rgba(255, 247, 233, 0.12) 302deg 360deg);
-  box-shadow: inset 0 0 0 1px rgba(255, 247, 233, 0.12);
-}
-
-:root[data-theme="dark"] .readiness-ring span {
-  background:
-    radial-gradient(circle at 30% 20%, rgba(215, 180, 100, 0.24), transparent 34%),
-    rgba(9, 10, 9, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(255, 247, 233, 0.12);
-}
-
 :root[data-theme="dark"] .readiness-check i {
   background: var(--gold);
   box-shadow: 0 0 0 5px rgba(215, 180, 100, 0.1);
 }
 
-:root[data-theme="dark"] .readiness-architecture div + div {
-  border-left-color: rgba(255, 247, 233, 0.1);
+:root[data-theme="dark"] .readiness-progress {
+  background: rgba(255, 247, 233, 0.12);
+}
+
+:root[data-theme="dark"] .readiness-progress span {
+  background: linear-gradient(90deg, var(--gold), rgba(45, 212, 191, 0.78));
+}
+
+:root[data-theme="dark"] .readiness-architecture span {
+  border-color: rgba(215, 180, 100, 0.18);
+  background: rgba(215, 180, 100, 0.07);
+  color: var(--foreground);
+}
+
+:root[data-theme="dark"] .readiness-architecture i {
+  background: rgba(215, 180, 100, 0.26);
 }
 
 :root[data-theme="dark"] .about-brief-flow {
@@ -750,16 +744,11 @@ main {
 
 .readiness-score-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 132px;
-  gap: 18px;
-  align-items: center;
-  border: 1px solid rgba(17, 17, 17, 0.09);
-  border-radius: 18px;
-  padding: 20px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(255, 250, 241, 0.72)),
-    rgba(255, 250, 241, 0.74);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52);
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 18px;
+  align-items: end;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  padding: 8px 2px 18px;
 }
 
 .readiness-score-panel span,
@@ -772,9 +761,9 @@ main {
 
 .readiness-score-panel strong {
   display: block;
-  margin: 8px 0 10px;
-  font-size: clamp(46px, 5vw, 64px);
-  line-height: 0.88;
+  margin-top: 6px;
+  font-size: clamp(34px, 3.6vw, 46px);
+  line-height: 0.96;
   letter-spacing: 0;
 }
 
@@ -785,37 +774,33 @@ main {
 }
 
 .readiness-score-panel p {
-  max-width: 330px;
+  max-width: 260px;
   margin: 0;
   color: var(--muted);
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
-.readiness-ring {
-  display: grid;
-  width: 118px;
-  height: 118px;
-  place-items: center;
+.readiness-progress {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  height: 8px;
   border-radius: 999px;
-  background:
-    conic-gradient(var(--accent) 0 302deg, rgba(15, 118, 110, 0.12) 302deg 360deg);
-  box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.08);
+  background: rgba(15, 118, 110, 0.11);
 }
 
-.readiness-ring span {
-  width: 82px;
-  height: 82px;
+.readiness-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
   border-radius: inherit;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(244, 195, 107, 0.28), transparent 34%),
-    var(--surface-strong);
-  box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.08);
+  background: linear-gradient(90deg, var(--gold), var(--accent));
 }
 
 .readiness-checks {
   display: grid;
-  gap: 8px;
+  gap: 0;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .readiness-check {
@@ -823,10 +808,8 @@ main {
   grid-template-columns: 10px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 14px;
-  padding: 13px 14px;
-  background: rgba(255, 255, 255, 0.46);
+  padding: 12px 2px;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .readiness-check i {
@@ -853,28 +836,27 @@ main {
 }
 
 .readiness-architecture {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  overflow: hidden;
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 16px;
-  background: rgba(255, 250, 241, 0.52);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 2px;
 }
 
-.readiness-architecture div {
-  display: grid;
-  gap: 7px;
-  min-height: 90px;
-  padding: 16px;
+.readiness-architecture span {
+  border: 1px solid rgba(15, 118, 110, 0.13);
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(15, 118, 110, 0.06);
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 850;
 }
 
-.readiness-architecture div + div {
-  border-left: 1px solid rgba(17, 17, 17, 0.08);
-}
-
-.readiness-architecture strong {
-  font-size: 14px;
-  line-height: 1.25;
+.readiness-architecture i {
+  width: 18px;
+  height: 1px;
+  background: rgba(15, 118, 110, 0.28);
 }
 
 .visual-kpis {
@@ -3737,20 +3719,6 @@ main {
     grid-template-columns: 1fr;
   }
 
-  .readiness-score-panel {
-    grid-template-columns: minmax(0, 1fr) 112px;
-  }
-
-  .readiness-ring {
-    width: 104px;
-    height: 104px;
-  }
-
-  .readiness-ring span {
-    width: 72px;
-    height: 72px;
-  }
-
   .blog-heading,
   .blog-list-item {
     align-items: start;
@@ -3860,20 +3828,6 @@ main {
 
   .readiness-score-panel {
     gap: 14px;
-  }
-
-  .readiness-ring {
-    justify-self: start;
-  }
-
-  .readiness-architecture div + div {
-    border-top: 1px solid rgba(17, 17, 17, 0.08);
-    border-left: 0;
-  }
-
-  :root[data-theme="dark"] .readiness-architecture div + div {
-    border-top-color: rgba(255, 247, 233, 0.1);
-    border-left: 0;
   }
 
   .blog-hero {
@@ -4097,7 +4051,7 @@ main {
 
   .readiness-score-panel,
   .readiness-check,
-  .readiness-architecture div,
+  .readiness-architecture,
   .about-brief-flow div,
   .about-brief-bottom div,
   .project-content,
@@ -4111,21 +4065,6 @@ main {
 
   .readiness-score-panel strong {
     font-size: 52px;
-  }
-
-  .readiness-ring {
-    width: 96px;
-    height: 96px;
-  }
-
-  .readiness-ring span {
-    width: 66px;
-    height: 66px;
-  }
-
-  .readiness-architecture div {
-    min-height: auto;
-    padding: 14px;
   }
 
   .section {
@@ -4266,16 +4205,6 @@ main {
 
   .readiness-score-panel strong {
     font-size: 46px;
-  }
-
-  .readiness-ring {
-    width: 86px;
-    height: 86px;
-  }
-
-  .readiness-ring span {
-    width: 58px;
-    height: 58px;
   }
 
   .about-brief {

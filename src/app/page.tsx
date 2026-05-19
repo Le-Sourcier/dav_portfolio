@@ -51,21 +51,21 @@ export default function Home() {
 
             <div className="readiness-score-panel">
               <div>
-                <span>Score de lancement</span>
-                <strong>84<span>/100</span></strong>
-                <p>Architecture viable pour vendre, onboarder et mesurer sans dette inutile.</p>
+                <span>MVP readiness</span>
+                <strong>4 piliers</strong>
               </div>
-              <div className="readiness-ring" aria-hidden="true">
+              <p>Auth, billing, ops et data cadrés pour lancer un SaaS commercialisable.</p>
+              <div className="readiness-progress" aria-hidden="true">
                 <span />
               </div>
             </div>
 
             <div className="readiness-checks">
               {[
-                ["Authentification & rôles", "RBAC, sessions, invitations équipe"],
-                ["Billing prêt produit", "Plans, paiements, quotas, historique"],
-                ["Ops & monitoring", "Logs utiles, alertes, erreurs traçables"],
-                ["Données exploitables", "Dashboards, exports, événements métier"],
+                ["Auth & rôles", "RBAC, sessions, invitations"],
+                ["Billing", "Plans, paiements, quotas"],
+                ["Ops", "Logs, alertes, erreurs traçables"],
+                ["Data", "Dashboards, exports, événements"],
               ].map(([title, detail]) => (
                 <div className="readiness-check" key={title}>
                   <i aria-hidden="true" />
@@ -78,18 +78,11 @@ export default function Home() {
             </div>
 
             <div className="readiness-architecture" aria-label="Architecture cible">
-              <div>
-                <span>Produit</span>
-                <strong>Interface client</strong>
-              </div>
-              <div>
-                <span>Core</span>
-                <strong>API modulaire</strong>
-              </div>
-              <div>
-                <span>Data</span>
-                <strong>PostgreSQL + jobs</strong>
-              </div>
+              <span>Interface client</span>
+              <i aria-hidden="true" />
+              <span>API modulaire</span>
+              <i aria-hidden="true" />
+              <span>PostgreSQL + jobs</span>
             </div>
           </div>
         </div>
