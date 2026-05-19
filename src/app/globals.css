@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@property --readiness-border-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: -90deg;
+}
+
 :root {
   --background: #f7f3ea;
   --foreground: #111111;
@@ -450,9 +456,17 @@ main {
 }
 
 :root[data-theme="dark"] .saas-readiness-card::after {
-  background-image:
-    linear-gradient(rgba(255, 247, 233, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 247, 233, 0.045) 1px, transparent 1px);
+  background:
+    conic-gradient(
+      from var(--readiness-border-angle) at 50% 50%,
+      transparent 0deg,
+      transparent 12deg,
+      rgba(215, 180, 100, 0.22) 28deg,
+      rgba(215, 180, 100, 1) 48deg,
+      rgba(215, 180, 100, 0.36) 68deg,
+      transparent 92deg,
+      transparent 360deg
+    );
 }
 
 :root[data-theme="dark"] .readiness-header p {
@@ -466,18 +480,23 @@ main {
   box-shadow: 0 0 0 5px rgba(215, 180, 100, 0.1);
 }
 
-:root[data-theme="dark"] .readiness-progress {
-  background: rgba(255, 247, 233, 0.12);
-}
-
-:root[data-theme="dark"] .readiness-progress span {
-  background: linear-gradient(90deg, var(--gold), rgba(45, 212, 191, 0.78));
-}
-
 :root[data-theme="dark"] .readiness-architecture span {
   border-color: rgba(215, 180, 100, 0.18);
   background: rgba(215, 180, 100, 0.07);
   color: var(--foreground);
+}
+
+:root[data-theme="dark"] .readiness-maturity span {
+  background: rgba(255, 247, 233, 0.12);
+}
+
+:root[data-theme="dark"] .readiness-maturity.is-ready span:nth-of-type(-n + 3) {
+  background: rgba(45, 212, 191, 0.82);
+}
+
+:root[data-theme="dark"] .readiness-maturity.is-planned span:nth-of-type(-n + 2),
+:root[data-theme="dark"] .readiness-maturity.is-watch span:first-of-type {
+  background: var(--gold);
 }
 
 :root[data-theme="dark"] .readiness-architecture i {
@@ -611,6 +630,8 @@ main {
 
 .primary-button,
 .secondary-button {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   min-height: 48px;
   align-items: center;
@@ -618,6 +639,38 @@ main {
   border-radius: 8px;
   padding: 0 18px;
   font-weight: 800;
+  isolation: isolate;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primary-button::before,
+.secondary-button::before {
+  position: absolute;
+  inset: auto -18% -95% -18%;
+  z-index: -1;
+  height: 120%;
+  border-radius: 45% 55% 0 0;
+  background:
+    radial-gradient(circle at 22% 28%, rgba(255, 247, 233, 0.34), transparent 22%),
+    linear-gradient(90deg, rgba(244, 195, 107, 0.95), rgba(15, 118, 110, 0.82));
+  content: "";
+  transform: translate3d(0, 18%, 0) rotate(-2deg);
+  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:hover::before,
+.secondary-button:hover::before {
+  transform: translate3d(0, -58%, 0) rotate(0deg);
+  animation: liquid-surface 2.8s ease-in-out infinite;
 }
 
 .primary-button {
@@ -630,6 +683,17 @@ main {
   border: 1px solid var(--line);
   color: var(--foreground);
   background: rgba(255, 250, 241, 0.62);
+}
+
+@keyframes liquid-surface {
+  0%,
+  100% {
+    border-radius: 45% 55% 0 0;
+  }
+
+  50% {
+    border-radius: 58% 42% 0 0;
+  }
 }
 
 .trust-row {
@@ -668,6 +732,32 @@ main {
   align-self: center;
   overflow: hidden;
   padding: 18px;
+  --readiness-border-angle: -90deg;
+  transform-origin: 50% 62%;
+  transition:
+    transform 980ms cubic-bezier(0.19, 1, 0.22, 1),
+    box-shadow 980ms cubic-bezier(0.19, 1, 0.22, 1),
+    border-color 980ms cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
+}
+
+.saas-readiness-card:hover {
+  animation: readiness-border-angle-sweep 3600ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  border-color: rgba(215, 180, 100, 0.34);
+  transform: perspective(1500px) rotateY(-10deg) rotateZ(-0.45deg) translate3d(-2px, -3px, 0);
+  box-shadow:
+    0 40px 96px rgba(75, 61, 35, 0.15),
+    0 0 0 1px rgba(215, 180, 100, 0.16),
+    0 0 36px rgba(215, 180, 100, 0.12);
+}
+
+@keyframes readiness-border-angle-sweep {
+  from {
+    --readiness-border-angle: -90deg;
+  }
+  to {
+    --readiness-border-angle: 270deg;
+  }
 }
 
 .saas-readiness-card::before {
@@ -683,19 +773,63 @@ main {
 
 .saas-readiness-card::after {
   position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(15, 118, 110, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 118, 110, 0.055) 1px, transparent 1px);
-  background-size: 46px 46px;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 3px;
+  background:
+    conic-gradient(
+      from var(--readiness-border-angle) at 50% 50%,
+      transparent 0deg,
+      transparent 12deg,
+      rgba(244, 195, 107, 0.18) 28deg,
+      rgba(244, 195, 107, 0.92) 48deg,
+      rgba(244, 195, 107, 0.32) 68deg,
+      transparent 92deg,
+      transparent 360deg
+    );
   content: "";
-  opacity: 0.58;
+  filter: drop-shadow(0 0 14px rgba(244, 195, 107, 0.4));
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 520ms ease;
+  will-change: opacity, --readiness-border-angle;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.saas-readiness-card:hover::after {
+  animation: readiness-border-glide 3600ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
 }
 
 .saas-readiness-card > * {
   position: relative;
   z-index: 1;
+}
+
+@keyframes readiness-border-glide {
+  0% {
+    opacity: 0;
+    --readiness-border-angle: -90deg;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    --readiness-border-angle: 270deg;
+  }
 }
 
 .visual-header {
@@ -781,22 +915,6 @@ main {
   line-height: 1.45;
 }
 
-.readiness-progress {
-  grid-column: 1 / -1;
-  overflow: hidden;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(15, 118, 110, 0.11);
-}
-
-.readiness-progress span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--gold), var(--accent));
-}
-
 .readiness-checks {
   display: grid;
   gap: 0;
@@ -805,7 +923,7 @@ main {
 
 .readiness-check {
   display: grid;
-  grid-template-columns: 10px minmax(0, 1fr);
+  grid-template-columns: 10px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
   padding: 12px 2px;
@@ -833,6 +951,51 @@ main {
 
 .readiness-check span {
   line-height: 1.35;
+}
+
+.readiness-maturity {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+}
+
+.readiness-maturity small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.readiness-maturity span {
+  display: inline-block;
+  width: 22px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.12);
+}
+
+.readiness-maturity.is-ready span {
+  background: rgba(15, 118, 110, 0.22);
+}
+
+.readiness-maturity.is-ready span:nth-of-type(-n + 3) {
+  background: var(--accent);
+}
+
+.readiness-maturity.is-planned span {
+  background: rgba(184, 132, 47, 0.18);
+}
+
+.readiness-maturity.is-planned span:nth-of-type(-n + 2) {
+  background: var(--gold);
+}
+
+.readiness-maturity.is-watch span {
+  background: rgba(184, 132, 47, 0.15);
+}
+
+.readiness-maturity.is-watch span:first-of-type {
+  background: var(--gold);
 }
 
 .readiness-architecture {
@@ -1935,6 +2098,10 @@ main {
 
   .expertise-slide {
     opacity: 1;
+  }
+
+  .saas-readiness-card:hover::after {
+    animation: none;
   }
 }
 
@@ -3226,6 +3393,10 @@ main {
 
 @media (prefers-reduced-motion: reduce) {
   .about-panel,
+  .primary-button,
+  .secondary-button,
+  .newsletter-form button,
+  .contact-form button,
   .article-back-to-top,
   .article-back-to-top-arrow {
     transition: none;
@@ -3234,9 +3405,17 @@ main {
   .about-panel:hover {
     transform: none;
   }
+
+  .primary-button:hover::before,
+  .secondary-button:hover::before,
+  .newsletter-form button:hover::before,
+  .contact-form button:hover::before {
+    animation: none;
+  }
 }
 
 @media (hover: none) {
+  .saas-readiness-card:hover,
   .about-panel:hover {
     transform: none;
   }
@@ -3310,6 +3489,8 @@ main {
 }
 
 .newsletter-form button {
+  position: relative;
+  overflow: hidden;
   min-height: 52px;
   border: 0;
   border-radius: 12px;
@@ -3318,6 +3499,24 @@ main {
   cursor: pointer;
   font: inherit;
   font-weight: 900;
+  isolation: isolate;
+}
+
+.newsletter-form button::before {
+  position: absolute;
+  inset: auto -16% -110% -16%;
+  z-index: -1;
+  height: 120%;
+  border-radius: 52% 48% 0 0;
+  background: linear-gradient(90deg, rgba(244, 195, 107, 0.96), rgba(15, 118, 110, 0.82));
+  content: "";
+  transform: translateY(16%);
+  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.newsletter-form button:hover::before {
+  transform: translateY(-58%);
+  animation: liquid-surface 2.8s ease-in-out infinite;
 }
 
 .contact-section {
@@ -3474,6 +3673,8 @@ main {
 }
 
 .contact-form button {
+  position: relative;
+  overflow: hidden;
   min-height: 54px;
   border: 1px solid rgba(11, 79, 73, 0.22);
   border-radius: 12px;
@@ -3483,9 +3684,29 @@ main {
   font: inherit;
   font-weight: 900;
   box-shadow: 0 16px 34px rgba(15, 118, 110, 0.18);
+  isolation: isolate;
   transition:
     transform 160ms ease,
     box-shadow 160ms ease;
+}
+
+.contact-form button::before {
+  position: absolute;
+  inset: auto -16% -110% -16%;
+  z-index: -1;
+  height: 120%;
+  border-radius: 52% 48% 0 0;
+  background:
+    radial-gradient(circle at 22% 28%, rgba(255, 247, 233, 0.28), transparent 20%),
+    linear-gradient(90deg, rgba(244, 195, 107, 0.9), rgba(45, 212, 191, 0.7));
+  content: "";
+  transform: translateY(16%);
+  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-form button:hover::before {
+  transform: translateY(-58%);
+  animation: liquid-surface 2.8s ease-in-out infinite;
 }
 
 .contact-form button:hover {
@@ -3828,6 +4049,17 @@ main {
 
   .readiness-score-panel {
     gap: 14px;
+  }
+
+  .readiness-check {
+    grid-template-columns: 10px minmax(0, 1fr);
+  }
+
+  .readiness-maturity {
+    grid-column: 2;
+    grid-template-columns: auto repeat(3, 22px);
+    align-items: center;
+    justify-items: start;
   }
 
   .blog-hero {

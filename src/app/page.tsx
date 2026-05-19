@@ -24,7 +24,7 @@ export default function Home() {
             <p className="hero-lead">{site.promise}</p>
 
             <div className="hero-actions">
-              <a className="primary-button" href={`mailto:${site.email}?subject=Projet%20SaaS%20ou%20mission`}>
+              <a className="primary-button liquid-cta" href={`mailto:${site.email}?subject=Projet%20SaaS%20ou%20mission`}>
                 Me confier un projet
               </a>
               <a className="secondary-button" href="#projets">
@@ -55,23 +55,26 @@ export default function Home() {
                 <strong>4 piliers</strong>
               </div>
               <p>Auth, billing, ops et data cadrés pour lancer un SaaS commercialisable.</p>
-              <div className="readiness-progress" aria-hidden="true">
-                <span />
-              </div>
             </div>
 
             <div className="readiness-checks">
               {[
-                ["Auth & rôles", "RBAC, sessions, invitations"],
-                ["Billing", "Plans, paiements, quotas"],
-                ["Ops", "Logs, alertes, erreurs traçables"],
-                ["Data", "Dashboards, exports, événements"],
-              ].map(([title, detail]) => (
+                ["Auth & rôles", "RBAC, sessions, invitations", "Prêt", "is-ready"],
+                ["Billing", "Plans, paiements, quotas", "À cadrer", "is-planned"],
+                ["Ops", "Logs, alertes, erreurs traçables", "À renforcer", "is-watch"],
+                ["Data", "Dashboards, exports, événements", "Prêt", "is-ready"],
+              ].map(([title, detail, status, maturity]) => (
                 <div className="readiness-check" key={title}>
                   <i aria-hidden="true" />
                   <div>
                     <strong>{title}</strong>
                     <span>{detail}</span>
+                  </div>
+                  <div className={`readiness-maturity ${maturity}`} aria-label={`Maturité: ${status}`}>
+                    <small>{status}</small>
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
                   </div>
                 </div>
               ))}
@@ -109,7 +112,7 @@ export default function Home() {
           </p>
           <div className="about-actions">
             <a
-              className="primary-button"
+              className="primary-button liquid-cta"
               href={`mailto:${site.email}?subject=Mission%20fullstack%20SaaS&body=Bonjour%20David,%0A%0AJ'aimerais%20discuter%20d'une%20opportunit%C3%A9%20de%20collaboration.%0A`}
             >
               M&apos;embaucher
