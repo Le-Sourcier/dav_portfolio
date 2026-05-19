@@ -23,6 +23,7 @@ export function Header() {
         <span>{site.initials}</span>
       </Link>
       <nav className="nav-links" aria-label="Navigation principale">
+        <Link href="/#apropos">À propos</Link>
         <Link href="/#expertise">Expertise</Link>
         <Link href="/#projets">Projets</Link>
         <Link href="/#parcours">Parcours</Link>

@@ -33,49 +33,63 @@ export default function Home() {
             </div>
 
             <div className="trust-row" aria-label="Preuves principales">
-              <span>Node.js</span>
-              <span>Next.js</span>
-              <span>PostgreSQL</span>
-              <span>Automatisation</span>
+              <span>Multi-tenant</span>
+              <span>RBAC</span>
+              <span>Paiements</span>
+              <span>Back-office</span>
             </div>
           </div>
 
-          <div className="hero-visual" aria-label="Aperçu produit et indicateurs clés">
-            <div className="visual-header">
+          <div className="hero-visual saas-readiness-card" aria-label="Audit de préparation SaaS">
+            <div className="visual-header readiness-header">
               <div>
-                <span>YDL Operating Console</span>
+                <span>YDL Product Audit</span>
                 <strong>SaaS readiness</strong>
               </div>
-              <p>Live</p>
+              <p>Avant build</p>
             </div>
-            <div className="visual-kpis">
-              {proofStats.slice(0, 3).map((stat) => (
-                <div key={stat.label}>
-                  <strong>{stat.value}</strong>
-                  <span>{stat.label}</span>
+
+            <div className="readiness-score-panel">
+              <div>
+                <span>Score de lancement</span>
+                <strong>84<span>/100</span></strong>
+                <p>Architecture viable pour vendre, onboarder et mesurer sans dette inutile.</p>
+              </div>
+              <div className="readiness-ring" aria-hidden="true">
+                <span />
+              </div>
+            </div>
+
+            <div className="readiness-checks">
+              {[
+                ["Authentification & rôles", "RBAC, sessions, invitations équipe"],
+                ["Billing prêt produit", "Plans, paiements, quotas, historique"],
+                ["Ops & monitoring", "Logs utiles, alertes, erreurs traçables"],
+                ["Données exploitables", "Dashboards, exports, événements métier"],
+              ].map(([title, detail]) => (
+                <div className="readiness-check" key={title}>
+                  <i aria-hidden="true" />
+                  <div>
+                    <strong>{title}</strong>
+                    <span>{detail}</span>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="visual-grid">
-              <div className="visual-score">
-                <span>API health</span>
-                <strong>99.98%</strong>
-                <p>Latency stable · errors monitored</p>
+
+            <div className="readiness-architecture" aria-label="Architecture cible">
+              <div>
+                <span>Produit</span>
+                <strong>Interface client</strong>
               </div>
-              <div className="visual-activity" aria-hidden="true">
-                <span className="bar-a" />
-                <span className="bar-b" />
-                <span className="bar-c" />
-                <span className="bar-d" />
+              <div>
+                <span>Core</span>
+                <strong>API modulaire</strong>
               </div>
-            </div>
-            <div className="visual-status-list">
-              {["Paiements sécurisés", "RBAC & permissions", "Dashboards temps réel"].map((item) => (
-                <span key={item}>
-                  <i />
-                  {item}
-                </span>
-              ))}
+              <div>
+                <span>Data</span>
+                <strong>PostgreSQL + jobs</strong>
+              </div>
             </div>
           </div>
         </div>
@@ -89,6 +103,62 @@ export default function Home() {
             <p>{stat.detail}</p>
           </article>
         ))}
+      </section>
+
+      <section id="apropos" className="section about-section">
+        <div className="about-copy">
+          <p className="section-kicker">À propos</p>
+          <h2>Un profil fullstack orienté produit, pas seulement exécution technique.</h2>
+          <p>
+            Je conçois des plateformes web et SaaS avec une attention égale pour l&apos;architecture, la vitesse de
+            livraison, l&apos;expérience utilisateur et les contraintes business. L&apos;objectif: transformer une idée
+            ou un process fragile en produit clair, maintenable et prêt à vendre.
+          </p>
+          <div className="about-actions">
+            <a
+              className="primary-button"
+              href={`mailto:${site.email}?subject=Mission%20fullstack%20SaaS&body=Bonjour%20David,%0A%0AJ'aimerais%20discuter%20d'une%20opportunit%C3%A9%20de%20collaboration.%0A`}
+            >
+              M&apos;embaucher
+            </a>
+            <a className="secondary-button" href="/cv/david-logan-cv.pdf" download>
+              Télécharger le CV
+            </a>
+          </div>
+        </div>
+
+        <div className="about-panel about-brief" aria-label="Méthode de collaboration">
+          <div className="about-brief-top">
+            <span>Mission snapshot</span>
+            <strong>Transformer un besoin flou en produit exploitable.</strong>
+          </div>
+
+          <div className="about-brief-flow" aria-label="Étapes de mission">
+            {["Diagnostic", "Architecture", "Build", "Stabilisation"].map((item, index) => (
+              <div key={item}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+              </div>
+            ))}
+          </div>
+
+          <blockquote className="about-brief-note">
+            Je commence par cadrer les flux métier, les droits, les données et les risques de livraison. Ensuite je
+            construis une base produit claire: API maintenable, interface lisible, automatisations utiles et déploiement
+            prêt à être repris par l&apos;équipe.
+          </blockquote>
+
+          <div className="about-brief-bottom">
+            <div>
+              <span>Livrables</span>
+              <p>API documentée · RBAC · paiements · dashboard admin · monitoring · déploiement</p>
+            </div>
+            <div>
+              <span>Positionnement</span>
+              <p>Assez technique pour sécuriser l&apos;architecture, assez produit pour garder l&apos;usage au centre.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <ExpertiseCarousel />
