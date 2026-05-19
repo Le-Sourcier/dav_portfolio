@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
+
+type BackToTopStyle = CSSProperties & {
+  "--scroll-progress": string;
+};
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
@@ -11,7 +15,7 @@ export function BackToTop() {
       const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
       const ratio = Math.min(Math.max(window.scrollY / max, 0), 1);
       setProgress(ratio);
-      setVisible(window.scrollY > 720);
+      setVisible(window.scrollY > 320);
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -26,27 +30,25 @@ export function BackToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const circumference = 2 * Math.PI * 22;
-  const dashOffset = circumference * (1 - progress);
+  const progressAngle = `${Math.round(progress * 360)}deg`;
 
   return (
     <button
       type="button"
       className={`article-back-to-top${visible ? " is-visible" : ""}`}
       onClick={handleClick}
-      aria-label="Revenir en haut de l'article"
+      aria-label="Revenir en haut de la page"
+      style={{ "--scroll-progress": progressAngle } as BackToTopStyle}
     >
-      <svg className="article-back-to-top-ring" viewBox="0 0 50 50" aria-hidden="true">
-        <circle cx="25" cy="25" r="22" />
-        <circle
-          cx="25"
-          cy="25"
-          r="22"
-          style={{ strokeDasharray: circumference, strokeDashoffset: dashOffset }}
-        />
-      </svg>
       <svg className="article-back-to-top-arrow" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 19V6M6 12l6-6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M12 19V6M6 12l6-6 6 6"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
       </svg>
       <span>Haut</span>
     </button>

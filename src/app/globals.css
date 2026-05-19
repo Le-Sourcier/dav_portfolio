@@ -2592,10 +2592,18 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 18px 8px 8px;
-  border: 1px solid var(--line);
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 94px;
+  min-height: 46px;
+  padding: 10px 17px 10px 14px;
+  --scroll-progress: 0deg;
+  --back-to-top-fill: var(--surface-strong);
+  --back-to-top-track: rgba(15, 118, 110, 0.24);
+  --back-to-top-progress: var(--gold);
+  border: 1px solid rgba(15, 118, 110, 0.18);
   border-radius: 999px;
-  background: var(--surface-strong);
+  background: var(--back-to-top-fill);
   color: var(--foreground);
   font-family: inherit;
   font-size: 12px;
@@ -2605,7 +2613,7 @@ main {
   cursor: pointer;
   opacity: 0;
   transform: translateY(14px);
-  transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
   backdrop-filter: saturate(140%) blur(8px);
   -webkit-backdrop-filter: saturate(140%) blur(8px);
   box-shadow:
@@ -2614,22 +2622,43 @@ main {
   pointer-events: none;
 }
 
+.article-back-to-top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from -90deg,
+    var(--back-to-top-progress) var(--scroll-progress),
+    var(--back-to-top-track) 0
+  );
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
 :root[data-theme="dark"] .article-back-link,
 :root[data-theme="dark"] .article-back-to-top {
-  border-color: rgba(255, 247, 233, 0.16);
-  background: rgba(12, 14, 12, 0.78);
+  --back-to-top-fill: rgba(12, 14, 12, 0.86);
+  --back-to-top-track: rgba(255, 247, 233, 0.22);
+  --back-to-top-progress: var(--gold);
+  border-color: rgba(255, 247, 233, 0.12);
   color: var(--foreground);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
 }
 
 :root[data-theme="dark"] .article-back-link:hover,
 :root[data-theme="dark"] .article-back-to-top:hover {
-  border-color: rgba(215, 180, 100, 0.38);
-  background: rgba(255, 247, 233, 0.08);
-}
-
-:root[data-theme="dark"] .article-back-to-top-ring circle:first-of-type {
-  stroke: rgba(255, 247, 233, 0.16);
+  --back-to-top-fill: rgba(22, 24, 20, 0.9);
+  --back-to-top-track: rgba(215, 180, 100, 0.28);
 }
 
 :root[data-theme="dark"] .article-back-to-top-arrow {
@@ -2643,7 +2672,7 @@ main {
 }
 
 .article-back-to-top:hover {
-  border-color: var(--accent);
+  --back-to-top-track: rgba(15, 118, 110, 0.26);
   box-shadow:
     0 22px 48px rgba(75, 61, 35, 0.22),
     0 2px 6px rgba(17, 17, 17, 0.06);
@@ -2653,35 +2682,11 @@ main {
   transform: translateY(-2px);
 }
 
-.article-back-to-top-ring {
-  position: absolute;
-  inset: 4px auto 4px 4px;
-  width: 36px;
-  height: 36px;
-  transform: rotate(-90deg);
-}
-
-.article-back-to-top-ring circle {
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-
-.article-back-to-top-ring circle:first-of-type {
-  stroke: rgba(15, 118, 110, 0.14);
-}
-
-.article-back-to-top-ring circle:last-of-type {
-  stroke: var(--gold);
-  transition: stroke-dashoffset 0.12s linear;
-}
-
 .article-back-to-top-arrow {
   position: relative;
   z-index: 1;
   width: 18px;
   height: 18px;
-  margin-left: 9px;
   color: var(--accent-strong);
   transition: transform 0.2s ease;
 }
@@ -2693,8 +2698,7 @@ main {
 
 @media (prefers-reduced-motion: reduce) {
   .article-back-to-top,
-  .article-back-to-top-arrow,
-  .article-back-to-top-ring circle {
+  .article-back-to-top-arrow {
     transition: none;
   }
 }
@@ -3256,7 +3260,10 @@ main {
   .article-back-to-top {
     right: 16px;
     bottom: 16px;
-    padding: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 10px;
   }
 
   .article-back-to-top span {
@@ -3265,10 +3272,6 @@ main {
 
   .article-back-to-top-arrow {
     margin-left: 0;
-  }
-
-  .article-back-to-top-ring {
-    inset: 4px;
   }
 
   .article-share {

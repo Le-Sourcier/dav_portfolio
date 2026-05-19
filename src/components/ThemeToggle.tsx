@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type ThemePreference = "system" | "light" | "dark";
 
@@ -11,6 +11,7 @@ const themes: Array<{ value: ThemePreference; label: string; short: string }> = 
 ];
 
 const storageKey = "ydl-theme";
+const themeChangeEvent = "ydl-theme-change";
 
 function resolveTheme(preference: ThemePreference) {
   if (preference !== "system") return preference;
@@ -24,31 +25,38 @@ function applyTheme(preference: ThemePreference) {
   document.documentElement.dataset.theme = resolved;
   document.documentElement.dataset.themePreference = preference;
   localStorage.setItem(storageKey, preference);
+  window.dispatchEvent(new Event(themeChangeEvent));
+}
+
+function getThemePreference(): ThemePreference {
+  if (typeof document === "undefined") return "system";
+
+  return (document.documentElement.dataset.themePreference as ThemePreference | undefined) ?? "system";
+}
+
+function subscribeToThemeChanges(onStoreChange: () => void) {
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const handleSystemThemeChange = () => {
+    if (getThemePreference() === "system") {
+      applyTheme("system");
+    }
+  };
+
+  window.addEventListener(themeChangeEvent, onStoreChange);
+  window.addEventListener("storage", onStoreChange);
+  media.addEventListener("change", handleSystemThemeChange);
+
+  return () => {
+    window.removeEventListener(themeChangeEvent, onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+    media.removeEventListener("change", handleSystemThemeChange);
+  };
 }
 
 export function ThemeToggle() {
-  const [preference, setPreference] = useState<ThemePreference>(() => {
-    if (typeof window === "undefined") return "system";
-
-    return (localStorage.getItem(storageKey) as ThemePreference | null) ?? "system";
-  });
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onSystemThemeChange = () => {
-      if ((localStorage.getItem(storageKey) ?? "system") === "system") {
-        applyTheme("system");
-      }
-    };
-
-    applyTheme(preference);
-    media.addEventListener("change", onSystemThemeChange);
-
-    return () => media.removeEventListener("change", onSystemThemeChange);
-  }, [preference]);
+  const preference = useSyncExternalStore(subscribeToThemeChanges, getThemePreference, () => "system");
 
   const updatePreference = (nextPreference: ThemePreference) => {
-    setPreference(nextPreference);
     applyTheme(nextPreference);
   };
 
