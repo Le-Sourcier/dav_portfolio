@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/lib/portfolio";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -28,9 +29,12 @@ export function Header() {
         <Link href="/blog">Blog</Link>
         <Link href="/#contact">Contact</Link>
       </nav>
-      <a className="header-cta" href={`mailto:${site.email}`}>
-        Discuter
-      </a>
+      <div className="header-actions">
+        <ThemeToggle />
+        <a className="header-cta" href={`mailto:${site.email}`}>
+          Discuter
+        </a>
+      </div>
     </header>
   );
 }

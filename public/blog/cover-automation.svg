@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Schéma d'un workflow d'automatisation aboutissant à un gain mesurable">
+  <defs>
+    <linearGradient id="bg-auto" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#0b3a36"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg-auto)"/>
+  <circle cx="220" cy="160" r="280" fill="rgba(184,132,47,0.18)"/>
+  <circle cx="1020" cy="480" r="240" fill="rgba(15,118,110,0.22)"/>
+  <g stroke="rgba(253,230,138,0.4)" stroke-width="2.5" fill="none" stroke-dasharray="8 8">
+    <path d="M180 360 L380 360 L380 240 L580 240 L580 400 L780 400 L780 280 L980 280"/>
+  </g>
+  <g font-family="system-ui,sans-serif" font-weight="800">
+    <g transform="translate(120,330)">
+      <rect width="120" height="60" rx="14" fill="#fde68a"/>
+      <text x="60" y="36" text-anchor="middle" font-size="13" fill="#0b3a36">Trigger</text>
+    </g>
+    <g transform="translate(320,210)">
+      <rect width="120" height="60" rx="14" fill="rgba(255,255,255,0.14)" stroke="rgba(253,230,138,0.5)"/>
+      <text x="60" y="36" text-anchor="middle" font-size="13" fill="#fff7e9">Filter</text>
+    </g>
+    <g transform="translate(520,370)">
+      <rect width="120" height="60" rx="14" fill="rgba(255,255,255,0.14)" stroke="rgba(253,230,138,0.5)"/>
+      <text x="60" y="36" text-anchor="middle" font-size="13" fill="#fff7e9">Transform</text>
+    </g>
+    <g transform="translate(720,250)">
+      <rect width="120" height="60" rx="14" fill="rgba(255,255,255,0.14)" stroke="rgba(253,230,138,0.5)"/>
+      <text x="60" y="36" text-anchor="middle" font-size="13" fill="#fff7e9">Notify</text>
+    </g>
+    <g transform="translate(920,250)">
+      <rect width="140" height="60" rx="14" fill="#0f766e" stroke="#fde68a" stroke-width="2"/>
+      <text x="70" y="36" text-anchor="middle" font-size="13" fill="#fff7e9">Outcome</text>
+    </g>
+  </g>
+</svg>

@@ -64,11 +64,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeScript = `
+    (() => {
+      const storageKey = "ydl-theme";
+      const root = document.documentElement;
+      const preference = localStorage.getItem(storageKey) || "system";
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const resolved = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+      root.dataset.theme = resolved;
+      root.dataset.themePreference = preference;
+    })();
+  `;
+
   return (
     <html
       lang="fr"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

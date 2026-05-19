@@ -207,12 +207,28 @@ export const blogPosts = [
     title: "Construire une architecture SaaS scalable sans sur-ingénierie",
     excerpt:
       "Les décisions techniques qui donnent de la marge à un produit SaaS sans créer une plateforme impossible à maintenir.",
+    coverImage: "/blog/cover-saas.svg",
+    coverImageAlt: "Schéma d'une architecture SaaS modulaire avec services découpés par responsabilité.",
     category: "Architecture",
     date: "2026-05-12",
+    updatedAt: "2026-05-15",
     readTime: "7 min",
+    wordCount: 1240,
+    level: "Intermédiaire",
+    language: "fr",
     featured: true,
+    tags: ["SaaS", "Backend", "Scalabilité"],
+    keyPoints: [
+      "Identifier les vrais points de pression avant de complexifier l'architecture.",
+      "Découper le backend par responsabilité métier, même dans un monolithe.",
+      "Instrumenter les parcours critiques avant toute optimisation lourde.",
+    ],
+    takeaway:
+      "Une architecture SaaS premium ne cherche pas à impressionner. Elle garde le produit compréhensible pendant que l'usage augmente.",
     intro:
       "La scalabilité n'est pas une course aux outils. C'est surtout une capacité à garder un système compréhensible pendant que les utilisateurs, les flux métier et les contraintes changent.",
+    pullQuote:
+      "La meilleure architecture est celle qu'on peut encore comprendre à 3h du matin, six mois après l'avoir écrite.",
     sections: [
       {
         title: "Commencer par les vrais points de pression",
@@ -223,11 +239,48 @@ export const blogPosts = [
         title: "Découper par responsabilité métier",
         body:
           "Un backend maintenable sépare les responsabilités: identité, facturation, permissions, notifications, analytics, fichiers et domaine produit. Même dans un monolithe, cette séparation réduit les régressions et rend l'extraction future plus simple.",
+        image: "/blog/figure-flow.svg",
+        imageAlt: "Flux source → service → file → résultat illustrant un découpage modulaire.",
+        imageCaption: "Un flux clair par domaine reste lisible même après plusieurs itérations.",
       },
       {
         title: "Mesurer avant d'optimiser",
         body:
           "Les métriques changent la qualité des décisions. Temps de réponse, taux d'erreur, files en attente, temps batch et parcours utilisateurs doivent être observables. Sans mesure, l'optimisation devient une préférence personnelle.",
+      },
+    ],
+    faq: [
+      {
+        question: "À partir de quand passer d'un monolithe à des services séparés ?",
+        answer:
+          "Quand les équipes se marchent dessus, que les déploiements deviennent risqués ou qu'un domaine a des contraintes de scaling très différentes. Pas avant. Un monolithe modulaire bien découpé tient longtemps.",
+      },
+      {
+        question: "Faut-il choisir PostgreSQL ou une base NoSQL pour un SaaS B2B ?",
+        answer:
+          "PostgreSQL couvre 95% des besoins SaaS B2B: relations, transactions, JSONB pour la flexibilité, recherche full-text, row-level security. Le NoSQL se justifie pour des cas précis (séries temporelles, événements à très haut débit).",
+      },
+      {
+        question: "Quelles métriques surveiller en priorité ?",
+        answer:
+          "Latence p95 des endpoints critiques, taux d'erreur 5xx, profondeur des files asynchrones, temps des jobs longs, et un funnel produit clé (signup → activation → action de valeur).",
+      },
+    ],
+    resources: [
+      {
+        label: "Designing Data-Intensive Applications (Kleppmann)",
+        href: "https://dataintensive.net/",
+        type: "Livre",
+      },
+      {
+        label: "The Twelve-Factor App",
+        href: "https://12factor.net/",
+        type: "Guide",
+      },
+      {
+        label: "PostgreSQL — Documentation officielle",
+        href: "https://www.postgresql.org/docs/",
+        type: "Doc",
       },
     ],
   },
@@ -236,12 +289,28 @@ export const blogPosts = [
     title: "Automatisation métier: choisir les workflows qui créent un vrai ROI",
     excerpt:
       "Comment prioriser les automatisations utiles et éviter les workflows qui impressionnent mais ne changent rien au business.",
+    coverImage: "/blog/cover-automation.svg",
+    coverImageAlt: "Schéma de workflow d'automatisation aboutissant à un bloc ROI augmenté.",
     category: "Automatisation",
     date: "2026-05-08",
+    updatedAt: "2026-05-08",
     readTime: "6 min",
+    wordCount: 980,
+    level: "Tous niveaux",
+    language: "fr",
     featured: true,
+    tags: ["Automatisation", "ROI", "Ops"],
+    keyPoints: [
+      "Prioriser les tâches fréquentes, fragiles et mesurables.",
+      "Prévoir une sortie humaine claire pour chaque scénario d'échec.",
+      "Documenter le processus complet, pas seulement l'outil utilisé.",
+    ],
+    takeaway:
+      "Une bonne automatisation se juge sur la friction supprimée, pas sur la complexité du scénario.",
     intro:
       "Une bonne automatisation ne remplace pas seulement une tâche. Elle réduit une friction répétée, fiabilise une opération et libère du temps sur un point qui compte vraiment.",
+    pullQuote:
+      "Automatiser une tâche cassée, c'est cacher le problème plus vite — pas le résoudre.",
     sections: [
       {
         title: "Partir du coût opérationnel",
@@ -252,11 +321,48 @@ export const blogPosts = [
         title: "Garder une sortie humaine claire",
         body:
           "Un workflow robuste prévoit les cas d'échec. Il doit permettre de comprendre ce qui s'est passé, reprendre manuellement si nécessaire et éviter qu'une erreur silencieuse se transforme en dette opérationnelle.",
+        image: "/blog/figure-flow.svg",
+        imageAlt: "Diagramme d'un workflow avec étape d'erreur reprise manuellement.",
+        imageCaption: "Chaque automatisation premium prévoit son scénario d'échec.",
       },
       {
         title: "Documenter le processus, pas seulement le scénario",
         body:
           "La vraie valeur vient quand l'équipe comprend le flux. Une automatisation premium inclut des logs, des alertes, des règles compréhensibles et une documentation courte.",
+      },
+    ],
+    faq: [
+      {
+        question: "n8n, Make, Zapier ou code custom — comment choisir ?",
+        answer:
+          "Zapier pour démarrer vite sur des intégrations standards. n8n quand on a besoin de logique complexe self-hostée et d'observabilité. Du code custom dès qu'un workflow devient critique pour le business ou touche des données sensibles.",
+      },
+      {
+        question: "Comment mesurer le ROI d'une automatisation ?",
+        answer:
+          "Heures économisées × coût horaire + erreurs évitées × coût d'une erreur − coût de maintenance du workflow. Si le résultat n'est pas largement positif après 3 mois, le scénario était mal choisi.",
+      },
+      {
+        question: "Que faire des automatisations 'orphelines' (personne ne sait à quoi elles servent) ?",
+        answer:
+          "Les désactiver pendant 30 jours et observer. Si personne ne se plaint, supprimer. Sinon documenter immédiatement avec l'utilisateur qui s'est manifesté.",
+      },
+    ],
+    resources: [
+      {
+        label: "n8n — Documentation et workflows",
+        href: "https://docs.n8n.io/",
+        type: "Doc",
+      },
+      {
+        label: "The Phoenix Project (Kim, Behr, Spafford)",
+        href: "https://itrevolution.com/product/the-phoenix-project/",
+        type: "Livre",
+      },
+      {
+        label: "Temporal — Workflows code-first durables",
+        href: "https://temporal.io/",
+        type: "Outil",
       },
     ],
   },
@@ -265,12 +371,28 @@ export const blogPosts = [
     title: "Ce qui rend un portfolio développeur réellement premium",
     excerpt:
       "Un portfolio qui vend ne montre pas seulement une stack: il met en scène des preuves, des résultats et une manière de travailler.",
+    coverImage: "/blog/cover-portfolio.svg",
+    coverImageAlt: "Maquette de portfolio premium avec preuves chiffrées et CTA visibles.",
     category: "Produit",
     date: "2026-05-01",
+    updatedAt: "2026-05-10",
     readTime: "5 min",
+    wordCount: 820,
+    level: "Débutant",
+    language: "fr",
     featured: false,
+    tags: ["Portfolio", "Conversion", "Next.js"],
+    keyPoints: [
+      "Mettre les preuves et les résultats avant la promesse.",
+      "Structurer la page pour aider un client à décider vite.",
+      "Réduire la friction de contact avec des actions directes.",
+    ],
+    takeaway:
+      "Un portfolio premium fonctionne comme une preuve commerciale, pas comme une galerie de composants.",
     intro:
       "Un portfolio premium donne confiance avant même le premier message. Il clarifie le positionnement, réduit les doutes et montre que le développeur comprend les enjeux produit.",
+    pullQuote:
+      "Un portfolio ne se juge pas à ce qu'il montre, mais à la vitesse à laquelle un client comprend pourquoi t'appeler.",
     sections: [
       {
         title: "La preuve avant la promesse",
@@ -281,11 +403,48 @@ export const blogPosts = [
         title: "Une hiérarchie pensée pour décider",
         body:
           "Le premier écran doit répondre vite: qui êtes-vous, quel problème résolvez-vous, pourquoi vous faire confiance, et comment vous contacter. Le reste doit approfondir, pas répéter.",
+        image: "/blog/figure-flow.svg",
+        imageAlt: "Hiérarchie d'information du haut de page d'un portfolio premium.",
+        imageCaption: "L'information descend du général au spécifique — décision rapide en haut.",
       },
       {
         title: "Un contact sans friction",
         body:
           "Le meilleur formulaire est celui qui aide à écrire un bon brief. Les canaux directs doivent rester accessibles, surtout pour les clients pressés ou les recruteurs.",
+      },
+    ],
+    faq: [
+      {
+        question: "Faut-il afficher tous ses projets ou seulement les meilleurs ?",
+        answer:
+          "Trois à six projets bien racontés battent vingt projets survolés. Chaque projet doit répondre à : quel problème, quelle responsabilité, quel résultat mesurable.",
+      },
+      {
+        question: "Mettre un formulaire de contact ou seulement un email ?",
+        answer:
+          "Les deux. Email visible pour les clients pressés qui veulent écrire depuis leur outil habituel. Formulaire pour ceux qui ont besoin d'être guidés (avec quelques champs orientant vers un bon brief).",
+      },
+      {
+        question: "Quel impact réel d'un portfolio premium sur les leads ?",
+        answer:
+          "Un bon portfolio ne génère pas de leads tout seul. Il filtre, qualifie et raccourcit le cycle de décision. Couplé à un canal d'acquisition (réseau, contenu, ads), il multiplie le taux de conversion par 2 à 4.",
+      },
+    ],
+    resources: [
+      {
+        label: "Refactoring UI (Adam Wathan & Steve Schoger)",
+        href: "https://www.refactoringui.com/",
+        type: "Livre",
+      },
+      {
+        label: "Next.js — Documentation",
+        href: "https://nextjs.org/docs",
+        type: "Doc",
+      },
+      {
+        label: "Read.cv — Inspirations portfolio",
+        href: "https://read.cv/",
+        type: "Inspiration",
       },
     ],
   },

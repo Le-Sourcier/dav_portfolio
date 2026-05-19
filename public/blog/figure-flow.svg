@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-label="Flux de données illustratif">
+  <rect width="960" height="360" fill="#fdf6e3" rx="18"/>
+  <g font-family="system-ui,sans-serif" font-weight="700">
+    <g transform="translate(60,140)">
+      <rect width="160" height="80" rx="14" fill="#ffffff" stroke="rgba(17,17,17,0.12)"/>
+      <text x="80" y="38" text-anchor="middle" font-size="13" fill="rgba(17,17,17,0.55)">Source</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" fill="#111111">Événement utilisateur</text>
+    </g>
+    <g transform="translate(280,140)">
+      <rect width="160" height="80" rx="14" fill="#ffffff" stroke="rgba(17,17,17,0.12)"/>
+      <text x="80" y="38" text-anchor="middle" font-size="13" fill="rgba(17,17,17,0.55)">Service</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" fill="#111111">Validation + règles</text>
+    </g>
+    <g transform="translate(500,140)">
+      <rect width="160" height="80" rx="14" fill="#ffffff" stroke="rgba(17,17,17,0.12)"/>
+      <text x="80" y="38" text-anchor="middle" font-size="13" fill="rgba(17,17,17,0.55)">File</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" fill="#111111">Traitement asynchrone</text>
+    </g>
+    <g transform="translate(720,140)">
+      <rect width="180" height="80" rx="14" fill="#0f766e"/>
+      <text x="90" y="38" text-anchor="middle" font-size="13" fill="rgba(253,230,138,0.85)">Résultat</text>
+      <text x="90" y="58" text-anchor="middle" font-size="14" fill="#fff7e9">Observabilité + état</text>
+    </g>
+  </g>
+  <g stroke="rgba(15,118,110,0.4)" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <path d="M220 180 L280 180"/>
+    <path d="M440 180 L500 180"/>
+    <path d="M660 180 L720 180"/>
+  </g>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="rgba(15,118,110,0.6)"/>
+    </marker>
+  </defs>
+  <text x="60" y="80" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#111111">Un flux lisible bat un flux astucieux.</text>
+</svg>

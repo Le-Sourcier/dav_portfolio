@@ -5,6 +5,7 @@ import { ExpertiseCarousel } from "@/components/ExpertiseCarousel";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
+import { BackToTop } from "@/components/blog/BackToTop";
 import { blogPosts, experience, proofStats, projects, site, stack, testimonials } from "@/lib/portfolio";
 
 const featuredProjects = projects.filter((project) => project.featured);
@@ -239,6 +240,7 @@ export default function Home() {
 
       <Footer />
       </main>
+      <BackToTop />
     </>
   );
 }
