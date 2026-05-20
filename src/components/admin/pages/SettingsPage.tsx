@@ -33,7 +33,7 @@ function FieldInput(props: React.ComponentProps<typeof Input>) {
   return (
     <Input
       {...props}
-      className={cn('h-9 rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400', props.className)}
+      className={cn('h-9 rounded-lg border-border/70 bg-card/85 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400', props.className)}
     />
   );
 }
@@ -58,9 +58,9 @@ function SaveButton({ onClick, label = 'Enregistrer', loading = false, saved = f
 
 function SectionCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800">
-      <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+    <div className="bg-card/85 rounded-xl border border-border/70">
+      <div className="px-6 py-5 border-b border-border/70">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {description && <p className="text-[13px] text-zinc-400 mt-0.5">{description}</p>}
       </div>
       <div className="px-6 py-5">{children}</div>
@@ -251,7 +251,7 @@ export function SettingsPage() {
     const newId = String(Date.now());
     setChatbotForm({
       ...chatbotForm,
-      quickActions: [...chatbotForm.quickActions, { id: newId, label: '', prompt: '' }],
+      quickActions: [...chatbotForm.quickActions, { id: newId, label: '', label_en: '', prompt: '', prompt_en: '' }],
     });
   };
 
@@ -328,7 +328,7 @@ export function SettingsPage() {
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Navigation */}
       <div className="lg:w-[220px] shrink-0">
-        <nav className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-1.5 space-y-0.5 lg:sticky lg:top-8">
+        <nav className="bg-card/85 rounded-xl border border-border/70 p-1.5 space-y-0.5 lg:sticky lg:top-8">
           {sectionList.map((section) => (
             <button
               key={section.id}
@@ -336,8 +336,8 @@ export function SettingsPage() {
               className={cn(
                 'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
                 activeSection === section.id
-                  ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-foreground'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-accent/60'
               )}
             >
               <section.icon className="w-4 h-4 shrink-0" />
@@ -347,7 +347,7 @@ export function SettingsPage() {
 
           {/* Last saved indicator */}
           {settings.lastSaved && (
-            <div className="px-3 pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <div className="px-3 pt-3 mt-2 border-t border-border/70">
               <p className="text-[10px] text-zinc-400">
                 Derniere sauvegarde :<br />
                 {new Date(settings.lastSaved).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -381,7 +381,7 @@ export function SettingsPage() {
                     </button>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{profileForm.name}</p>
+                    <p className="text-sm font-medium text-foreground">{profileForm.name}</p>
                     <p className="text-[12px] text-zinc-400">{t('settings.profile.changePhoto')}</p>
                   </div>
                 </div>
@@ -451,7 +451,7 @@ export function SettingsPage() {
                       ...profileForm, 
                       [lang === 'fr' ? 'bio' : 'bio_en']: e.target.value 
                     })}
-                    className="min-h-[80px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
+                    className="min-h-[80px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">{(lang === 'fr' ? profileForm.bio : profileForm.bio_en ?? '').length}{t('settings.profile.bioCount')}</p>
                 </div>
@@ -539,7 +539,7 @@ export function SettingsPage() {
             <SectionCard title={t('settings.expertise.education')} description={t('settings.expertise.educationDesc')}>
               <div className="space-y-3">
                 {educationForm.map((edu) => (
-                  <div key={edu.id} className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 space-y-3">
+                  <div key={edu.id} className="p-4 rounded-lg bg-secondary/60 border border-border/70 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 space-y-3">
                         <div>
@@ -682,13 +682,13 @@ export function SettingsPage() {
 
             <SectionCard title="Sessions actives" description="Gerez vos sessions connectees.">
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/60">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
                       <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">Session actuelle</p>
+                      <p className="text-[13px] font-medium text-foreground">Session actuelle</p>
                       <p className="text-[11px] text-zinc-400">
                         {navigator.userAgent.includes('Chrome') ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Navigateur'} - {navigator.platform} - {new Date().toLocaleDateString('fr-FR')}
                       </p>
@@ -719,7 +719,7 @@ export function SettingsPage() {
                     'relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-150',
                     selectedTheme === theme.id
                       ? 'border-zinc-900 dark:border-white'
-                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
+                      : 'border-border/70 hover:border-zinc-300 dark:hover:border-zinc-700'
                   )}
                 >
                   {selectedTheme === theme.id && (
@@ -736,17 +736,17 @@ export function SettingsPage() {
               ))}
             </div>
 
-            <div className="mt-6 pt-5 border-t border-zinc-100 dark:border-zinc-800 space-y-4">
-              <h4 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100">Preferences d'affichage</h4>
+            <div className="mt-6 pt-5 border-t border-border/70 space-y-4">
+              <h4 className="text-[13px] font-semibold text-foreground">Preferences d'affichage</h4>
               <div className="space-y-1">
                 {([
                   { key: 'animations' as const, label: 'Animations', desc: 'Transitions et animations de l\'interface' },
                   { key: 'sidebarCompact' as const, label: 'Sidebar compacte', desc: 'Reduire la barre laterale par defaut' },
                   { key: 'denseMode' as const, label: 'Mode dense', desc: 'Reduire l\'espacement entre les elements' },
                 ]).map((pref) => (
-                  <label key={pref.key} className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors">
+                  <label key={pref.key} className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/60 cursor-pointer transition-colors">
                     <div>
-                      <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">{pref.label}</p>
+                      <p className="text-[13px] font-medium text-foreground">{pref.label}</p>
                       <p className="text-[11px] text-zinc-400">{pref.desc}</p>
                     </div>
                     <button
@@ -758,7 +758,7 @@ export function SettingsPage() {
                     >
                       <div
                         className={cn(
-                          'absolute top-0.5 w-4 h-4 bg-white dark:bg-zinc-900 rounded-full transition-transform shadow-sm',
+                          'absolute top-0.5 w-4 h-4 bg-card/85 rounded-full transition-transform shadow-sm',
                           displayPrefs[pref.key] ? 'left-[18px]' : 'left-0.5'
                         )}
                       />
@@ -800,7 +800,7 @@ export function SettingsPage() {
                       ...seoForm, 
                       [lang === 'fr' ? 'metaDescription' : 'metaDescription_en']: e.target.value 
                     })}
-                    className="min-h-[70px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
+                    className="min-h-[70px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
                   />
                   <p className={cn('text-[11px] mt-1', charStatus === 'success' ? 'text-emerald-500' : 'text-red-500')}>
                     {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length}/160 caracteres {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length > 160 && '(trop long)'}
@@ -822,7 +822,7 @@ export function SettingsPage() {
                 </div>
 
                 {/* Live Google preview */}
-                <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-800">
+                <div className="p-4 rounded-lg bg-secondary/60 border border-border/70">
                   <p className="text-[11px] font-medium text-zinc-400 mb-2 uppercase tracking-wider">{t('settings.seo.googlePreview')}</p>
                   <div className="space-y-0.5">
                     <p className="text-blue-600 dark:text-blue-400 text-base font-medium truncate">
@@ -853,7 +853,7 @@ export function SettingsPage() {
                     placeholder="https://yourdomain.com/og-image.png"
                   />
                   {seoForm.ogImage && (
-                    <div className="mt-2 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 max-w-sm">
+                    <div className="mt-2 rounded-lg overflow-hidden border border-border/70 max-w-sm">
                       <img src={seoForm.ogImage} alt="OG Preview" className="w-full h-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                   )}
@@ -868,7 +868,7 @@ export function SettingsPage() {
                     <select
                       value={seoForm.ogType}
                       onChange={(e) => setSeoForm({ ...seoForm, ogType: e.target.value })}
-                      className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm"
+                      className="w-full h-9 px-3 rounded-lg border border-border/70 bg-card/85 text-sm"
                     >
                       <option value="website">website</option>
                       <option value="article">article</option>
@@ -889,9 +889,9 @@ export function SettingsPage() {
           <>
             <SectionCard title={t('settings.chatbot.config')} description={t('settings.chatbot.configDesc')}>
               <div className="space-y-6">
-                <label className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors">
+                <label className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/60 cursor-pointer transition-colors">
                   <div>
-                    <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">{t('settings.chatbot.enableChatbot')}</p>
+                    <p className="text-[13px] font-medium text-foreground">{t('settings.chatbot.enableChatbot')}</p>
                     <p className="text-[11px] text-zinc-400">{t('settings.chatbot.enableChatbotDesc')}</p>
                   </div>
                   <button
@@ -903,7 +903,7 @@ export function SettingsPage() {
                   >
                     <div
                       className={cn(
-                        'absolute top-0.5 w-4 h-4 bg-white dark:bg-zinc-900 rounded-full transition-transform shadow-sm',
+                        'absolute top-0.5 w-4 h-4 bg-card/85 rounded-full transition-transform shadow-sm',
                         chatbotForm.enabled ? 'left-[18px]' : 'left-0.5'
                       )}
                     />
@@ -921,7 +921,7 @@ export function SettingsPage() {
                       ...chatbotForm, 
                       [lang === 'fr' ? 'welcomeMessage' : 'welcomeMessage_en']: e.target.value 
                     })}
-                    className="min-h-[100px] rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm resize-none"
+                    className="min-h-[100px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
                     placeholder={t('settings.chatbot.welcomeMessagePlaceholder')}
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">{t('settings.chatbot.welcomeMessageHint')}</p>
@@ -936,7 +936,7 @@ export function SettingsPage() {
             <SectionCard title={t('settings.chatbot.quickActions')} description={t('settings.chatbot.quickActionsDesc')}>
               <div className="space-y-3">
                 {chatbotForm.quickActions.map((action) => (
-                  <div key={action.id} className="flex items-start gap-2 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                  <div key={action.id} className="flex items-start gap-2 p-3 rounded-lg bg-secondary/60 border border-border/70">
                     <GripVertical className="w-4 h-4 text-zinc-300 dark:text-zinc-600 mt-2 shrink-0" />
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>

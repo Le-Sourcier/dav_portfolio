@@ -174,7 +174,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
             <ArrowLeft className="w-4 h-4 text-zinc-500" />
           </button>
           <div>
-            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-lg font-semibold text-foreground">
               {isEditing ? 'Modifier le projet' : 'Nouveau projet'}
             </h1>
             <p className="text-[11px] text-zinc-400">
@@ -205,7 +205,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
         <div className="flex-1 min-w-0 space-y-4">
 
           {/* Title + Category */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4 space-y-3">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4 space-y-3">
             <div>
               <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                 <FolderKanban className="w-3 h-3 inline mr-1" />
@@ -216,14 +216,14 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
                   value={form.title}
                   onChange={e => handleChange('title', e.target.value)}
                   placeholder="Ex: Dashboard Analytics SaaS"
-                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
                 />
               ) : (
                 <input
                   value={form.title_en || ''}
                   onChange={e => handleChange('title_en', e.target.value)}
                   placeholder="E.g.: Analytics SaaS Dashboard"
-                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
                 />
               )}
             </div>
@@ -254,14 +254,14 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
                   value={form.url}
                   onChange={e => handleChange('url', e.target.value)}
                   placeholder="https://monprojet.com"
-                  className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
                 />
               </div>
             </div>
           </div>
 
           {/* Cover Image */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+          <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
             {form.image ? (
               <div className="relative group">
                 <img src={form.image} alt="Cover" className="w-full h-48 object-cover" />
@@ -271,7 +271,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
                 </div>
               </div>
             ) : (
-              <button onClick={() => { const u = prompt('URL de l\'image :'); if (u) handleChange('image', u); }} className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+              <button onClick={() => { const u = prompt('URL de l\'image :'); if (u) handleChange('image', u); }} className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors">
                 <Image className="w-6 h-6" />
                 <span className="text-[12px] font-medium">{lang === 'fr' ? 'Ajouter une image' : 'Add cover image'}</span>
               </button>
@@ -347,7 +347,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           />
 
           {/* Metrics */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <BarChart3 className="w-3 h-3" />
@@ -360,9 +360,9 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
             <div className="space-y-2">
               {(form.metrics || []).map((metric, i) => (
                 <div key={i} className="flex gap-1.5 items-center">
-                  <input value={metric.name} onChange={e => handleMetricChange(i, 'name', e.target.value)} placeholder={lang === 'fr' ? 'Nom' : 'Name'} className="flex-1 h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400" />
-                  <input type="number" value={metric.value} onChange={e => handleMetricChange(i, 'value', Number(e.target.value))} placeholder={lang === 'fr' ? 'Val' : 'Val'} className="w-16 h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center" />
-                  <input value={metric.unit} onChange={e => handleMetricChange(i, 'unit', e.target.value)} placeholder="%" className="w-12 h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center" />
+                  <input value={metric.name} onChange={e => handleMetricChange(i, 'name', e.target.value)} placeholder={lang === 'fr' ? 'Nom' : 'Name'} className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400" />
+                  <input type="number" value={metric.value} onChange={e => handleMetricChange(i, 'value', Number(e.target.value))} placeholder={lang === 'fr' ? 'Val' : 'Val'} className="w-16 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center" />
+                  <input value={metric.unit} onChange={e => handleMetricChange(i, 'unit', e.target.value)} placeholder="%" className="w-12 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center" />
                   <button onClick={() => removeMetric(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -376,7 +376,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
         <div className="xl:w-[280px] shrink-0 space-y-4">
 
           {/* Technologies */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <Cpu className="w-3 h-3" />
@@ -393,7 +393,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
                     value={tech}
                     onChange={e => handleArrayChange('technologies', i, e.target.value)}
                     placeholder="React, Node..."
-                    className="flex-1 h-7 px-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                   />
                   <button onClick={() => removeArrayItem('technologies', i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
                     <Trash2 className="w-3 h-3" />
@@ -404,11 +404,11 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           </div>
 
           {/* Preview card */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-3">{lang === 'fr' ? 'Apercu carte' : 'Card preview'}</label>
-            <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-3 space-y-2">
+            <div className="bg-secondary/60 rounded-lg p-3 space-y-2">
               {form.image && <img src={form.image} alt="" className="w-full h-20 object-cover rounded-md" />}
-              <p className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 leading-tight">{form.title || 'Titre du projet'}</p>
+              <p className="text-[13px] font-bold text-foreground leading-tight">{form.title || 'Titre du projet'}</p>
               <span className="inline-block px-2 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-[9px] font-bold">{form.category}</span>
               {form.technologies?.filter(Boolean).length ? (
                 <div className="flex flex-wrap gap-1">
@@ -421,7 +421,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           </div>
 
           {/* Help */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">{lang === 'fr' ? 'Sections du projet' : 'Project sections'}</label>
             <div className="space-y-1 text-[10px] text-zinc-500">
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {lang === 'fr' ? 'Titre, Categorie, Image' : 'Title, Category, Image'}</p>
@@ -452,7 +452,7 @@ interface DynamicListSectionProps {
 
 function DynamicListSection({ label, icon, items, placeholder, onAdd, onChange, onRemove }: DynamicListSectionProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+    <div className="bg-card/85 rounded-xl border border-border/70 p-4">
       <div className="flex items-center justify-between mb-3">
         <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
           {icon}
@@ -469,7 +469,7 @@ function DynamicListSection({ label, icon, items, placeholder, onAdd, onChange, 
               value={item}
               onChange={e => onChange(i, e.target.value)}
               placeholder={placeholder}
-              className="flex-1 h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400 transition-colors"
+              className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 transition-colors"
             />
             <button onClick={() => onRemove(i)} className="p-1.5 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
               <Trash2 className="w-3.5 h-3.5" />

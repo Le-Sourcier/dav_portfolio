@@ -60,29 +60,29 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
     <aside
       className={cn(
         'flex flex-col h-screen sticky top-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out',
-        'bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900 text-zinc-400',
+        'bg-sidebar/80 text-sidebar-foreground border-r border-sidebar-border/80 backdrop-blur-2xl shadow-[18px_0_60px_var(--admin-shadow)]',
         sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
       )}
     >
       {/* Header */}
       <div className={cn(
-        'flex items-center h-16 shrink-0 border-b border-white/[0.06]',
+        'flex items-center h-16 shrink-0 border-b border-sidebar-border/80',
         sidebarCollapsed ? 'justify-center px-3' : 'justify-between px-5'
       )}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
-            <span className="text-zinc-950 font-black text-sm">{envConfig.appBrand.charAt(0)}</span>
+          <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-[0_12px_30px_rgba(15,118,110,0.18)] dark:shadow-[0_12px_30px_rgba(215,180,100,0.2)]">
+            <span className="font-black text-xs">{envConfig.appBrand.charAt(0)}</span>
           </div>
           {!sidebarCollapsed && (
-            <span className="text-[15px] font-semibold text-white tracking-tight">
-              {envConfig.appBrand.toLowerCase()}<span className="text-zinc-500">admin</span>
+            <span className="text-[15px] font-semibold text-foreground tracking-tight">
+              {envConfig.appBrand.toLowerCase()}<span className="text-muted-foreground"> admin</span>
             </span>
           )}
         </div>
         {!sidebarCollapsed && (
           <button
             onClick={toggleSidebarCollapse}
-            className="p-1.5 rounded-md hover:bg-white/[0.06] text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
           >
             <PanelLeftClose className="w-4 h-4" />
           </button>
@@ -93,7 +93,7 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
       {sidebarCollapsed && (
         <button
           onClick={toggleSidebarCollapse}
-          className="mx-auto mt-3 p-1.5 rounded-md hover:bg-white/[0.06] text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="mx-auto mt-3 p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
         >
           <PanelLeft className="w-4 h-4" />
         </button>
@@ -104,7 +104,7 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
         {navSections.map((section) => (
           <div key={section.label}>
             {!sidebarCollapsed && (
-              <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+              <p className="px-2 mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-primary">
                 {section.label}
               </p>
             )}
@@ -122,11 +122,11 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
                       'w-full flex items-center gap-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
                       sidebarCollapsed ? 'justify-center p-2.5' : 'px-2.5 py-2',
                       isActive
-                        ? 'bg-white/[0.08] text-white'
-                        : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04]'
+                        ? 'bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(15,118,110,0.16)] dark:shadow-[0_12px_30px_rgba(215,180,100,0.14)]'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/70'
                     )}
                   >
-                    <item.icon className={cn('w-[18px] h-[18px] shrink-0', isActive && 'text-white')} />
+                    <item.icon className={cn('w-[18px] h-[18px] shrink-0', isActive && 'text-primary-foreground')} />
                     {!sidebarCollapsed && (
                       <>
                         <span className="truncate">{item.label}</span>
@@ -149,10 +149,10 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
       </nav>
 
       {/* User + Logout */}
-      <div className="shrink-0 border-t border-white/[0.06] p-3">
+      <div className="shrink-0 border-t border-sidebar-border/80 p-3">
         {!sidebarCollapsed ? (
-          <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors mb-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 overflow-hidden shrink-0 ring-1 ring-white/10">
+          <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-accent/60 transition-colors mb-1">
+            <div className="w-8 h-8 rounded-full bg-secondary overflow-hidden shrink-0 ring-1 ring-border">
               <img
                 src={profile.avatar}
                 alt="Admin"
@@ -160,17 +160,17 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-medium text-zinc-200 truncate">
+              <p className="text-[13px] font-medium text-foreground truncate">
                 {profile.name || user?.name || 'Admin'}
               </p>
-              <p className="text-[11px] text-zinc-600 truncate">
+              <p className="text-[11px] text-muted-foreground truncate">
                 {profile.email || user?.email || envConfig.owner.email}
               </p>
             </div>
           </div>
         ) : (
           <div className="flex justify-center mb-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 overflow-hidden ring-1 ring-white/10">
+            <div className="w-8 h-8 rounded-full bg-secondary overflow-hidden ring-1 ring-border">
               <img
                 src={profile.avatar}
                 alt="Admin"

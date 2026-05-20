@@ -44,7 +44,7 @@ export function AppointmentsPage() {
       label: 'Client',
       render: (item) => (
         <div>
-          <p className="font-medium text-[13px] text-zinc-800 dark:text-zinc-200">{item.name}</p>
+          <p className="font-medium text-[13px] text-foreground">{item.name}</p>
           <p className="text-[11px] text-zinc-400">{item.email}</p>
         </div>
       ),
@@ -128,6 +128,7 @@ export function AppointmentsPage() {
         onDelete={handleDelete}
         getItemId={(item) => item.id}
         emptyMessage="Aucun rendez-vous."
+        pageSize={10}
       />
 
       {/* Appointment detail modal */}

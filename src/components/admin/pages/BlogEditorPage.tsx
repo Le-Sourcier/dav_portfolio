@@ -128,7 +128,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
             <ArrowLeft className="w-4 h-4 text-zinc-500" />
           </button>
           <div>
-            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-lg font-semibold text-foreground">
               {isEditing ? 'Modifier l\'article' : 'Nouvel article'}
             </h1>
             <p className="text-[11px] text-zinc-400">
@@ -190,7 +190,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         {/* Left: Editor */}
         <div className="flex-1 min-w-0 space-y-4">
           {/* Title */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">
               {lang === 'fr' ? "Titre de l'article (FR)" : 'Article Title (EN)'}
             </label>
@@ -199,20 +199,20 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 placeholder="Ex: Comment deployer une app React en production"
-                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
               />
             ) : (
               <input
                 value={formData.title_en || ''}
                 onChange={(e) => handleChange('title_en', e.target.value)}
                 placeholder="E.g.: How to deploy a React app in production"
-                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
               />
             )}
           </div>
 
           {/* Cover image */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+          <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
             {formData.imageUrl ? (
               <div className="relative group">
                 <img src={formData.imageUrl} alt="Cover" className="w-full h-48 object-cover" />
@@ -240,7 +240,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
                   const url = prompt('URL de l\'image de couverture :');
                   if (url) handleChange('imageUrl', url);
                 }}
-                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors"
               >
                 <Image className="w-6 h-6" />
                 <span className="text-[12px] font-medium">Ajouter une image de couverture</span>
@@ -249,7 +249,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Excerpt */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">
               {lang === 'fr' ? 'Extrait / Resume (FR)' : 'Excerpt / Summary (EN)'}
             </label>
@@ -295,7 +295,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         {/* Right: Metadata sidebar */}
         <div className="xl:w-[280px] shrink-0 space-y-4">
           {/* Category */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Categorie</label>
             <div className="flex flex-wrap gap-1.5">
               {blogCategories.map((cat) => (
@@ -316,7 +316,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Tags */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-2">
               <label className="text-[11px] font-medium text-zinc-400">Tags</label>
               <button onClick={addTag} className="text-zinc-400 hover:text-zinc-600 transition-colors">
@@ -330,7 +330,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
                     value={tag}
                     onChange={(e) => handleTagChange(i, e.target.value)}
                     placeholder="tag..."
-                    className="flex-1 h-7 px-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                   />
                   <button onClick={() => removeTag(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
                     <Trash2 className="w-3 h-3" />
@@ -341,7 +341,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Status */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-3">Statut</label>
             <div className="space-y-2">
               <label className="flex items-center gap-2.5 cursor-pointer">
@@ -378,7 +378,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Markdown help */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Aide Markdown</label>
             <div className="space-y-1 text-[11px] text-zinc-500 font-mono">
               <p><strong className="text-zinc-700 dark:text-zinc-300">**gras**</strong></p>

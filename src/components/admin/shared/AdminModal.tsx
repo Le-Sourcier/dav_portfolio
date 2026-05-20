@@ -33,7 +33,7 @@ export function AdminModal() {
           exit={{ opacity: 0, y: 12 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-xl p-6 md:p-8 shadow-xl my-8"
+          className="bg-card/85 border border-border/70 w-full max-w-3xl rounded-xl p-6 md:p-8 shadow-xl my-8"
         >
           {renderForm()}
         </motion.div>

@@ -208,7 +208,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
             <ArrowLeft className="w-4 h-4 text-zinc-500" />
           </button>
           <div>
-            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-lg font-semibold text-foreground">
               {isEditing ? 'Modifier l\'experience' : 'Nouvelle experience'}
             </h1>
             <p className="text-[11px] text-zinc-400">
@@ -241,7 +241,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
         <div className="flex-1 min-w-0 space-y-4">
 
           {/* Title + Company */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4 space-y-3">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4 space-y-3">
             <div>
               <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                 <Briefcase className="w-3 h-3 inline mr-1" />
@@ -252,14 +252,14 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
                   value={form.title}
                   onChange={e => handleChange('title', e.target.value)}
                   placeholder="Ex: Developpeur Fullstack Senior"
-                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
                 />
               ) : (
                 <input
                   value={form.title_en || ''}
                   onChange={e => handleChange('title_en', e.target.value)}
                   placeholder="E.g.: Senior Fullstack Developer"
-                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-100"
+                  className="w-full text-xl font-semibold tracking-tight bg-transparent outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 text-foreground"
                 />
               )}
             </div>
@@ -273,7 +273,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
                   value={form.company}
                   onChange={e => handleChange('company', e.target.value)}
                   placeholder="Google, Meta..."
-                  className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
                 />
               </div>
               <div>
@@ -285,7 +285,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
                   value={form.dates}
                   onChange={e => handleChange('dates', e.target.value)}
                   placeholder="Jan 2023 - Present"
-                  className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
                 />
               </div>
               <div>
@@ -297,14 +297,14 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
                   value={form.location}
                   onChange={e => handleChange('location', e.target.value)}
                   placeholder="Paris, Remote..."
-                  className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
                 />
               </div>
             </div>
           </div>
 
           {/* Cover Image */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+          <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
             {form.coverImage ? (
               <div className="relative group">
                 <img src={form.coverImage} alt="Cover" className="w-full h-48 object-cover" />
@@ -328,7 +328,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
                   const url = prompt('URL de l\'image de couverture :');
                   if (url) handleChange('coverImage', url);
                 }}
-                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors"
               >
                 <Image className="w-6 h-6" />
                 <span className="text-[12px] font-medium">Ajouter une image de couverture</span>
@@ -396,7 +396,7 @@ api.listen(3000);
           />
 
           {/* Achievements */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <Trophy className="w-3 h-3" />
@@ -414,13 +414,13 @@ api.listen(3000);
                       value={ach.title}
                       onChange={e => handleAchievementChange(i, 'title', e.target.value)}
                       placeholder="Titre de la realisation"
-                      className="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] font-semibold outline-none focus:border-zinc-400"
+                      className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] font-semibold outline-none focus:border-zinc-400"
                     />
                     <input
                       value={ach.description}
                       onChange={e => handleAchievementChange(i, 'description', e.target.value)}
                       placeholder="Description..."
-                      className="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                      className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                     />
                   </div>
                   <button onClick={() => removeAchievement(i)} className="p-1.5 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
@@ -436,7 +436,7 @@ api.listen(3000);
         <div className="xl:w-[280px] shrink-0 space-y-4">
 
           {/* Stack */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <Cpu className="w-3 h-3" />
@@ -453,7 +453,7 @@ api.listen(3000);
                     value={tech}
                     onChange={e => handleArrayChange('stack', i, e.target.value)}
                     placeholder="React, Node..."
-                    className="flex-1 h-7 px-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                   />
                   <button onClick={() => removeArrayItem('stack', i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
                     <Trash2 className="w-3 h-3" />
@@ -464,7 +464,7 @@ api.listen(3000);
           </div>
 
           {/* Links */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <ExternalLink className="w-3 h-3" />
@@ -482,13 +482,13 @@ api.listen(3000);
                       value={link.label}
                       onChange={e => handleLinkChange(i, 'label', e.target.value)}
                       placeholder="Label"
-                      className="w-full h-7 px-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                      className="w-full h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                     />
                     <input
                       value={link.url}
                       onChange={e => handleLinkChange(i, 'url', e.target.value)}
                       placeholder="https://..."
-                      className="w-full h-7 px-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent text-[11px] font-mono outline-none focus:border-zinc-400"
+                      className="w-full h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] font-mono outline-none focus:border-zinc-400"
                     />
                   </div>
                   <button onClick={() => removeLink(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0 self-center">
@@ -500,13 +500,13 @@ api.listen(3000);
           </div>
 
           {/* Preview card */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-3">Apercu carte</label>
-            <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-3 space-y-2">
+            <div className="bg-secondary/60 rounded-lg p-3 space-y-2">
               {form.coverImage && (
                 <img src={form.coverImage} alt="" className="w-full h-20 object-cover rounded-md" />
               )}
-              <p className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 leading-tight">
+              <p className="text-[13px] font-bold text-foreground leading-tight">
                 {form.title || 'Poste'}
               </p>
               <p className="text-[11px] text-zinc-500">{form.company || 'Entreprise'} - {form.dates || 'Periode'}</p>
@@ -521,7 +521,7 @@ api.listen(3000);
           </div>
 
           {/* Help */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Champs affiches</label>
             <div className="space-y-1 text-[10px] text-zinc-500">
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Titre, Entreprise, Dates</p>
@@ -552,7 +552,7 @@ interface DynamicListSectionProps {
 
 function DynamicListSection({ label, icon, items, placeholder, onAdd, onChange, onRemove }: DynamicListSectionProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-4">
+    <div className="bg-card/85 rounded-xl border border-border/70 p-4">
       <div className="flex items-center justify-between mb-3">
         <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
           {icon}
@@ -569,7 +569,7 @@ function DynamicListSection({ label, icon, items, placeholder, onAdd, onChange, 
               value={item}
               onChange={e => onChange(i, e.target.value)}
               placeholder={placeholder}
-              className="flex-1 h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-[12px] outline-none focus:border-zinc-400 transition-colors"
+              className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 transition-colors"
             />
             <button onClick={() => onRemove(i)} className="p-1.5 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
               <Trash2 className="w-3.5 h-3.5" />

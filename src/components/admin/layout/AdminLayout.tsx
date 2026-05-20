@@ -82,7 +82,7 @@ export function AdminLayout() {
 
   return (
     <div className={cn(
-      'min-h-screen bg-zinc-50 dark:bg-zinc-950 flex',
+      'min-h-screen flex text-foreground',
       display.denseMode && 'text-[13px] [&_*]:leading-snug'
     )}>
       {/* Mobile overlay */}
@@ -110,7 +110,7 @@ export function AdminLayout() {
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto h-screen">
-        <div className="max-w-6xl mx-auto px-6 py-6 lg:px-10 lg:py-8">
+        <div className="max-w-6xl mx-auto px-4 py-5 sm:px-6 lg:px-10 lg:py-8">
           <AdminHeader
             unreadCount={typeof unreadCount === 'number' ? unreadCount : 0}
             onSearchClick={openCommand}

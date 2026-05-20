@@ -35,7 +35,7 @@ export function ProjectsPage() {
             <img src={item.image} alt={item.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
           )}
           <div className="min-w-0">
-            <p className="font-medium text-[13px] text-zinc-800 dark:text-zinc-200 truncate">{item.title}</p>
+            <p className="font-medium text-[13px] text-foreground truncate">{item.title}</p>
             <p className="text-[11px] text-zinc-400 truncate">{item.description?.slice(0, 60)}...</p>
           </div>
         </div>

@@ -3,38 +3,49 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --background: #f7f3ea;
+  --foreground: #111111;
+  --card: rgba(255, 250, 241, 0.82);
+  --card-foreground: #111111;
+  --popover: rgba(255, 250, 241, 0.96);
+  --popover-foreground: #111111;
+  --primary: #0f766e;
+  --primary-foreground: #fff7e9;
+  --secondary: rgba(17, 17, 17, 0.06);
+  --secondary-foreground: #111111;
+  --muted: rgba(17, 17, 17, 0.06);
+  --muted-foreground: #6f6a60;
+  --accent: rgba(15, 118, 110, 0.1);
+  --accent-foreground: #0b4f49;
+  --destructive: #dc2626;
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.81 0.1 252);
-  --chart-2: oklch(0.62 0.19 260);
-  --chart-3: oklch(0.55 0.22 263);
-  --chart-4: oklch(0.49 0.22 264);
-  --chart-5: oklch(0.42 0.18 266);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: rgba(17, 17, 17, 0.12);
+  --input: rgba(17, 17, 17, 0.14);
+  --ring: rgba(15, 118, 110, 0.42);
+  --chart-1: #0f766e;
+  --chart-2: #b8842f;
+  --chart-3: #2dd4bf;
+  --chart-4: #d7b464;
+  --chart-5: #0b4f49;
+  --sidebar: rgba(255, 250, 241, 0.78);
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #0f766e;
+  --sidebar-primary-foreground: #fff7e9;
+  --sidebar-accent: rgba(15, 118, 110, 0.1);
+  --sidebar-accent-foreground: #0b4f49;
+  --sidebar-border: rgba(17, 17, 17, 0.1);
+  --sidebar-ring: rgba(15, 118, 110, 0.42);
+  --admin-surface: rgba(255, 250, 241, 0.74);
+  --admin-surface-strong: rgba(255, 250, 241, 0.92);
+  --admin-hover: rgba(17, 17, 17, 0.06);
+  --admin-line: rgba(17, 17, 17, 0.12);
+  --admin-gold: #b8842f;
+  --admin-teal: #0f766e;
+  --admin-shadow: rgba(75, 61, 35, 0.1);
+  --admin-bg:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.08), transparent 34rem),
+    linear-gradient(315deg, rgba(184, 132, 47, 0.1), transparent 28rem),
+    #f7f3ea;
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
@@ -67,38 +78,51 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.269 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.275 0 0);
-  --input: oklch(0.325 0 0);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.81 0.1 252);
-  --chart-2: oklch(0.62 0.19 260);
-  --chart-3: oklch(0.55 0.22 263);
-  --chart-4: oklch(0.49 0.22 264);
-  --chart-5: oklch(0.42 0.18 266);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.275 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --background: #090a09;
+  --foreground: #f7f1e7;
+  --card: rgba(18, 19, 17, 0.76);
+  --card-foreground: #f7f1e7;
+  --popover: rgba(18, 19, 17, 0.96);
+  --popover-foreground: #f7f1e7;
+  --primary: #d7b464;
+  --primary-foreground: #111111;
+  --secondary: rgba(255, 247, 233, 0.07);
+  --secondary-foreground: #f7f1e7;
+  --muted: rgba(255, 247, 233, 0.07);
+  --muted-foreground: #a9a092;
+  --accent: rgba(45, 212, 191, 0.12);
+  --accent-foreground: #2dd4bf;
+  --destructive: #f87171;
+  --destructive-foreground: #090a09;
+  --border: rgba(255, 247, 233, 0.14);
+  --input: rgba(255, 247, 233, 0.16);
+  --ring: rgba(215, 180, 100, 0.46);
+  --chart-1: #d7b464;
+  --chart-2: #2dd4bf;
+  --chart-3: #f2c96b;
+  --chart-4: #0f766e;
+  --chart-5: #fff7e9;
+  --sidebar: rgba(9, 10, 9, 0.76);
+  --sidebar-foreground: #f7f1e7;
+  --sidebar-primary: #d7b464;
+  --sidebar-primary-foreground: #111111;
+  --sidebar-accent: rgba(255, 247, 233, 0.08);
+  --sidebar-accent-foreground: #f7f1e7;
+  --sidebar-border: rgba(255, 247, 233, 0.12);
+  --sidebar-ring: rgba(215, 180, 100, 0.46);
+  --admin-surface: rgba(18, 19, 17, 0.76);
+  --admin-surface-strong: rgba(22, 23, 20, 0.92);
+  --admin-hover: rgba(255, 247, 233, 0.08);
+  --admin-line: rgba(255, 247, 233, 0.14);
+  --admin-gold: #d7b464;
+  --admin-teal: #2dd4bf;
+  --admin-shadow: rgba(0, 0, 0, 0.42);
+  --admin-bg:
+    radial-gradient(circle at 18% 22%, rgba(215, 180, 100, 0.12), transparent 26rem),
+    radial-gradient(circle at 88% 14%, rgba(45, 212, 191, 0.08), transparent 24rem),
+    linear-gradient(rgba(255, 247, 233, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 247, 233, 0.035) 1px, transparent 1px),
+    linear-gradient(115deg, #181713 0%, #090a09 48%, #071114 100%);
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
@@ -186,7 +210,24 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: var(--admin-bg);
+    background-size: auto, auto, 96px 96px, 96px 96px, auto;
     letter-spacing: var(--tracking-normal);
+    min-height: 100vh;
+  }
+
+  body::before {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.18) 72%, rgba(0, 0, 0, 0.42) 100%);
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .dark body::before {
+    opacity: 1;
   }
 }
 

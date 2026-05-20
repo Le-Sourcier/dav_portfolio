@@ -44,11 +44,14 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
       <div className="flex items-center gap-4 min-w-0">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-secondary/80 transition-colors"
+          className="lg:hidden p-2 -ml-2 rounded-lg border border-border/70 bg-card/70 hover:bg-accent transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
         <div className="min-w-0">
+          <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+            Console admin
+          </p>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground truncate">
             {pageInfo.title}
           </h1>
@@ -62,15 +65,15 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
         {/* Search trigger */}
         <button
           onClick={onSearchClick}
-          className="group flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-500 transition-all"
+          className="group flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-full border border-border/70 bg-card/70 text-muted-foreground backdrop-blur-xl hover:border-primary/40 hover:text-foreground transition-all"
         >
           <Search className="w-3.5 h-3.5" />
           <span className="hidden sm:inline text-[12px]">Rechercher...</span>
           <div className="hidden sm:flex items-center gap-0.5 ml-3">
-            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition-colors">
+            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-secondary border border-border/70 text-muted-foreground group-hover:border-primary/30 transition-colors">
               {isMac ? '⌘' : 'Ctrl'}
             </kbd>
-            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition-colors">
+            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-secondary border border-border/70 text-muted-foreground group-hover:border-primary/30 transition-colors">
               K
             </kbd>
           </div>
@@ -79,11 +82,11 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
         {/* Notifications */}
         <button
           onClick={() => useUIStore.getState().setActiveTab('contacts')}
-          className="relative p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="relative p-2 rounded-full border border-border/70 bg-card/70 hover:bg-accent transition-colors"
         >
-          <Bell className="w-[18px] h-[18px] text-zinc-400" />
+          <Bell className="w-[18px] h-[18px] text-muted-foreground" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-zinc-50 dark:ring-zinc-950" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full ring-2 ring-background" />
           )}
         </button>
 

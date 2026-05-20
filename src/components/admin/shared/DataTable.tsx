@@ -1,4 +1,5 @@
-import { Edit2, Trash2, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { Edit2, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface Column<T> {
@@ -19,6 +20,7 @@ interface DataTableProps<T> {
   getItemId: (item: T) => string;
   emptyMessage?: string;
   showActions?: boolean;
+  pageSize?: number;
 }
 
 export function DataTable<T>({
@@ -32,10 +34,24 @@ export function DataTable<T>({
   getItemId,
   emptyMessage = 'Aucun element trouve.',
   showActions = true,
+  pageSize = 0,
 }: DataTableProps<T>) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const hasPagination = pageSize > 0 && data.length > pageSize;
+  const totalPages = hasPagination ? Math.ceil(data.length / pageSize) : 1;
+  const paginatedData = hasPagination
+    ? data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : data;
+
+  // Reset to page 1 if data shrinks below current page
+  if (currentPage > totalPages && totalPages > 0) {
+    setCurrentPage(1);
+  }
+
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+      <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
         <div className="p-6 space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="flex gap-6 animate-pulse">
@@ -50,11 +66,11 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-zinc-100 dark:border-zinc-800">
+            <tr className="border-b border-border/70">
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -84,12 +100,12 @@ export function DataTable<T>({
                 </td>
               </tr>
             ) : (
-              data.map((item, idx) => (
+              paginatedData.map((item, idx) => (
                 <tr
                   key={getItemId(item)}
                   className={cn(
-                    'group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50',
-                    idx !== data.length - 1 && 'border-b border-zinc-50 dark:border-zinc-800/50'
+                    'group transition-colors hover:bg-accent/60',
+                    idx !== paginatedData.length - 1 && 'border-b border-zinc-50 dark:border-zinc-800/50'
                   )}
                 >
                   {columns.map((col) => (
@@ -145,6 +161,34 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {hasPagination && (
+        <div className="flex items-center justify-between px-5 py-3 border-t border-border/70">
+          <p className="text-[11px] text-zinc-400">
+            {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, data.length)} sur {data.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-[12px] font-medium text-zinc-600 dark:text-zinc-400 min-w-[60px] text-center">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

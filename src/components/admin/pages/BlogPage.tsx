@@ -37,7 +37,7 @@ export function BlogPage() {
             <img src={item.imageUrl} alt={item.title} className="w-12 h-8 rounded-lg object-cover shrink-0" />
           )}
           <div className="min-w-0">
-            <p className="font-medium text-[13px] text-zinc-800 dark:text-zinc-200 truncate">{item.title}</p>
+            <p className="font-medium text-[13px] text-foreground truncate">{item.title}</p>
             <p className="text-[11px] text-zinc-400 truncate">{item.excerpt?.slice(0, 60)}...</p>
           </div>
         </div>
@@ -140,7 +140,7 @@ export function BlogPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {statCards.map((s) => (
-          <div key={s.label} className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <div key={s.label} className="p-4 rounded-xl bg-card/85 border border-border/70">
             <div className="flex items-center gap-2 mb-2">
               <s.icon className={`w-4 h-4 ${s.color}`} />
               <span className="text-[11px] text-zinc-400 font-medium">{s.label}</span>

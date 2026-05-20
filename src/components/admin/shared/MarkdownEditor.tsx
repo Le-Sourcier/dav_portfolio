@@ -104,9 +104,9 @@ export function MarkdownEditor({
   const wordCount = value.split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/70">
         {label && <span className="text-[11px] font-medium text-zinc-400">{label}</span>}
         <div className="flex items-center gap-1 ml-auto">
           <button
@@ -126,7 +126,7 @@ export function MarkdownEditor({
 
       {/* Toolbar */}
       {!showPreview && (
-        <div className="flex items-center gap-0.5 px-3 py-1.5 border-b border-zinc-100 dark:border-zinc-800 overflow-x-auto">
+        <div className="flex items-center gap-0.5 px-3 py-1.5 border-b border-border/70 overflow-x-auto">
           {toolbarActions.map((action, i) => {
             const isCodeInline = action.label.includes('inline');
             const isCodeBlock = action.label.includes('```');
@@ -166,12 +166,12 @@ export function MarkdownEditor({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           style={{ minHeight }}
-          className="w-full p-4 bg-transparent text-sm font-mono text-zinc-800 dark:text-zinc-200 resize-y outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700 leading-relaxed"
+          className="w-full p-4 bg-transparent text-sm font-mono text-foreground resize-y outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700 leading-relaxed"
         />
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-4 py-1.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900">
+      <div className="flex items-center justify-between px-4 py-1.5 border-t border-border/70 bg-zinc-50/50 bg-card/85">
         <div className="flex items-center gap-4 text-[10px] text-zinc-400">
           <span>{wordCount} mots</span>
           <span>Markdown</span>

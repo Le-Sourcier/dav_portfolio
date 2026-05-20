@@ -219,10 +219,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           exit={{ opacity: 0, y: -8, scale: 0.98 }}
           transition={{ duration: 0.15, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-xl rounded-xl shadow-2xl overflow-hidden"
+          className="bg-card/85 border border-border/70 w-full max-w-xl rounded-xl shadow-2xl overflow-hidden"
         >
           {/* Input */}
-          <div className="flex items-center gap-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="flex items-center gap-3 px-4 border-b border-border/70">
             <Search className="w-4 h-4 text-zinc-400 shrink-0" />
             <input
               ref={inputRef}
@@ -230,7 +230,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
               onKeyDown={handleKeyDown}
               placeholder="Rechercher pages, projets, articles, actions..."
-              className="flex-1 h-12 bg-transparent text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 outline-none"
+              className="flex-1 h-12 bg-transparent text-sm text-foreground placeholder:text-zinc-400 outline-none"
             />
             {query && (
               <button onClick={() => { setQuery(''); setSelectedIndex(0); }} className="p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
@@ -273,7 +273,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                           'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors',
                           isSelected
                             ? 'bg-zinc-100 dark:bg-zinc-800'
-                            : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                            : 'hover:bg-accent/60'
                         )}
                       >
                         <div className={cn(
@@ -287,7 +287,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         <div className="flex-1 min-w-0">
                           <p className={cn(
                             'text-[13px] truncate',
-                            isSelected ? 'text-zinc-900 dark:text-zinc-100 font-medium' : 'text-zinc-700 dark:text-zinc-300'
+                            isSelected ? 'text-foreground font-medium' : 'text-zinc-700 dark:text-zinc-300'
                           )}>
                             {item.label}
                           </p>
@@ -311,7 +311,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900">
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/70 bg-zinc-50/50 bg-card/85">
             <div className="flex items-center gap-3 text-[10px] text-zinc-400">
               <span className="flex items-center gap-1"><kbd className="font-mono border border-zinc-200 dark:border-zinc-700 rounded px-1 py-0.5">↑↓</kbd> Naviguer</span>
               <span className="flex items-center gap-1"><kbd className="font-mono border border-zinc-200 dark:border-zinc-700 rounded px-1 py-0.5">↵</kbd> Ouvrir</span>

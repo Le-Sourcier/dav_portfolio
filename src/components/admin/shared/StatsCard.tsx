@@ -21,10 +21,10 @@ export function StatsCard({ label, value, icon: Icon, color = 'text-primary', tr
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.05, duration: 0.3, ease: 'easeOut' }}
-      className="group relative bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/60 dark:border-zinc-800 p-5 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-200"
+      className="group relative bg-card/85 rounded-xl border border-border/70 p-5 shadow-sm backdrop-blur-xl hover:border-primary/35 hover:shadow-[0_18px_50px_var(--admin-shadow)] transition-all duration-200"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center bg-zinc-100 dark:bg-zinc-800', color)}>
+        <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center bg-secondary border border-border/50', color)}>
           <Icon className="w-[18px] h-[18px]" />
         </div>
         {trend && (
@@ -43,7 +43,7 @@ export function StatsCard({ label, value, icon: Icon, color = 'text-primary', tr
       <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500 uppercase tracking-wide mb-1">
         {label}
       </p>
-      <p className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+      <p className="text-2xl font-semibold text-foreground tracking-tight">
         {displayValue}
       </p>
     </motion.div>
