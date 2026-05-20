@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getAllProjects,
   getProjectById,
+  getProjectBySlug,
   createProject,
   updateProject,
   deleteProject,
@@ -12,6 +13,7 @@ import {
   createProjectValidator,
   updateProjectValidator,
   projectIdValidator,
+  projectSlugValidator,
 } from '../validators/project.validator.js';
 
 const router = Router();
@@ -27,6 +29,27 @@ const router = Router();
  *         description: List of projects
  */
 router.get('/', getAllProjects);
+
+/**
+ * @swagger
+ * /api/projects/slug/{slug}:
+ *   get:
+ *     summary: Get project by slug
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+ *     responses:
+ *       200:
+ *         description: Project details
+ *       404:
+ *         description: Project not found
+ */
+router.get('/slug/:slug', validate(projectSlugValidator), getProjectBySlug);
 
 /**
  * @swagger

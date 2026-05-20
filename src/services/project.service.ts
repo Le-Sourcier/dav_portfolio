@@ -19,6 +19,14 @@ class ProjectService {
     return project;
   }
 
+  async findBySlug(slug: string): Promise<IProject> {
+    const project = await Project.findOne({ where: { slug } });
+    if (!project) {
+      throw new AppError('Project not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    return project;
+  }
+
   async create(data: Omit<IProject, 'id' | 'createdAt' | 'updatedAt'>): Promise<IProject> {
     const project = await Project.create(data);
     return project;

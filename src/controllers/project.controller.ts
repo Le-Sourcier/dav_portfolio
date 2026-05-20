@@ -20,6 +20,15 @@ export const getProjectById = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+export const getProjectBySlug = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const project = await projectService.findBySlug(req.params.slug!);
+    sendSuccess(res, project, 'Project retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const project = await projectService.create(req.body);
@@ -47,4 +56,11 @@ export const deleteProject = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-export default { getAllProjects, getProjectById, createProject, updateProject, deleteProject };
+export default {
+  getAllProjects,
+  getProjectById,
+  getProjectBySlug,
+  createProject,
+  updateProject,
+  deleteProject,
+};

@@ -3,22 +3,33 @@ import { sequelize } from '../config/database.js';
 import {
   IProject,
   ProjectCategory,
+  ProjectLink,
   ProjectMetric,
   ChartData,
   SolutionDiagram,
   ImpactData,
 } from '../types/entities.types.js';
 
-interface ProjectCreationAttributes extends Optional<IProject, 'id' | 'createdAt' | 'updatedAt'> {}
+interface ProjectCreationAttributes
+  extends Optional<IProject, 'id' | 'createdAt' | 'updatedAt' | 'featured' | 'tech' | 'links'> {}
 
 class Project extends Model<IProject, ProjectCreationAttributes> implements IProject {
   declare id: string;
+  declare slug: string;
   declare title: string;
+  declare name: string;
   declare category: ProjectCategory;
   declare image: string;
   declare description: string;
+  declare headline?: string;
   declare problem: string;
   declare solution: string;
+  declare result?: string;
+  declare metric?: string;
+  declare role?: string;
+  declare tech: string[];
+  declare links: ProjectLink[];
+  declare featured: boolean;
   declare results: string[];
   declare metrics: ProjectMetric[];
   declare chartData: ChartData[];
@@ -40,12 +51,21 @@ Project.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    slug: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+    },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
     category: {
-      type: DataTypes.ENUM('UI/UX', 'Branding', 'Web', 'Art', 'Photo', 'Fullstack', 'Software'),
+      type: DataTypes.STRING(120),
       allowNull: false,
       defaultValue: 'Fullstack',
     },
@@ -57,6 +77,10 @@ Project.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    headline: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     problem: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -64,6 +88,33 @@ Project.init(
     solution: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    result: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    metric: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    role: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    tech: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
+    links: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
+    featured: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     results: {
       type: DataTypes.JSONB,
@@ -101,6 +152,7 @@ Project.init(
     sequelize,
     modelName: 'Project',
     tableName: 'projects',
+    indexes: [{ unique: true, fields: ['slug'] }],
   }
 );
 

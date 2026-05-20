@@ -22,7 +22,7 @@ class AppointmentService {
 
   async findAll(): Promise<IAppointment[]> {
     const appointments = await Appointment.findAll({
-      order: [['date', 'ASC'], ['time', 'ASC']],
+      order: [['createdAt', 'DESC']],
     });
     return appointments;
   }

@@ -35,16 +35,30 @@ export interface ImpactData {
   value: number;
 }
 
-export type ProjectCategory = 'UI/UX' | 'Branding' | 'Web' | 'Art' | 'Photo' | 'Fullstack' | 'Software';
+export type ProjectCategory = string;
+
+export interface ProjectLink {
+  label: string;
+  href: string;
+}
 
 export interface IProject {
   id: string;
+  slug: string;
   title: string;
+  name: string;
   category: ProjectCategory;
   image: string;
   description: string;
+  headline?: string;
   problem: string;
   solution: string;
+  result?: string;
+  metric?: string;
+  role?: string;
+  tech: string[];
+  links: ProjectLink[];
+  featured: boolean;
   results: string[];
   metrics: ProjectMetric[];
   chartData: ChartData[];
