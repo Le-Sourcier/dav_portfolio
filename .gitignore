@@ -23,6 +23,12 @@
 # misc
 .DS_Store
 *.pem
+.claude/
+.codex/
+.agents/
+AGENTS.md
+CLAUDE.md
+brand-unused-assets/
 
 # debug
 npm-debug.log*

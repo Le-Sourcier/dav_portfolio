@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { PortfolioAssistant } from "@/components/PortfolioAssistant";
 import { site } from "@/lib/portfolio";
 import "./globals.css";
 
@@ -53,6 +54,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: site.url,
   },
+  icons: {
+    icon: [
+      { url: "/brand/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/brand/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   robots: {
     index: true,
     follow: true,
@@ -85,7 +93,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <PortfolioAssistant />
+      </body>
     </html>
   );
 }

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/portfolio";
 
@@ -7,7 +8,8 @@ export function Footer() {
       <div className="footer-main">
         <div>
           <Link href="/" className="footer-brand">
-            {site.initials}
+            <Image className="brand-logo-light" src="/brand/logo-horizontal-clean.png" alt="" width={220} height={81} />
+            <Image className="brand-logo-dark" src="/brand/logo-horizontal-clean-dark.png" alt="" width={220} height={81} />
           </Link>
           <h2>{site.name}</h2>
           <p>{site.title} spécialisé en SaaS, automatisation métier et plateformes web/mobile scalables.</p>

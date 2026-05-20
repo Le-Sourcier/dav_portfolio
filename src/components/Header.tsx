@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/lib/portfolio";
@@ -41,7 +42,8 @@ export function Header() {
   return (
     <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
       <Link href="/" className="brand" aria-label="Accueil Yao David Logan">
-        <span>{site.initials}</span>
+        <Image className="brand-logo-light" src="/brand/logo-horizontal-clean.png" alt="" width={176} height={65} priority />
+        <Image className="brand-logo-dark" src="/brand/logo-horizontal-clean-dark.png" alt="" width={176} height={65} priority />
       </Link>
       <nav className="nav-links" aria-label="Navigation principale">
         {navItems.map((item) => (
