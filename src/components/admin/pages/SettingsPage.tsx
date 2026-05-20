@@ -33,7 +33,7 @@ function FieldInput(props: React.ComponentProps<typeof Input>) {
   return (
     <Input
       {...props}
-      className={cn('h-9 rounded-lg border-border/70 bg-card/85 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400', props.className)}
+      className={cn('h-9 rounded-lg border-border/70 bg-card/60 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400', props.className)}
     />
   );
 }
@@ -58,7 +58,7 @@ function SaveButton({ onClick, label = 'Enregistrer', loading = false, saved = f
 
 function SectionCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-card/85 rounded-xl border border-border/70">
+    <div className="bg-card/60 rounded-xl border border-border/70">
       <div className="px-6 py-5 border-b border-border/70">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {description && <p className="text-[13px] text-zinc-400 mt-0.5">{description}</p>}
@@ -328,7 +328,7 @@ export function SettingsPage() {
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Navigation */}
       <div className="lg:w-[220px] shrink-0">
-        <nav className="bg-card/85 rounded-xl border border-border/70 p-1.5 space-y-0.5 lg:sticky lg:top-8">
+        <nav className="bg-card/60 rounded-xl border border-border/70 p-1.5 space-y-0.5 lg:sticky lg:top-8">
           {sectionList.map((section) => (
             <button
               key={section.id}
@@ -451,7 +451,7 @@ export function SettingsPage() {
                       ...profileForm, 
                       [lang === 'fr' ? 'bio' : 'bio_en']: e.target.value 
                     })}
-                    className="min-h-[80px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
+                    className="min-h-[80px] rounded-lg border-border/70 bg-card/60 text-sm resize-none"
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">{(lang === 'fr' ? profileForm.bio : profileForm.bio_en ?? '').length}{t('settings.profile.bioCount')}</p>
                 </div>
@@ -539,7 +539,7 @@ export function SettingsPage() {
             <SectionCard title={t('settings.expertise.education')} description={t('settings.expertise.educationDesc')}>
               <div className="space-y-3">
                 {educationForm.map((edu) => (
-                  <div key={edu.id} className="p-4 rounded-lg bg-secondary/60 border border-border/70 space-y-3">
+                  <div key={edu.id} className="p-4 rounded-lg bg-secondary/45 border border-border/70 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 space-y-3">
                         <div>
@@ -682,7 +682,7 @@ export function SettingsPage() {
 
             <SectionCard title="Sessions actives" description="Gerez vos sessions connectees.">
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/60">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/45">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
                       <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -758,7 +758,7 @@ export function SettingsPage() {
                     >
                       <div
                         className={cn(
-                          'absolute top-0.5 w-4 h-4 bg-card/85 rounded-full transition-transform shadow-sm',
+                          'absolute top-0.5 w-4 h-4 bg-card/60 rounded-full transition-transform shadow-sm',
                           displayPrefs[pref.key] ? 'left-[18px]' : 'left-0.5'
                         )}
                       />
@@ -800,7 +800,7 @@ export function SettingsPage() {
                       ...seoForm, 
                       [lang === 'fr' ? 'metaDescription' : 'metaDescription_en']: e.target.value 
                     })}
-                    className="min-h-[70px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
+                    className="min-h-[70px] rounded-lg border-border/70 bg-card/60 text-sm resize-none"
                   />
                   <p className={cn('text-[11px] mt-1', charStatus === 'success' ? 'text-emerald-500' : 'text-red-500')}>
                     {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length}/160 caracteres {(lang === 'fr' ? seoForm.metaDescription : seoForm.metaDescription_en ?? '').length > 160 && '(trop long)'}
@@ -822,7 +822,7 @@ export function SettingsPage() {
                 </div>
 
                 {/* Live Google preview */}
-                <div className="p-4 rounded-lg bg-secondary/60 border border-border/70">
+                <div className="p-4 rounded-lg bg-secondary/45 border border-border/70">
                   <p className="text-[11px] font-medium text-zinc-400 mb-2 uppercase tracking-wider">{t('settings.seo.googlePreview')}</p>
                   <div className="space-y-0.5">
                     <p className="text-blue-600 dark:text-blue-400 text-base font-medium truncate">
@@ -868,7 +868,7 @@ export function SettingsPage() {
                     <select
                       value={seoForm.ogType}
                       onChange={(e) => setSeoForm({ ...seoForm, ogType: e.target.value })}
-                      className="w-full h-9 px-3 rounded-lg border border-border/70 bg-card/85 text-sm"
+                      className="w-full h-9 px-3 rounded-lg border border-border/70 bg-card/60 text-sm"
                     >
                       <option value="website">website</option>
                       <option value="article">article</option>
@@ -903,7 +903,7 @@ export function SettingsPage() {
                   >
                     <div
                       className={cn(
-                        'absolute top-0.5 w-4 h-4 bg-card/85 rounded-full transition-transform shadow-sm',
+                        'absolute top-0.5 w-4 h-4 bg-card/60 rounded-full transition-transform shadow-sm',
                         chatbotForm.enabled ? 'left-[18px]' : 'left-0.5'
                       )}
                     />
@@ -921,7 +921,7 @@ export function SettingsPage() {
                       ...chatbotForm, 
                       [lang === 'fr' ? 'welcomeMessage' : 'welcomeMessage_en']: e.target.value 
                     })}
-                    className="min-h-[100px] rounded-lg border-border/70 bg-card/85 text-sm resize-none"
+                    className="min-h-[100px] rounded-lg border-border/70 bg-card/60 text-sm resize-none"
                     placeholder={t('settings.chatbot.welcomeMessagePlaceholder')}
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">{t('settings.chatbot.welcomeMessageHint')}</p>
@@ -936,7 +936,7 @@ export function SettingsPage() {
             <SectionCard title={t('settings.chatbot.quickActions')} description={t('settings.chatbot.quickActionsDesc')}>
               <div className="space-y-3">
                 {chatbotForm.quickActions.map((action) => (
-                  <div key={action.id} className="flex items-start gap-2 p-3 rounded-lg bg-secondary/60 border border-border/70">
+                  <div key={action.id} className="flex items-start gap-2 p-3 rounded-lg bg-secondary/45 border border-border/70">
                     <GripVertical className="w-4 h-4 text-zinc-300 dark:text-zinc-600 mt-2 shrink-0" />
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>

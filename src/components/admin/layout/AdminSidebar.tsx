@@ -60,7 +60,7 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
     <aside
       className={cn(
         'flex flex-col h-screen sticky top-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out',
-        'bg-sidebar/80 text-sidebar-foreground border-r border-sidebar-border/80 backdrop-blur-2xl shadow-[18px_0_60px_var(--admin-shadow)]',
+        'admin-glass-sidebar text-sidebar-foreground border-r shadow-[18px_0_60px_var(--admin-shadow)]',
         sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
       )}
     >

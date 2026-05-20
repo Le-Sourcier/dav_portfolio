@@ -219,7 +219,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           exit={{ opacity: 0, y: -8, scale: 0.98 }}
           transition={{ duration: 0.15, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-card/85 border border-border/70 w-full max-w-xl rounded-xl shadow-2xl overflow-hidden"
+          className="bg-card/60 border border-border/70 w-full max-w-xl rounded-xl shadow-2xl overflow-hidden"
         >
           {/* Input */}
           <div className="flex items-center gap-3 px-4 border-b border-border/70">
@@ -311,7 +311,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/70 bg-zinc-50/50 bg-card/85">
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/70 bg-zinc-50/50 bg-card/60">
             <div className="flex items-center gap-3 text-[10px] text-zinc-400">
               <span className="flex items-center gap-1"><kbd className="font-mono border border-zinc-200 dark:border-zinc-700 rounded px-1 py-0.5">↑↓</kbd> Naviguer</span>
               <span className="flex items-center gap-1"><kbd className="font-mono border border-zinc-200 dark:border-zinc-700 rounded px-1 py-0.5">↵</kbd> Ouvrir</span>

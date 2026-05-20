@@ -69,7 +69,7 @@ export function AdminLogin() {
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-card/80 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-border/70 shadow-[0_24px_60px_var(--admin-shadow)] backdrop-blur-xl">
+          <div className="w-20 h-20 bg-card/60 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-border/70 shadow-[0_24px_60px_var(--admin-shadow)] backdrop-blur-xl">
             <Lock className="w-9 h-9 text-primary" />
           </div>
           <p className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary">Console securisee</p>
@@ -77,7 +77,7 @@ export function AdminLogin() {
           <p className="text-muted-foreground font-medium">Acces restreint aux administrateurs uniquement</p>
         </div>
 
-        <div className="bg-card/85 border border-border/70 p-8 md:p-10 rounded-2xl shadow-[0_28px_90px_var(--admin-shadow)] backdrop-blur-2xl">
+        <div className="bg-card/60 border border-border/70 p-8 md:p-10 rounded-2xl shadow-[0_28px_90px_var(--admin-shadow)] backdrop-blur-2xl">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Email</label>

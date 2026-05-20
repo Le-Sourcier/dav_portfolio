@@ -21,11 +21,11 @@ export function StatsCard({ label, value, icon: Icon, color = 'text-primary', tr
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.05, duration: 0.3, ease: 'easeOut' }}
-      className="group relative bg-card/85 rounded-xl border border-border/70 p-5 shadow-sm backdrop-blur-xl hover:border-primary/35 hover:shadow-[0_18px_50px_var(--admin-shadow)] transition-all duration-200"
+      className="admin-glass-card group relative rounded-2xl border p-6 shadow-[0_18px_55px_var(--admin-shadow)] hover:border-primary/35 hover:shadow-[0_24px_70px_var(--admin-shadow)] transition-all duration-200"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center bg-secondary border border-border/50', color)}>
-          <Icon className="w-[18px] h-[18px]" />
+      <div className="flex items-center justify-between mb-5">
+        <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center bg-secondary border border-border/50', color)}>
+          <Icon className="w-5 h-5" />
         </div>
         {trend && (
           <span className={cn(
@@ -40,7 +40,7 @@ export function StatsCard({ label, value, icon: Icon, color = 'text-primary', tr
           </span>
         )}
       </div>
-      <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500 uppercase tracking-wide mb-1">
+      <p className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.14em] mb-2">
         {label}
       </p>
       <p className="text-2xl font-semibold text-foreground tracking-tight">

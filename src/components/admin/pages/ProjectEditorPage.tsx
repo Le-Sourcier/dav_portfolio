@@ -205,7 +205,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
         <div className="flex-1 min-w-0 space-y-4">
 
           {/* Title + Category */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4 space-y-3">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4 space-y-3">
             <div>
               <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                 <FolderKanban className="w-3 h-3 inline mr-1" />
@@ -261,7 +261,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           </div>
 
           {/* Cover Image */}
-          <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
+          <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
             {form.image ? (
               <div className="relative group">
                 <img src={form.image} alt="Cover" className="w-full h-48 object-cover" />
@@ -347,7 +347,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           />
 
           {/* Metrics */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <BarChart3 className="w-3 h-3" />
@@ -376,7 +376,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
         <div className="xl:w-[280px] shrink-0 space-y-4">
 
           {/* Technologies */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
               <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
                 <Cpu className="w-3 h-3" />
@@ -404,9 +404,9 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           </div>
 
           {/* Preview card */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-3">{lang === 'fr' ? 'Apercu carte' : 'Card preview'}</label>
-            <div className="bg-secondary/60 rounded-lg p-3 space-y-2">
+            <div className="bg-secondary/45 rounded-lg p-3 space-y-2">
               {form.image && <img src={form.image} alt="" className="w-full h-20 object-cover rounded-md" />}
               <p className="text-[13px] font-bold text-foreground leading-tight">{form.title || 'Titre du projet'}</p>
               <span className="inline-block px-2 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-[9px] font-bold">{form.category}</span>
@@ -421,7 +421,7 @@ export function ProjectEditorPage({ initialData, onBack }: ProjectEditorPageProp
           </div>
 
           {/* Help */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">{lang === 'fr' ? 'Sections du projet' : 'Project sections'}</label>
             <div className="space-y-1 text-[10px] text-zinc-500">
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {lang === 'fr' ? 'Titre, Categorie, Image' : 'Title, Category, Image'}</p>
@@ -452,7 +452,7 @@ interface DynamicListSectionProps {
 
 function DynamicListSection({ label, icon, items, placeholder, onAdd, onChange, onRemove }: DynamicListSectionProps) {
   return (
-    <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+    <div className="bg-card/60 rounded-xl border border-border/70 p-4">
       <div className="flex items-center justify-between mb-3">
         <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
           {icon}

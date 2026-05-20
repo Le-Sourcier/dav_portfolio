@@ -156,28 +156,28 @@ export function AppointmentsPage() {
 
             {/* Info cards */}
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/25 border border-border/50">
                 <Calendar className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</p>
                   <p className="text-sm font-bold">{viewingItem.date}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/25 border border-border/50">
                 <Clock className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Heure</p>
                   <p className="text-sm font-bold">{viewingItem.time}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/25 border border-border/50">
                 <AlertCircle className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Urgence</p>
                   <p className="text-sm font-bold">{viewingItem.urgency === 'urgent' ? 'Urgent' : 'Non urgent'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/25 border border-border/50">
                 <div className="shrink-0">
                   <StatusBadge
                     label={statusLabels[viewingItem.status] || viewingItem.status}
@@ -190,7 +190,7 @@ export function AppointmentsPage() {
             {/* Subject */}
             <div className="mb-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Sujet</p>
-              <div className="bg-secondary/30 rounded-xl p-4 border border-border/50">
+              <div className="bg-secondary/25 rounded-xl p-4 border border-border/50">
                 <p className="text-sm font-medium leading-relaxed">{viewingItem.subject}</p>
               </div>
             </div>
@@ -199,7 +199,7 @@ export function AppointmentsPage() {
             {viewingItem.notes && (
               <div className="mb-4">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Notes</p>
-                <div className="bg-secondary/30 rounded-xl p-4 border border-border/50">
+                <div className="bg-secondary/25 rounded-xl p-4 border border-border/50">
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{viewingItem.notes}</p>
                 </div>
               </div>

@@ -53,7 +53,7 @@ export function ConfirmDialog({
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.15 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-card/85 border border-border/70 w-full max-w-sm rounded-xl p-6 shadow-xl"
+            className="bg-card/60 border border-border/70 w-full max-w-sm rounded-xl p-6 shadow-xl"
           >
             <div className="flex items-start gap-3 mb-4">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconColors[variant]}`}>

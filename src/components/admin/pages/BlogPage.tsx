@@ -140,7 +140,7 @@ export function BlogPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {statCards.map((s) => (
-          <div key={s.label} className="p-4 rounded-xl bg-card/85 border border-border/70">
+          <div key={s.label} className="p-4 rounded-xl bg-card/60 border border-border/70">
             <div className="flex items-center gap-2 mb-2">
               <s.icon className={`w-4 h-4 ${s.color}`} />
               <span className="text-[11px] text-zinc-400 font-medium">{s.label}</span>

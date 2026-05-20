@@ -190,7 +190,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         {/* Left: Editor */}
         <div className="flex-1 min-w-0 space-y-4">
           {/* Title */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">
               {lang === 'fr' ? "Titre de l'article (FR)" : 'Article Title (EN)'}
             </label>
@@ -212,7 +212,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Cover image */}
-          <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
+          <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
             {formData.imageUrl ? (
               <div className="relative group">
                 <img src={formData.imageUrl} alt="Cover" className="w-full h-48 object-cover" />
@@ -249,7 +249,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Excerpt */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">
               {lang === 'fr' ? 'Extrait / Resume (FR)' : 'Excerpt / Summary (EN)'}
             </label>
@@ -295,7 +295,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         {/* Right: Metadata sidebar */}
         <div className="xl:w-[280px] shrink-0 space-y-4">
           {/* Category */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Categorie</label>
             <div className="flex flex-wrap gap-1.5">
               {blogCategories.map((cat) => (
@@ -316,7 +316,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Tags */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-2">
               <label className="text-[11px] font-medium text-zinc-400">Tags</label>
               <button onClick={addTag} className="text-zinc-400 hover:text-zinc-600 transition-colors">
@@ -341,7 +341,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Status */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-3">Statut</label>
             <div className="space-y-2">
               <label className="flex items-center gap-2.5 cursor-pointer">
@@ -378,7 +378,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Markdown help */}
-          <div className="bg-card/85 rounded-xl border border-border/70 p-4">
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Aide Markdown</label>
             <div className="space-y-1 text-[11px] text-zinc-500 font-mono">
               <p><strong className="text-zinc-700 dark:text-zinc-300">**gras**</strong></p>

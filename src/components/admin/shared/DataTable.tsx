@@ -51,13 +51,13 @@ export function DataTable<T>({
 
   if (isLoading) {
     return (
-      <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
-        <div className="p-6 space-y-4">
+      <div className="admin-glass-card rounded-2xl border overflow-hidden shadow-[0_18px_55px_var(--admin-shadow)]">
+        <div className="p-7 space-y-5">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="flex gap-6 animate-pulse">
-              <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-1/3" />
-              <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-1/4" />
-              <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-1/5" />
+              <div className="h-4 bg-secondary rounded-full w-1/3" />
+              <div className="h-4 bg-secondary rounded-full w-1/4" />
+              <div className="h-4 bg-secondary rounded-full w-1/5" />
             </div>
           ))}
         </div>
@@ -66,7 +66,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
+    <div className="admin-glass-card rounded-2xl border overflow-hidden shadow-[0_18px_55px_var(--admin-shadow)]">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -75,7 +75,7 @@ export function DataTable<T>({
                 <th
                   key={col.key}
                   className={cn(
-                    'px-5 py-3 text-left text-[11px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider',
+                    'px-6 py-5 text-left text-[11px] font-black text-primary uppercase tracking-[0.16em]',
                     col.className
                   )}
                 >
@@ -83,7 +83,7 @@ export function DataTable<T>({
                 </th>
               ))}
               {showActions && (
-                <th className="px-5 py-3 text-right text-[11px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider w-[120px]">
+                <th className="px-6 py-5 text-right text-[11px] font-black text-primary uppercase tracking-[0.16em] w-[140px]">
                   Actions
                 </th>
               )}
@@ -105,51 +105,51 @@ export function DataTable<T>({
                   key={getItemId(item)}
                   className={cn(
                     'group transition-colors hover:bg-accent/60',
-                    idx !== paginatedData.length - 1 && 'border-b border-zinc-50 dark:border-zinc-800/50'
+                    idx !== paginatedData.length - 1 && 'border-b border-border/55'
                   )}
                 >
                   {columns.map((col) => (
-                    <td key={col.key} className={cn('px-5 py-3.5', col.className)}>
+                    <td key={col.key} className={cn('px-6 py-5 align-middle', col.className)}>
                       {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? '')}
                     </td>
                   ))}
                   {showActions && (
-                    <td className="px-5 py-3.5">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-6 py-5 align-middle">
+                      <div className="flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         {onView && (
                           <button
                             onClick={() => onView(item)}
-                            className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                             title="Voir"
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-4 h-4" />
                           </button>
                         )}
                         {onToggleVisibility && (
                           <button
                             onClick={() => onToggleVisibility(item)}
-                            className="p-1.5 rounded-md text-zinc-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
+                            className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
                             title="Visibilite"
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-4 h-4" />
                           </button>
                         )}
                         {onEdit && (
                           <button
                             onClick={() => onEdit(item)}
-                            className="p-1.5 rounded-md text-zinc-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                            className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
                             title="Modifier"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                         )}
                         {onDelete && (
                           <button
                             onClick={() => onDelete(item)}
-                            className="p-1.5 rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                            className="p-2 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors"
                             title="Supprimer"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         )}
                       </div>
@@ -164,7 +164,7 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {hasPagination && (
-        <div className="flex items-center justify-between px-5 py-3 border-t border-border/70">
+        <div className="flex items-center justify-between px-6 py-5 border-t border-border/70">
           <p className="text-[11px] text-zinc-400">
             {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, data.length)} sur {data.length}
           </p>
@@ -172,7 +172,7 @@ export function DataTable<T>({
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -182,7 +182,7 @@ export function DataTable<T>({
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

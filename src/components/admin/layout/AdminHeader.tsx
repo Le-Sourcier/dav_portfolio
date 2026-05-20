@@ -44,7 +44,7 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
       <div className="flex items-center gap-4 min-w-0">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden p-2 -ml-2 rounded-lg border border-border/70 bg-card/70 hover:bg-accent transition-colors"
+          className="lg:hidden p-2 -ml-2 rounded-lg border border-border/70 bg-card/55 hover:bg-accent transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -65,7 +65,7 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
         {/* Search trigger */}
         <button
           onClick={onSearchClick}
-          className="group flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-full border border-border/70 bg-card/70 text-muted-foreground backdrop-blur-xl hover:border-primary/40 hover:text-foreground transition-all"
+          className="group flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-full border border-border/70 bg-card/55 text-muted-foreground backdrop-blur-xl hover:border-primary/40 hover:text-foreground transition-all"
         >
           <Search className="w-3.5 h-3.5" />
           <span className="hidden sm:inline text-[12px]">Rechercher...</span>
@@ -82,7 +82,7 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
         {/* Notifications */}
         <button
           onClick={() => useUIStore.getState().setActiveTab('contacts')}
-          className="relative p-2 rounded-full border border-border/70 bg-card/70 hover:bg-accent transition-colors"
+          className="relative p-2 rounded-full border border-border/70 bg-card/55 hover:bg-accent transition-colors"
         >
           <Bell className="w-[18px] h-[18px] text-muted-foreground" />
           {unreadCount > 0 && (

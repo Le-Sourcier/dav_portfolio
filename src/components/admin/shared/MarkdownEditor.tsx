@@ -104,7 +104,7 @@ export function MarkdownEditor({
   const wordCount = value.split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="bg-card/85 rounded-xl border border-border/70 overflow-hidden">
+    <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/70">
         {label && <span className="text-[11px] font-medium text-zinc-400">{label}</span>}
@@ -171,7 +171,7 @@ export function MarkdownEditor({
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-4 py-1.5 border-t border-border/70 bg-zinc-50/50 bg-card/85">
+      <div className="flex items-center justify-between px-4 py-1.5 border-t border-border/70 bg-zinc-50/50 bg-card/60">
         <div className="flex items-center gap-4 text-[10px] text-zinc-400">
           <span>{wordCount} mots</span>
           <span>Markdown</span>

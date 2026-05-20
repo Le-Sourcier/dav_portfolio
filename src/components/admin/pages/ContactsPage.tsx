@@ -135,7 +135,7 @@ export function ContactsPage() {
             {viewingContact.subject && (
               <p className="text-sm font-bold mb-4">Sujet : {viewingContact.subject}</p>
             )}
-            <div className="bg-secondary/30 rounded-xl p-6">
+            <div className="bg-secondary/25 rounded-xl p-6">
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{viewingContact.message}</p>
             </div>
             <p className="text-xs text-muted-foreground mt-4">
@@ -182,7 +182,7 @@ export function ContactsPage() {
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Ecrivez votre reponse (minimum 10 caracteres)..."
                     rows={4}
-                    className="w-full rounded-xl border border-border bg-secondary/30 p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/50"
+                    className="w-full rounded-xl border border-border bg-secondary/25 p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/50"
                   />
                   <div className="flex justify-end mt-3">
                     <button

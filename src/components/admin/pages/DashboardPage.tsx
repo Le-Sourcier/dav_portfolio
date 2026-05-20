@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils';
 // --- Helpers ---
 function CardShell({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('bg-card/85 rounded-xl border border-border/70 shadow-sm backdrop-blur-xl', className)}>
+    <div className={cn('bg-card/60 rounded-xl border border-border/70 shadow-sm backdrop-blur-xl', className)}>
       {children}
     </div>
   );
@@ -165,7 +165,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-5">
       {/* Welcome banner with key metrics */}
-      <div className="bg-card/85 rounded-xl border border-border/70 p-6 text-foreground relative overflow-hidden shadow-[0_24px_80px_var(--admin-shadow)] backdrop-blur-2xl">
+      <div className="bg-card/60 rounded-xl border border-border/70 p-6 text-foreground relative overflow-hidden shadow-[0_24px_80px_var(--admin-shadow)] backdrop-blur-2xl">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvc3ZnPg==')] opacity-50" />
         <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
