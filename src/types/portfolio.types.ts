@@ -10,6 +10,28 @@ export interface ProjectChartPoint {
   value: number;
 }
 
+export interface ProjectDiagramNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+export interface ProjectDiagramConnection {
+  from: string;
+  to: string;
+  label?: string;
+}
+
+export interface ProjectSolutionDiagram {
+  nodes: ProjectDiagramNode[];
+  connections: ProjectDiagramConnection[];
+}
+
+export interface ProjectImpactPoint {
+  label: string;
+  value: number;
+}
+
 export interface ProjectLink {
   label: string;
   href: string;
@@ -19,13 +41,17 @@ export interface Project {
   id: string;
   slug: string;
   title: string;
+  title_en?: string | null;
   name: string;
   category: string;
   image: string;
   description: string;
+  description_en?: string | null;
   headline?: string;
   problem: string;
+  problem_en?: string | null;
   solution: string;
+  solution_en?: string | null;
   result?: string;
   metric?: string;
   role?: string;
@@ -35,6 +61,8 @@ export interface Project {
   results: string[];
   metrics: ProjectMetric[];
   chartData: ProjectChartPoint[];
+  solutionDiagram?: ProjectSolutionDiagram | null;
+  impactGraph?: ProjectImpactPoint[] | null;
   url?: string;
   createdAt?: string;
   updatedAt?: string;

@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { blogPosts, site } from "@/lib/portfolio";
+import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -15,7 +16,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
+export const dynamic = "force-dynamic";
+
+export default async function BlogPage() {
+  const projects = await loadProjects();
+  const hasProjects = projects.length > 0;
   const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -38,7 +43,7 @@ export default function BlogPage() {
 
   return (
     <>
-      <Header />
+      <Header showProjects={hasProjects} />
       <main>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <section className="blog-hero section">
@@ -64,7 +69,7 @@ export default function BlogPage() {
 
         <BlogDirectory />
         <Newsletter />
-        <Footer />
+        <Footer showProjects={hasProjects} />
       </main>
       <BackToTop />
     </>

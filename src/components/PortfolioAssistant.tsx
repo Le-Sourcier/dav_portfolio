@@ -1,8 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useMemo, useRef, useState } from "react";
-import { blogPosts, experience, projects, services, site, stack } from "@/lib/portfolio";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { blogPosts, experience, services, site, stack } from "@/lib/portfolio";
+import { projectsApi } from "@/services/api/projects.api";
+import { normalizeProject } from "@/services/portfolio/projectMapper";
+import type { Project } from "@/types/portfolio.types";
 
 type AssistantAction = {
   label: string;
@@ -16,13 +19,6 @@ type AssistantMessage = {
   actions?: AssistantAction[];
 };
 
-const quickQuestions = [
-  "Que peux-tu construire ?",
-  "Montre-moi les projets",
-  "Quels services proposes-tu ?",
-  "Comment te contacter ?",
-];
-
 const normalize = (value: string) =>
   value
     .toLowerCase()
@@ -32,7 +28,7 @@ const normalize = (value: string) =>
 const phoneHref = site.phone.replace(/\s+/g, "");
 const whatsappHref = `https://wa.me/${phoneHref.replace("+", "")}`;
 
-function findProject(query: string) {
+function findProject(query: string, projects: Project[]) {
   return projects.find((project) => {
     const searchable = normalize(
       [project.name, project.category, project.headline, project.description, project.tech.join(" ")].join(" "),
@@ -48,9 +44,9 @@ function findPost(query: string) {
   });
 }
 
-function buildAnswer(rawQuestion: string): Omit<AssistantMessage, "id" | "role"> {
+function buildAnswer(rawQuestion: string, projects: Project[]): Omit<AssistantMessage, "id" | "role"> {
   const question = normalize(rawQuestion);
-  const matchedProject = findProject(question);
+  const matchedProject = findProject(question, projects);
   const matchedPost = findPost(question);
 
   if (question.length < 3) {
@@ -93,6 +89,13 @@ function buildAnswer(rawQuestion: string): Omit<AssistantMessage, "id" | "role">
   }
 
   if (question.includes("projet") || question.includes("portfolio") || question.includes("realisation") || matchedProject) {
+    if (projects.length === 0) {
+      return {
+        text: "Les projets ne sont pas encore disponibles depuis l'API. Pour parler d'un besoin concret, le plus direct est de contacter David avec le contexte, le délai et les contraintes déjà connues.",
+        actions: [{ label: "Contact", href: `mailto:${site.email}?subject=Projet%20SaaS%20ou%20mission` }],
+      };
+    }
+
     if (matchedProject) {
       return {
         text: `${matchedProject.name}: ${matchedProject.headline} Résultat: ${matchedProject.result} Rôle: ${matchedProject.role}. Stack: ${matchedProject.tech.join(", ")}.`,
@@ -166,9 +169,14 @@ function buildAnswer(rawQuestion: string): Omit<AssistantMessage, "id" | "role">
   };
 }
 
-export function PortfolioAssistant() {
+type PortfolioAssistantProps = {
+  projects?: Project[];
+};
+
+export function PortfolioAssistant({ projects = [] }: PortfolioAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [apiProjects, setApiProjects] = useState<Project[]>(projects);
   const [messages, setMessages] = useState<AssistantMessage[]>([
     {
       id: 1,
@@ -182,12 +190,40 @@ export function PortfolioAssistant() {
   ]);
   const nextId = useRef(2);
   const panelTitle = useMemo(() => (isOpen ? "Fermer l'assistant" : "Ouvrir l'assistant"), [isOpen]);
+  const assistantProjects = apiProjects.length > 0 ? apiProjects : projects;
+  const quickQuestions = useMemo(
+    () => [
+      "Que peux-tu construire ?",
+      ...(assistantProjects.length > 0 ? ["Montre-moi les projets"] : []),
+      "Quels services proposes-tu ?",
+      "Comment te contacter ?",
+    ],
+    [assistantProjects.length],
+  );
+
+  useEffect(() => {
+    let mounted = true;
+
+    projectsApi
+      .getAll()
+      .then((data) => {
+        if (mounted) setApiProjects(Array.isArray(data) ? data.map(normalizeProject) : []);
+      })
+      .catch((error) => {
+        console.error("[portfolio-assistant] Unable to load projects from API:", error);
+        if (mounted) setApiProjects([]);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const ask = (question: string) => {
     const trimmed = question.trim();
     if (!trimmed) return;
 
-    const answer = buildAnswer(trimmed);
+    const answer = buildAnswer(trimmed, assistantProjects);
     setMessages((current) => [
       ...current,
       { id: nextId.current++, role: "user", text: trimmed },

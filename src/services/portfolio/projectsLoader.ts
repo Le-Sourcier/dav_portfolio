@@ -1,54 +1,47 @@
-import { projectsApi } from '@/services/api/projects.api';
-import { projects as staticProjects } from '@/lib/portfolio';
+import { envConfig } from '@/config/env';
+import type { ApiResponse } from '@/types/api.types';
+import type { BackendProject } from '@/types/backend-project.types';
+import { normalizeProject } from '@/services/portfolio/projectMapper';
 import type { Project } from '@/types/portfolio.types';
 
-type StaticProject = (typeof staticProjects)[number];
+async function requestApi<T>(path: string): Promise<T> {
+  const url = `${envConfig.apiUrl}${path}`;
+  const response = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
 
-function fromStatic(item: StaticProject): Project {
-  return {
-    id: item.slug,
-    slug: item.slug,
-    title: item.name,
-    name: item.name,
-    category: item.category,
-    image: '',
-    description: item.description,
-    headline: item.headline,
-    problem: '',
-    solution: '',
-    result: item.result,
-    metric: item.metric,
-    role: item.role,
-    tech: [...item.tech],
-    links: item.links.map((link) => ({ label: link.label, href: link.href })),
-    featured: item.featured ?? false,
-    results: [item.result],
-    metrics: [],
-    chartData: [],
-  };
+  if (!response.ok) {
+    throw new Error(`GET ${url} failed with ${response.status} ${response.statusText}`);
+  }
+
+  const payload = (await response.json()) as ApiResponse<T> | T;
+
+  if (payload && typeof payload === 'object' && 'data' in payload) {
+    return payload.data;
+  }
+
+  return payload as T;
 }
-
-const staticProjectsMapped: Project[] = staticProjects.map(fromStatic);
 
 export async function loadProjects(): Promise<Project[]> {
   try {
-    const data = await projectsApi.getAll();
-    if (Array.isArray(data) && data.length > 0) return data;
-    return staticProjectsMapped;
-  } catch {
-    return staticProjectsMapped;
+    const data = await requestApi<BackendProject[]>('/projects');
+    return Array.isArray(data) ? data.map(normalizeProject) : [];
+  } catch (error) {
+    console.error(`[portfolio] Unable to load projects from API (${envConfig.apiUrl}/projects):`, error);
+    return [];
   }
 }
 
 export async function loadProjectBySlug(slug: string): Promise<Project | null> {
   try {
-    return await projectsApi.getBySlug(slug);
-  } catch {
-    const fallback = staticProjectsMapped.find((p) => p.slug === slug);
-    return fallback ?? null;
+    const project = await requestApi<BackendProject>(`/projects/slug/${encodeURIComponent(slug)}`);
+    return normalizeProject(project);
+  } catch (error) {
+    console.error(`[portfolio] Unable to load project "${slug}" from API (${envConfig.apiUrl}/projects/slug/${slug}):`, error);
+    return null;
   }
-}
-
-export function listStaticProjectSlugs(): string[] {
-  return staticProjectsMapped.map((p) => p.slug);
 }

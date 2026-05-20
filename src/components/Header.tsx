@@ -15,9 +15,14 @@ const navItems = [
   { href: "/#contact", label: "Contact" },
 ];
 
-export function Header() {
+interface HeaderProps {
+  showProjects?: boolean;
+}
+
+export function Header({ showProjects = true }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const visibleNavItems = navItems.filter((item) => showProjects || item.href !== "/#projets");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -46,7 +51,7 @@ export function Header() {
         <Image className="brand-logo-dark" src="/brand/logo-horizontal-clean-dark.png" alt="" width={176} height={65} priority />
       </Link>
       <nav className="nav-links" aria-label="Navigation principale">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <Link href={item.href} key={item.href}>
             {item.label}
           </Link>
@@ -70,7 +75,7 @@ export function Header() {
         </a>
       </div>
       <nav id="mobile-menu" className="mobile-menu" aria-label="Navigation mobile">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <Link href={item.href} key={item.href} onClick={() => setIsMenuOpen(false)}>
             {item.label}
           </Link>

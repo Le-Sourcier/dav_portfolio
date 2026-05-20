@@ -14,12 +14,15 @@ import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareBar } from "@/components/blog/ShareBar";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { blogPosts, site } from "@/lib/portfolio";
+import { loadProjects } from "@/services/portfolio/projectsLoader";
 import type { BlogPost } from "@/types/blog";
 import { sectionId } from "@/utils/sectionId";
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 const findPost = (slug: string): BlogPost | undefined =>
   (blogPosts as BlogPost[]).find((item) => item.slug === slug);
@@ -124,10 +127,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(post);
   const faqJsonLd = buildFaqJsonLd(post);
   const pullQuoteIndex = post.sections.length >= 3 ? 1 : 0;
+  const projects = await loadProjects();
+  const hasProjects = projects.length > 0;
 
   return (
     <>
-      <Header />
+      <Header showProjects={hasProjects} />
       <ReadingProgress />
       <main>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -218,9 +223,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <a className="primary-button" href={contactHref}>
                 Discuter du sujet
               </a>
-              <Link className="secondary-button" href="/#projets">
-                Voir les projets
-              </Link>
+              {hasProjects ? (
+                <Link className="secondary-button" href="/#projets">
+                  Voir les projets
+                </Link>
+              ) : null}
             </div>
           </section>
 
@@ -263,7 +270,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </article>
 
         <Newsletter compact />
-        <Footer />
+        <Footer showProjects={hasProjects} />
       </main>
       <BackToTop />
     </>

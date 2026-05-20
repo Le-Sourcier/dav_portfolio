@@ -2,7 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/portfolio";
 
-export function Footer() {
+type FooterProps = {
+  showProjects?: boolean;
+};
+
+export function Footer({ showProjects = true }: FooterProps) {
   return (
     <footer className="site-footer">
       <div className="footer-main">
@@ -17,7 +21,7 @@ export function Footer() {
         <nav aria-label="Navigation footer">
           <span>Navigation</span>
           <Link href="/#expertise">Expertise</Link>
-          <Link href="/#projets">Projets</Link>
+          {showProjects ? <Link href="/#projets">Projets</Link> : null}
           <Link href="/#parcours">Parcours</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/#contact">Contact</Link>

@@ -1,10 +1,10 @@
 import { apiClient } from './client';
-import type { Project } from '@/types/portfolio.types';
+import type { BackendProject } from '@/types/backend-project.types';
 
 export const projectsApi = {
-  getAll: () => apiClient.get<Project[]>('/projects'),
-  getById: (id: string) => apiClient.get<Project>(`/projects/${id}`),
-  getBySlug: (slug: string) => apiClient.get<Project>(`/projects/slug/${slug}`),
+  getAll: () => apiClient.get<BackendProject[]>('/projects'),
+  getById: (id: string) => apiClient.get<BackendProject>(`/projects/${id}`),
+  getBySlug: (slug: string) => apiClient.get<BackendProject>(`/projects/slug/${slug}`),
 };
 
 export default projectsApi;
