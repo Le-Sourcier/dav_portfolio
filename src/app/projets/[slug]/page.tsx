@@ -1,33 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { projects, site } from "@/lib/portfolio";
+import { site } from "@/lib/portfolio";
+import { listStaticProjectSlugs, loadProjectBySlug } from "@/services/portfolio/projectsLoader";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+  return listStaticProjectSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = projects.find((item) => item.slug === slug);
+  const project = await loadProjectBySlug(slug);
 
   if (!project) {
     return {};
   }
 
+  const description = [project.headline, project.result].filter(Boolean).join(" ").trim();
+
   return {
     title: `${project.name} - Étude de cas`,
-    description: `${project.headline} ${project.result}`,
+    description,
     alternates: {
       canonical: `${site.url}/projets/${project.slug}`,
     },
     openGraph: {
       title: `${project.name} - Étude de cas`,
-      description: project.result,
+      description: project.result ?? description,
       url: `${site.url}/projets/${project.slug}`,
       type: "article",
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: project.name }],
@@ -35,7 +38,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     twitter: {
       card: "summary_large_image",
       title: `${project.name} - Étude de cas`,
-      description: project.result,
+      description: project.result ?? description,
       images: ["/opengraph-image"],
     },
   };
@@ -43,7 +46,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = projects.find((item) => item.slug === slug);
+  const project = await loadProjectBySlug(slug);
 
   if (!project) {
     notFound();

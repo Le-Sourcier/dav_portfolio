@@ -6,11 +6,12 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { BackToTop } from "@/components/blog/BackToTop";
-import { blogPosts, experience, proofStats, projects, site, stack, testimonials } from "@/lib/portfolio";
+import { blogPosts, experience, proofStats, site, stack, testimonials } from "@/lib/portfolio";
+import { loadProjects } from "@/services/portfolio/projectsLoader";
 
-const featuredProjects = projects.filter((project) => project.featured);
-
-export default function Home() {
+export default async function Home() {
+  const projects = await loadProjects();
+  const featuredProjects = projects.filter((project) => project.featured);
   return (
     <>
       <Header />

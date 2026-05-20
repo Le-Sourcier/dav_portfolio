@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PortfolioAssistant } from "@/components/PortfolioAssistant";
+import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import { site } from "@/lib/portfolio";
 import "./globals.css";
 
@@ -94,8 +96,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col">
-        {children}
-        <PortfolioAssistant />
+        <QueryProvider>
+          {children}
+          <PortfolioAssistant />
+          <ToastProvider />
+        </QueryProvider>
       </body>
     </html>
   );
