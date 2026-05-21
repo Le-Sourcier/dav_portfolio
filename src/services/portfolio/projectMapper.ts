@@ -1,12 +1,16 @@
 import type { BackendProject } from '@/types/backend-project.types';
+import type { AppLocale } from '@/i18n/config';
+import { defaultLocale } from '@/i18n/config';
+import { localizeText } from '@/i18n/localize';
 import type { Project, ProjectMetric } from '@/types/portfolio.types';
 
 function formatMetric(metric?: ProjectMetric): string {
   if (!metric) return '';
-  return `${metric.value}${metric.unit}`;
+  const unit = metric.unit?.trim() ?? '';
+  return `${metric.value}${unit.toLowerCase() === 'n' ? '' : unit}`;
 }
 
-export function normalizeProject(item: BackendProject): Project {
+export function normalizeProject(item: BackendProject, locale: AppLocale = defaultLocale): Project {
   const tech = Array.isArray(item.tech)
     ? item.tech
     : Array.isArray(item.technologies)
@@ -15,6 +19,10 @@ export function normalizeProject(item: BackendProject): Project {
   const primaryResult = item.result || item.results?.find(Boolean) || '';
   const primaryMetric = item.metric || formatMetric(item.metrics?.find((metric) => metric.name));
   const links = Array.isArray(item.links) ? [...item.links] : [];
+  const title = localizeText(locale, item.title || item.name, item.title_en);
+  const description = localizeText(locale, item.description, item.description_en);
+  const problem = localizeText(locale, item.problem, item.problem_en);
+  const solution = localizeText(locale, item.solution, item.solution_en);
 
   if (item.url && !links.some((link) => link.href === item.url)) {
     links.push({ label: 'Voir le projet', href: item.url });
@@ -23,17 +31,17 @@ export function normalizeProject(item: BackendProject): Project {
   return {
     id: item.id,
     slug: item.slug,
-    title: item.title || item.name,
+    title,
     title_en: item.title_en,
-    name: item.name || item.title,
+    name: title || item.name || item.title,
     category: item.category,
     image: item.image || item.imageUrl || '',
-    description: item.description || '',
+    description,
     description_en: item.description_en,
-    headline: item.headline || item.description || primaryResult,
-    problem: item.problem || '',
+    headline: item.headline || description || primaryResult,
+    problem,
     problem_en: item.problem_en,
-    solution: item.solution || '',
+    solution,
     solution_en: item.solution_en,
     result: primaryResult,
     metric: primaryMetric,

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BackToTop } from "@/components/blog/BackToTop";
+import { getRequestLocale } from "@/i18n/server";
 import { site } from "@/lib/portfolio";
 import { loadProjectBySlug } from "@/services/portfolio/projectsLoader";
 import type { ProjectMetric } from "@/types/portfolio.types";
@@ -41,7 +42,8 @@ export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = await loadProjectBySlug(slug);
+  const locale = await getRequestLocale();
+  const project = await loadProjectBySlug(slug, locale);
 
   if (!project) {
     return {};
@@ -83,7 +85,8 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = await loadProjectBySlug(slug);
+  const locale = await getRequestLocale();
+  const project = await loadProjectBySlug(slug, locale);
 
   if (!project) {
     notFound();

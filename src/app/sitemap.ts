@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
-import { blogPosts, site } from "@/lib/portfolio";
+import { site } from "@/lib/portfolio";
+import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const projects = await loadProjects();
+  const [projects, blogPosts] = await Promise.all([loadProjects(), loadBlogPosts()]);
 
   return [
     {

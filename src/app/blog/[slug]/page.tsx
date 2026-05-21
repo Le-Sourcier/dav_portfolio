@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Script from "next/script";
+import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
-import { ArticleFaq } from "@/components/blog/ArticleFaq";
-import { ArticleFigure } from "@/components/blog/ArticleFigure";
 import { ArticleHero } from "@/components/blog/ArticleHero";
-import { ArticleResources } from "@/components/blog/ArticleResources";
 import { BackToTop } from "@/components/blog/BackToTop";
-import { PullQuote } from "@/components/blog/PullQuote";
+import { MarkdownContent } from "@/components/blog/MarkdownContent";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareBar } from "@/components/blog/ShareBar";
 import { TableOfContents } from "@/components/blog/TableOfContents";
-import { blogPosts, site } from "@/lib/portfolio";
+import { site } from "@/lib/portfolio";
+import { getRequestLocale } from "@/i18n/server";
+import { loadBlogPostBySlug, loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 import type { BlogPost } from "@/types/blog";
 import { sectionId } from "@/utils/sectionId";
@@ -24,16 +25,10 @@ type BlogPostPageProps = {
 
 export const dynamic = "force-dynamic";
 
-const findPost = (slug: string): BlogPost | undefined =>
-  (blogPosts as BlogPost[]).find((item) => item.slug === slug);
-
-export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
-}
-
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = findPost(slug);
+  const locale = await getRequestLocale();
+  const post = await loadBlogPostBySlug(slug, locale);
 
   if (!post) {
     return {};
@@ -54,16 +49,26 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       section: post.category,
       tags: post.tags,
       authors: [site.name],
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: post.title }],
+      images: [
+        {
+          url: absoluteImageUrl(post.coverImage) ?? "/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt,
-      images: ["/opengraph-image"],
+      images: [absoluteImageUrl(post.coverImage) ?? "/opengraph-image"],
     },
   };
 }
+
+const absoluteImageUrl = (url?: string) =>
+  url ? (url.startsWith("http") ? url : `${site.url}${url}`) : undefined;
 
 const buildJsonLd = (post: BlogPost) => ({
   "@context": "https://schema.org",
@@ -76,167 +81,161 @@ const buildJsonLd = (post: BlogPost) => ({
   articleSection: post.category,
   inLanguage: post.language ?? "fr",
   wordCount: post.wordCount,
-  image: post.coverImage ? `${site.url}${post.coverImage}` : undefined,
+  image: absoluteImageUrl(post.coverImage),
   author: { "@type": "Person", name: site.name },
   publisher: { "@type": "Person", name: site.name },
   mainEntityOfPage: `${site.url}/blog/${post.slug}`,
+  interactionStatistic: [
+    {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/ReadAction",
+      userInteractionCount: post.viewCount,
+    },
+    {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/ShareAction",
+      userInteractionCount: post.shareCount,
+    },
+    {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/CommentAction",
+      userInteractionCount: post.comments.length,
+    },
+  ],
 });
 
-const buildBreadcrumbJsonLd = (post: BlogPost) => ({
+const buildBreadcrumbJsonLd = (post: BlogPost, labels: { home: string; blog: string }) => ({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Accueil", item: site.url },
-    { "@type": "ListItem", position: 2, name: "Blog", item: `${site.url}/blog` },
+    { "@type": "ListItem", position: 1, name: labels.home, item: site.url },
+    { "@type": "ListItem", position: 2, name: labels.blog, item: `${site.url}/blog` },
     { "@type": "ListItem", position: 3, name: post.title, item: `${site.url}/blog/${post.slug}` },
   ],
 });
 
-const buildFaqJsonLd = (post: BlogPost) =>
-  post.faq && post.faq.length > 0
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: post.faq.map((entry) => ({
-          "@type": "Question",
-          name: entry.question,
-          acceptedAnswer: { "@type": "Answer", text: entry.answer },
-        })),
-      }
-    : null;
+const formatDate = (iso: string, locale = "fr") =>
+  new Date(iso).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+
+const formatCount = (value: number, locale = "fr") =>
+  new Intl.NumberFormat(locale === "en" ? "en-US" : "fr-FR", {
+    notation: value >= 1000 ? "compact" : "standard",
+    maximumFractionDigits: 1,
+  }).format(value);
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = findPost(slug);
+  const locale = await getRequestLocale();
+  const t = await getTranslations("BlogArticle");
+  const post = await loadBlogPostBySlug(slug, locale);
 
   if (!post) {
     notFound();
   }
 
-  const allPosts = blogPosts as BlogPost[];
+  const allPosts = await loadBlogPosts(locale);
   const currentIndex = allPosts.findIndex((item) => item.slug === post.slug);
   const previousPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
   const articleUrl = `${site.url}/blog/${post.slug}`;
-  const contactHref = `mailto:${site.email}?subject=${encodeURIComponent(`Discussion autour de: ${post.title}`)}`;
   const tocItems = post.sections.map((section) => ({
     id: sectionId(section.title),
     title: section.title,
   }));
   const jsonLd = buildJsonLd(post);
-  const breadcrumbJsonLd = buildBreadcrumbJsonLd(post);
-  const faqJsonLd = buildFaqJsonLd(post);
-  const pullQuoteIndex = post.sections.length >= 3 ? 1 : 0;
-  const projects = await loadProjects();
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(post, { home: t("home"), blog: t("blog") });
+  const projects = await loadProjects(locale);
   const hasProjects = projects.length > 0;
+  const hasBlog = allPosts.length > 0;
+  const hireSubject = encodeURIComponent(`Discussion autour de l'article : ${post.title}`);
+  const hireBody = encodeURIComponent(
+    `Bonjour David,\n\nJ'ai lu votre article "${post.title}" et je voudrais discuter d'un besoin proche.\n\nContexte :\nObjectif :\nDelai :\n\nMerci.`,
+  );
+  const articleFacts = [
+    { label: t("category"), value: post.category },
+    { label: t("readTime"), value: post.readTime },
+    { label: t("published"), value: formatDate(post.date, post.language) },
+    { label: t("views"), value: formatCount(post.viewCount, post.language) },
+    { label: t("shares"), value: formatCount(post.shareCount, post.language) },
+    { label: t("comments"), value: formatCount(post.comments.length, post.language) },
+  ];
 
   return (
     <>
-      <Header showProjects={hasProjects} />
+      <Header showProjects={hasProjects} showBlog={hasBlog} />
       <ReadingProgress />
       <main>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <script
+        <Script
+          id={`blog-post-jsonld-${post.slug}`}
           type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Script
+          id={`blog-breadcrumb-jsonld-${post.slug}`}
+          type="application/ld+json"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
-        {faqJsonLd ? (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        <article className="article-shell article-shell--detail">
+          <ArticleHero
+            post={post}
+            authorInitials={site.initials}
+            authorName={post.author || site.name}
+            backHref="/blog"
+            backLabel={t("back")}
+            actions={<ShareBar url={articleUrl} title={post.title} compact />}
           />
-        ) : null}
-        <article className="article-shell">
-          <Link href="/blog" className="text-link article-back-link">
-            ← Retour au blog
-          </Link>
-          <ArticleHero post={post} authorInitials={site.initials} authorName={site.name} />
-          <div className="article-intro">
-            <p>{post.intro}</p>
-            <aside className="article-takeaway">
-              <span>À retenir</span>
-              <p>{post.takeaway}</p>
-            </aside>
-          </div>
-
-          <section className="article-keypoints" aria-labelledby="synthese-article">
-            <div>
-              <p className="section-kicker" id="synthese-article">
-                Synthèse
-              </p>
-              <h2>Trois décisions qui changent la qualité du produit.</h2>
-            </div>
-            <div>
-              {post.keyPoints.map((point, index) => (
-                <article key={point}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <p>{point}</p>
-                </article>
-              ))}
-            </div>
-          </section>
 
           <div className="article-layout">
             <aside className="article-sidebar">
-              <TableOfContents items={tocItems} />
+              <div className="article-meta-panel" aria-label={t("articleMeta")}>
+                {articleFacts.map((item) => (
+                  <p key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </p>
+                ))}
+              </div>
+              {tocItems.length > 0 ? <TableOfContents items={tocItems} /> : null}
             </aside>
 
             <div className="article-body">
-              {post.sections.map((section, index) => (
-                <div key={section.title}>
-                  <section id={sectionId(section.title)}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <h2>{section.title}</h2>
-                    <p>{section.body}</p>
-                    {section.image ? (
-                      <ArticleFigure
-                        src={section.image}
-                        alt={section.imageAlt ?? section.title}
-                        caption={section.imageCaption}
-                      />
-                    ) : null}
-                  </section>
-                  {post.pullQuote && index === pullQuoteIndex ? (
-                    <PullQuote text={post.pullQuote} attribution={site.name} />
-                  ) : null}
-                </div>
-              ))}
+              {post.excerpt ? <p className="article-standfirst">{post.excerpt}</p> : null}
+              <MarkdownContent content={post.content} />
             </div>
           </div>
 
-          {post.faq && post.faq.length > 0 ? <ArticleFaq entries={post.faq} /> : null}
-
-          {post.resources && post.resources.length > 0 ? (
-            <ArticleResources resources={post.resources} />
+          {post.comments.length > 0 ? (
+            <section className="article-comments" aria-labelledby="article-comments-title">
+              <div>
+                <span>{t("comments")}</span>
+                <h2 id="article-comments-title">{t("readerNotes")}</h2>
+              </div>
+              <div className="article-comments-list">
+                {post.comments.map((comment) => (
+                  <article key={comment.id}>
+                    <header>
+                      <strong>{comment.author}</strong>
+                      <time dateTime={comment.createdAt}>
+                        {formatDate(comment.createdAt, post.language)}
+                      </time>
+                    </header>
+                    <p>{comment.content}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
           ) : null}
-
-          <section className="article-cta">
-            <div>
-              <p className="section-kicker">Passer à l&apos;action</p>
-              <h2>Transformer cette réflexion en décision produit.</h2>
-              <p>
-                Si ce sujet ressemble à un problème réel dans votre produit, le plus utile est de clarifier le contexte,
-                les contraintes et les prochains choix techniques.
-              </p>
-            </div>
-            <div>
-              <a className="primary-button" href={contactHref}>
-                Discuter du sujet
-              </a>
-              {hasProjects ? (
-                <Link className="secondary-button" href="/#projets">
-                  Voir les projets
-                </Link>
-              ) : null}
-            </div>
-          </section>
-
-          <ShareBar url={articleUrl} title={post.title} />
 
           <nav className="article-pagination" aria-label="Navigation entre articles">
             {previousPost ? (
               <Link href={`/blog/${previousPost.slug}`}>
-                <span>Précédent</span>
+                <span>{t("previous")}</span>
                 <strong>{previousPost.title}</strong>
                 <small>{previousPost.category} · {previousPost.readTime}</small>
               </Link>
@@ -245,7 +244,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             )}
             {nextPost ? (
               <Link href={`/blog/${nextPost.slug}`}>
-                <span>Suivant</span>
+                <span>{t("next")}</span>
                 <strong>{nextPost.title}</strong>
                 <small>{nextPost.category} · {nextPost.readTime}</small>
               </Link>
@@ -254,23 +253,35 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             )}
           </nav>
 
-          <div className="article-author">
+          <section className="case-hire-cta article-contact-cta" aria-labelledby="article-contact-title">
             <div>
-              <span>{site.initials}</span>
+              <span>{t("contactKicker")}</span>
+              <h2 id="article-contact-title">{t("contactTitle")}</h2>
             </div>
-            <section>
-              <p className="section-kicker">Auteur</p>
-              <h2>{site.name}</h2>
-              <p>
-                Développeur fullstack orienté produits SaaS, backend critique, automatisation métier et interfaces web
-                premium.
-              </p>
-            </section>
-          </div>
+            <div className="case-hire-note">
+              <p>{t("contactText")}</p>
+              <dl>
+                <div>
+                  <dt>{t("contactFormat")}</dt>
+                  <dd>{t("contactFormatValue")}</dd>
+                </div>
+                <div>
+                  <dt>{t("contactFocus")}</dt>
+                  <dd>{t("contactFocusValue")}</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="case-hire-actions">
+              <a href={`mailto:${site.email}?subject=${hireSubject}&body=${hireBody}`}>
+                {t("contactPrimary")}
+              </a>
+              <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
+            </div>
+          </section>
         </article>
 
         <Newsletter compact />
-        <Footer showProjects={hasProjects} />
+        <Footer showProjects={hasProjects} showBlog={hasBlog} />
       </main>
       <BackToTop />
     </>

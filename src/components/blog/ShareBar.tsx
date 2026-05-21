@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type ShareBarProps = {
   url: string;
   title: string;
+  compact?: boolean;
 };
 
 const buildTwitterHref = (url: string, title: string) =>
@@ -16,7 +18,8 @@ const buildLinkedInHref = (url: string) =>
 const buildMailHref = (url: string, title: string) =>
   `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`;
 
-export function ShareBar({ url, title }: ShareBarProps) {
+export function ShareBar({ url, title, compact = false }: ShareBarProps) {
+  const t = useTranslations("BlogArticle");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -34,24 +37,24 @@ export function ShareBar({ url, title }: ShareBarProps) {
     } catch (error) {
       // Clipboard API unavailable (insecure context, permission denied) — surface a fallback.
       console.warn("Copy to clipboard failed", error);
-      window.prompt("Copier le lien :", url);
+      window.prompt(t("copyPrompt"), url);
     }
   };
 
   return (
-    <div className="article-share" role="group" aria-label="Partager l'article">
-      <span>Partager</span>
-      <a href={buildTwitterHref(url, title)} target="_blank" rel="noopener noreferrer" aria-label="Partager sur X / Twitter">
+    <div className={`article-share${compact ? " is-compact" : ""}`} role="group" aria-label={t("share")}>
+      {!compact ? <span>{t("share")}</span> : null}
+      <a href={buildTwitterHref(url, title)} target="_blank" rel="noopener noreferrer" aria-label="X / Twitter">
         X
       </a>
-      <a href={buildLinkedInHref(url)} target="_blank" rel="noopener noreferrer" aria-label="Partager sur LinkedIn">
+      <a href={buildLinkedInHref(url)} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
         in
       </a>
-      <a href={buildMailHref(url, title)} aria-label="Partager par email">
+      <a href={buildMailHref(url, title)} aria-label="Email">
         @
       </a>
       <button type="button" onClick={handleCopy} aria-live="polite">
-        {copied ? "Lien copié ✓" : "Copier le lien"}
+        {copied ? t("copied") : t("copy")}
       </button>
     </div>
   );

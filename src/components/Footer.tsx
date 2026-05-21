@@ -4,9 +4,11 @@ import { site } from "@/lib/portfolio";
 
 type FooterProps = {
   showProjects?: boolean;
+  showJourney?: boolean;
+  showBlog?: boolean;
 };
 
-export function Footer({ showProjects = true }: FooterProps) {
+export function Footer({ showProjects = true, showJourney = true, showBlog = true }: FooterProps) {
   return (
     <footer className="site-footer">
       <div className="footer-main">
@@ -22,8 +24,8 @@ export function Footer({ showProjects = true }: FooterProps) {
           <span>Navigation</span>
           <Link href="/#expertise">Expertise</Link>
           {showProjects ? <Link href="/#projets">Projets</Link> : null}
-          <Link href="/#parcours">Parcours</Link>
-          <Link href="/blog">Blog</Link>
+          {showJourney ? <Link href="/#parcours">Parcours</Link> : null}
+          {showBlog ? <Link href="/blog">Blog</Link> : null}
           <Link href="/#contact">Contact</Link>
         </nav>
         <nav aria-label="Liens professionnels">

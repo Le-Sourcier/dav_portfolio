@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { blogPosts, experience, services, site, stack } from "@/lib/portfolio";
-import { projectsApi } from "@/services/api/projects.api";
-import { normalizeProject } from "@/services/portfolio/projectMapper";
+import { FormEvent, useMemo, useRef, useState } from "react";
+import { services, site, stack } from "@/lib/portfolio";
+import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
+import type { BlogPost } from "@/types/blog";
 import type { Project } from "@/types/portfolio.types";
 
 type AssistantAction = {
@@ -37,17 +37,22 @@ function findProject(query: string, projects: Project[]) {
   });
 }
 
-function findPost(query: string) {
-  return blogPosts.find((post) => {
+function findPost(query: string, posts: BlogPost[]) {
+  return posts.find((post) => {
     const searchable = normalize([post.title, post.excerpt, post.category, post.tags.join(" ")].join(" "));
     return searchable.includes(query);
   });
 }
 
-function buildAnswer(rawQuestion: string, projects: Project[]): Omit<AssistantMessage, "id" | "role"> {
+function buildAnswer(
+  rawQuestion: string,
+  projects: Project[],
+  posts: BlogPost[],
+  experiences: PortfolioExperienceItem[],
+): Omit<AssistantMessage, "id" | "role"> {
   const question = normalize(rawQuestion);
   const matchedProject = findProject(question, projects);
-  const matchedPost = findPost(question);
+  const matchedPost = findPost(question, posts);
 
   if (question.length < 3) {
     return {
@@ -119,22 +124,35 @@ function buildAnswer(rawQuestion: string, projects: Project[]): Omit<AssistantMe
   if (question.includes("blog") || question.includes("article") || question.includes("lire") || matchedPost) {
     if (matchedPost) {
       return {
-        text: `${matchedPost.title}. ${matchedPost.excerpt} Niveau: ${matchedPost.level}. Lecture: ${matchedPost.readTime}.`,
+        text: `${matchedPost.title}. ${matchedPost.excerpt} Lecture: ${matchedPost.readTime}.`,
         actions: [{ label: "Lire l'article", href: `/blog/${matchedPost.slug}` }],
       };
     }
 
-    const posts = blogPosts.map((post) => post.title).join(" ; ");
+    if (posts.length === 0) {
+      return {
+        text: "Aucun article publié n'est disponible depuis l'API pour le moment.",
+        actions: [{ label: "Ouvrir le blog", href: "/blog" }],
+      };
+    }
+
+    const postList = posts.map((post) => post.title).join(" ; ");
     return {
-      text: `Le blog couvre l'architecture SaaS, l'automatisation métier et la conversion d'un portfolio premium. Articles disponibles: ${posts}.`,
+      text: `Le blog couvre l'architecture SaaS, l'automatisation métier et la conversion produit. Articles disponibles: ${postList}.`,
       actions: [{ label: "Ouvrir le blog", href: "/blog" }],
     };
   }
 
   if (question.includes("parcours") || question.includes("experience") || question.includes("travail") || question.includes("poste")) {
-    const current = experience[0];
+    const current = experiences[0];
+    if (!current) {
+      return {
+        text: "Le parcours n'est pas encore disponible depuis l'API. Le CV reste le meilleur support pour consulter le profil complet.",
+        actions: [{ label: "Télécharger le CV", href: "/cv/david-logan-cv.pdf" }],
+      };
+    }
     return {
-      text: `Parcours orienté produit SaaS et automatisation. Actuellement: ${current.role} chez ${current.company}, focus ${current.focus}. Expériences aussi chez Ubuntu Consulting SARL et Groupe Drapeau.`,
+      text: `Parcours orienté produit SaaS et automatisation. Dernière expérience disponible: ${current.role} chez ${current.company}, période ${current.period}.`,
       actions: [
         { label: "Voir le parcours", href: "/#parcours" },
         { label: "Télécharger le CV", href: "/cv/david-logan-cv.pdf" },
@@ -171,12 +189,13 @@ function buildAnswer(rawQuestion: string, projects: Project[]): Omit<AssistantMe
 
 type PortfolioAssistantProps = {
   projects?: Project[];
+  posts?: BlogPost[];
+  experiences?: PortfolioExperienceItem[];
 };
 
-export function PortfolioAssistant({ projects = [] }: PortfolioAssistantProps) {
+export function PortfolioAssistant({ projects = [], posts = [], experiences = [] }: PortfolioAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [apiProjects, setApiProjects] = useState<Project[]>(projects);
   const [messages, setMessages] = useState<AssistantMessage[]>([
     {
       id: 1,
@@ -190,7 +209,7 @@ export function PortfolioAssistant({ projects = [] }: PortfolioAssistantProps) {
   ]);
   const nextId = useRef(2);
   const panelTitle = useMemo(() => (isOpen ? "Fermer l'assistant" : "Ouvrir l'assistant"), [isOpen]);
-  const assistantProjects = apiProjects.length > 0 ? apiProjects : projects;
+  const assistantProjects = projects;
   const quickQuestions = useMemo(
     () => [
       "Que peux-tu construire ?",
@@ -201,29 +220,11 @@ export function PortfolioAssistant({ projects = [] }: PortfolioAssistantProps) {
     [assistantProjects.length],
   );
 
-  useEffect(() => {
-    let mounted = true;
-
-    projectsApi
-      .getAll()
-      .then((data) => {
-        if (mounted) setApiProjects(Array.isArray(data) ? data.map(normalizeProject) : []);
-      })
-      .catch((error) => {
-        console.error("[portfolio-assistant] Unable to load projects from API:", error);
-        if (mounted) setApiProjects([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   const ask = (question: string) => {
     const trimmed = question.trim();
     if (!trimmed) return;
 
-    const answer = buildAnswer(trimmed, assistantProjects);
+    const answer = buildAnswer(trimmed, assistantProjects, posts, experiences);
     setMessages((current) => [
       ...current,
       { id: nextId.current++, role: "user", text: trimmed },

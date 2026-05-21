@@ -7,27 +7,44 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { BackToTop } from "@/components/blog/BackToTop";
 import {
-  blogPosts,
-  experience,
   proofStats,
   site,
   stack,
-  testimonials,
 } from "@/lib/portfolio";
+import { getRequestLocale } from "@/i18n/server";
+import {
+  loadBlogPosts,
+  loadExperiences,
+  loadTestimonials,
+} from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const projects = await loadProjects();
+  const locale = await getRequestLocale();
+  const [projects, blogPosts, experience, testimonials] = await Promise.all([
+    loadProjects(locale),
+    loadBlogPosts(locale),
+    loadExperiences(locale),
+    loadTestimonials(locale),
+  ]);
   const featuredProjects = projects.filter((project) => project.featured);
   const visibleProjects =
     featuredProjects.length > 0 ? featuredProjects : projects;
   const hasProjects = visibleProjects.length > 0;
+  const hasJourney = experience.length > 0;
+  const hasBlog = blogPosts.length > 0;
+  const hasTestimonials = testimonials.length > 0;
+  const dateFormatter = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <>
-      <Header showProjects={hasProjects} />
+      <Header showProjects={hasProjects} showJourney={hasJourney} showBlog={hasBlog} />
 
       <main>
         <section className="hero-section">
@@ -285,50 +302,54 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section id="parcours" className="section parcours-section">
-          <div className="parcours-copy">
-            <p className="section-kicker">Parcours</p>
-            <h2>
-              Un parcours construit autour du produit, de la performance et de
-              l&apos;automatisation.
-            </h2>
-            <p>
-              Chaque expérience renforce le même socle: transformer une
-              contrainte métier en plateforme claire, maintenable et prête à
-              évoluer.
-            </p>
-            <div className="parcours-proof">
-              <span>Produit</span>
-              <span>Backend</span>
-              <span>Automatisation</span>
-              <span>SEO</span>
+        {hasJourney ? (
+          <section id="parcours" className="section parcours-section">
+            <div className="parcours-copy">
+              <p className="section-kicker">Parcours</p>
+              <h2>
+                Un parcours construit autour du produit, de la performance et de
+                l&apos;automatisation.
+              </h2>
+              <p>
+                Chaque expérience renforce le même socle: transformer une
+                contrainte métier en plateforme claire, maintenable et prête à
+                évoluer.
+              </p>
+              <div className="parcours-proof">
+                <span>Produit</span>
+                <span>Backend</span>
+                <span>Automatisation</span>
+                <span>SEO</span>
+              </div>
             </div>
-          </div>
 
-          <div className="parcours-timeline">
-            {experience.map((item, index) => (
-              <article
-                className="parcours-card"
-                key={`${item.company}-${item.period}`}>
-                <div className="parcours-marker" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-                <div>
-                  <span>{item.period}</span>
-                  <p className="parcours-focus">{item.focus}</p>
-                  <h3>{item.role}</h3>
-                  <p className="company">{item.company}</p>
-                  <p>{item.summary}</p>
-                  <div className="parcours-tags">
-                    {item.points.map((point) => (
-                      <small key={point}>{point}</small>
-                    ))}
+            <div className="parcours-timeline">
+              {experience.map((item, index) => (
+                <article
+                  className="parcours-card"
+                  key={`${item.company}-${item.period}`}>
+                  <div className="parcours-marker" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+                  <div>
+                    <span>{item.period}</span>
+                    <p className="parcours-focus">{item.focus}</p>
+                    <h3>{item.role}</h3>
+                    <p className="company">{item.company}</p>
+                    <p>{item.summary}</p>
+                    {item.points.length > 0 ? (
+                      <div className="parcours-tags">
+                        {item.points.map((point) => (
+                          <small key={point}>{point}</small>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="section stack-section">
           <div className="stack-intro">
@@ -372,57 +393,116 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section testimonials-section">
-          <div className="section-heading">
-            <p className="section-kicker">Témoignages</p>
-            <h2>
-              Une collaboration pensée pour la clarté et l&apos;exécution.
-            </h2>
-          </div>
-          <div className="testimonial-grid">
-            {testimonials.map((testimonial) => (
-              <article key={testimonial.name} className="testimonial-card">
-                <p>“{testimonial.quote}”</p>
-                <div>
-                  <strong>{testimonial.name}</strong>
-                  <span>{testimonial.role}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="blog" className="section blog-section">
-          <div className="section-heading blog-heading">
-            <div>
-              <p className="section-kicker">Blog</p>
-              <h2>Notes techniques pour construire mieux.</h2>
+        {hasTestimonials ? (
+          <section className="section testimonials-section">
+            <div className="section-heading">
+              <p className="section-kicker">Témoignages</p>
+              <h2>
+                Une collaboration pensée pour la clarté et l&apos;exécution.
+              </h2>
             </div>
-            <Link href="/blog" className="secondary-button">
-              Tous les articles
-            </Link>
-          </div>
-          <div className="blog-card-grid">
-            {blogPosts.slice(0, 3).map((post) => (
-              <Link
-                href={`/blog/${post.slug}`}
-                key={post.slug}
-                className="blog-card">
-                <span>
-                  {post.category} · {post.readTime}
-                </span>
-                <h3>{post.title}</h3>
-                <p>{post.excerpt}</p>
+            <div className="testimonial-grid">
+              {testimonials.map((testimonial) => {
+                const initials = testimonial.name
+                  .split(/\s+/)
+                  .map((part) => part[0])
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase();
+                const filledStars = Math.round(testimonial.rating ?? 0);
+                const dateLabel = testimonial.createdAt
+                  ? dateFormatter.format(new Date(testimonial.createdAt))
+                  : null;
+                return (
+                  <article key={testimonial.id} className="testimonial-card">
+                    <div className="testimonial-card-header">
+                      <div
+                        className={`testimonial-avatar${testimonial.avatar ? " has-image" : ""}`}
+                        aria-hidden="true">
+                        {testimonial.avatar ? (
+                          <img src={testimonial.avatar} alt="" loading="lazy" />
+                        ) : (
+                          <span>{initials || "?"}</span>
+                        )}
+                      </div>
+                      <div className="testimonial-card-identity">
+                        <strong>{testimonial.name}</strong>
+                        <span>
+                          {[testimonial.role, testimonial.company]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </span>
+                      </div>
+                    </div>
+                    {testimonial.rating ? (
+                      <div
+                        className="testimonial-rating"
+                        aria-label={`Note: ${filledStars} sur 5`}>
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <span
+                            key={index}
+                            className={index < filledStars ? "is-filled" : ""}
+                            aria-hidden="true">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                    <p className="testimonial-quote">“{testimonial.quote}”</p>
+                    {dateLabel ? (
+                      <time
+                        className="testimonial-date"
+                        dateTime={testimonial.createdAt}>
+                        {dateLabel}
+                      </time>
+                    ) : null}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {hasBlog ? (
+          <section id="blog" className="section blog-section">
+            <div className="section-heading blog-heading">
+              <div>
+                <p className="section-kicker">Blog</p>
+                <h2>Notes techniques pour construire mieux.</h2>
+              </div>
+              <Link href="/blog" className="secondary-button">
+                Tous les articles
               </Link>
-            ))}
-          </div>
-        </section>
+            </div>
+            <div className="blog-card-grid">
+              {blogPosts.slice(0, 3).map((post) => (
+                <Link
+                  href={`/blog/${post.slug}`}
+                  key={post.slug}
+                  className={`blog-card${post.coverImage ? " has-cover" : ""}`}>
+                  {post.coverImage ? (
+                    <img src={post.coverImage} alt="" loading="lazy" className="blog-card-cover" />
+                  ) : null}
+                  <span>
+                    {post.category} · {post.readTime}
+                  </span>
+                  <h3>{post.title}</h3>
+                  <p>{post.excerpt}</p>
+                  <small className="blog-card-meta">
+                    {(post.author || site.name)} · {dateFormatter.format(new Date(post.date))}
+                  </small>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <Newsletter />
 
         <ContactSection />
 
-        <Footer showProjects={hasProjects} />
+        <Footer showProjects={hasProjects} showJourney={hasJourney} showBlog={hasBlog} />
       </main>
       <BackToTop />
     </>

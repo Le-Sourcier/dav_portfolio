@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type TableOfContentsItem = {
   id: string;
@@ -12,6 +13,7 @@ type TableOfContentsProps = {
 };
 
 export function TableOfContents({ items }: TableOfContentsProps) {
+  const t = useTranslations("BlogArticle");
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -47,8 +49,8 @@ export function TableOfContents({ items }: TableOfContentsProps) {
   }, [items]);
 
   return (
-    <nav className="article-toc" aria-label="Sommaire">
-      <span>Sommaire</span>
+    <nav className="article-toc" aria-label={t("toc")}>
+      <span>{t("toc")}</span>
       <ol>
         {items.map((item, index) => (
           <li key={item.id} className={item.id === activeId ? "is-active" : undefined}>

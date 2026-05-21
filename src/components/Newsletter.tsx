@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { site } from "@/lib/portfolio";
+import { newsletterApi } from "@/services/api/newsletter.api";
 
 type NewsletterProps = {
   compact?: boolean;
@@ -9,15 +9,23 @@ type NewsletterProps = {
 
 export function Newsletter({ compact = false }: NewsletterProps) {
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const subject = encodeURIComponent("Inscription newsletter");
-    const body = encodeURIComponent(
-      `Bonjour David,\n\nJe souhaite recevoir les prochaines notes techniques.\n\nEmail: ${email}\n\nMerci.`,
-    );
+    setStatus("loading");
+    setMessage("");
 
-    window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
+    try {
+      await newsletterApi.subscribe(email);
+      setStatus("success");
+      setMessage("Inscription confirmée.");
+      setEmail("");
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "Impossible de valider l'inscription.");
+    }
   };
 
   return (
@@ -41,7 +49,10 @@ export function Newsletter({ compact = false }: NewsletterProps) {
             placeholder="vous@entreprise.com"
           />
         </label>
-        <button type="submit">S&apos;abonner</button>
+        <button type="submit" disabled={status === "loading"}>
+          {status === "loading" ? "Envoi..." : "S'abonner"}
+        </button>
+        {message ? <p className={`form-feedback is-${status}`}>{message}</p> : null}
       </form>
     </section>
   );

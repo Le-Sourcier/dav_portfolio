@@ -2,98 +2,196 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { blogPosts } from "@/lib/portfolio";
+import { useTranslations } from "next-intl";
+import type { BlogPost } from "@/types/blog";
 
-const categories = ["Tous", ...Array.from(new Set(blogPosts.map((post) => post.category)))];
+type BlogDirectoryProps = {
+  posts: BlogPost[];
+  locale?: string;
+};
 
-export function BlogDirectory() {
-  const [activeCategory, setActiveCategory] = useState("Tous");
+type SortKey = "recent" | "popular" | "discussed";
+
+const formatDate = (iso: string, locale = "fr") =>
+  new Date(iso).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+const scorePost = (post: BlogPost) =>
+  post.viewCount * 3 + post.shareCount * 5 + post.comments.length * 8;
+
+export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
+  const t = useTranslations("BlogIndex");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("recent");
+  const categories = useMemo(
+    () => Array.from(new Set(posts.map((post) => post.category).filter(Boolean))),
+    [posts],
+  );
 
-  const featured = blogPosts[0];
+  const featured = useMemo(
+    () =>
+      [...posts].sort((a, b) => {
+        const scoreDelta = scorePost(b) - scorePost(a);
+        if (scoreDelta !== 0) return scoreDelta;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      })[0],
+    [posts],
+  );
   const filteredPosts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return blogPosts.filter((post) => {
-      const matchesCategory = activeCategory === "Tous" || post.category === activeCategory;
-      const searchable = [post.title, post.excerpt, post.category, ...(post.tags ?? [])].join(" ").toLowerCase();
-      const matchesQuery = !normalizedQuery || searchable.includes(normalizedQuery);
+    return posts
+      .filter((post) => {
+        const matchesCategory = activeCategory === "all" || post.category === activeCategory;
+        const searchable = [
+          post.title,
+          post.excerpt,
+          post.category,
+          post.author,
+          post.readTime,
+          ...(post.tags ?? []),
+        ]
+          .join(" ")
+          .toLowerCase();
+        const matchesQuery = !normalizedQuery || searchable.includes(normalizedQuery);
 
-      return matchesCategory && matchesQuery;
-    });
-  }, [activeCategory, query]);
+        return matchesCategory && matchesQuery;
+      })
+      .sort((a, b) => {
+        if (sort === "popular") return b.viewCount - a.viewCount;
+        if (sort === "discussed") return b.comments.length - a.comments.length;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+  }, [activeCategory, posts, query, sort]);
+
+  const visiblePosts =
+    activeCategory === "all" && query.trim() === "" && featured
+      ? filteredPosts.filter((post) => post.slug !== featured.slug)
+      : filteredPosts;
+  const hasFilters = activeCategory !== "all" || query.trim() !== "";
+  const resetFilters = () => {
+    setActiveCategory("all");
+    setQuery("");
+    setSort("recent");
+  };
 
   return (
     <section className="section blog-index">
       <div className="blog-control-panel">
         <div>
-          <span>{blogPosts.length} articles</span>
-          <strong>Explorer par problème, stack ou objectif produit.</strong>
+          <span>{t("count", { count: posts.length })}</span>
+          <strong>{t("controlTitle")}</strong>
         </div>
-        <label className="blog-search">
-          Recherche
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="SaaS, backend, ROI..."
-          />
-        </label>
-      </div>
-
-      <div className="blog-category-tabs" aria-label="Catégories du blog">
-        {categories.map((category) => (
-          <button
-            type="button"
-            key={category}
-            className={activeCategory === category ? "is-active" : ""}
-            onClick={() => setActiveCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      <Link href={`/blog/${featured.slug}`} className="blog-featured">
-        <div className="blog-featured-visual">
-          <span>Article sélectionné</span>
-          <strong>{featured.category}</strong>
-          <small>{featured.readTime}</small>
-        </div>
-        <div>
-          <span>{featured.date}</span>
-          <h2>{featured.title}</h2>
-          <p>{featured.excerpt}</p>
-          <div className="blog-tag-row">
-            {featured.tags.map((tag) => (
-              <small key={tag}>{tag}</small>
+        <div className="blog-filter-box">
+          <div className="blog-filter-row">
+            <label className="blog-search">
+              <span>{t("search")}</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t("searchPlaceholder")}
+              />
+            </label>
+            <label className="blog-sort">
+              <span>{t("sort")}</span>
+              <select value={sort} onChange={(event) => setSort(event.target.value as SortKey)}>
+                <option value="recent">{t("sortRecent")}</option>
+                <option value="popular">{t("sortPopular")}</option>
+                <option value="discussed">{t("sortDiscussed")}</option>
+              </select>
+            </label>
+          </div>
+          <div className="blog-category-tabs" aria-label="Catégories du blog">
+            <button
+              type="button"
+              className={activeCategory === "all" ? "is-active" : ""}
+              onClick={() => setActiveCategory("all")}
+            >
+              {t("all")}
+            </button>
+            {categories.map((category) => (
+              <button
+                type="button"
+                key={category}
+                className={activeCategory === category ? "is-active" : ""}
+                onClick={() => setActiveCategory(category)}
+              >
+                {category}
+              </button>
             ))}
+            {hasFilters ? (
+              <button type="button" className="blog-reset-filter" onClick={resetFilters}>
+                {t("reset")}
+              </button>
+            ) : null}
           </div>
         </div>
-      </Link>
+      </div>
+
+      {featured && !hasFilters ? (
+        <Link href={`/blog/${featured.slug}`} className="blog-featured" aria-label={`${t("read")} ${featured.title}`}>
+          <img src={featured.coverImage} alt={featured.coverImageAlt ?? featured.title} />
+          <div>
+            <span>{t("featured")} · {featured.category}</span>
+            <h2>{featured.title}</h2>
+            <p>{featured.excerpt}</p>
+            <div className="blog-featured-meta">
+              <small>{formatDate(featured.date, locale)}</small>
+              <small>{featured.readTime}</small>
+              <small>{t("views", { count: featured.viewCount })}</small>
+              <small>{t("comments", { count: featured.comments.length })}</small>
+            </div>
+            <strong>{t("readArticle")}</strong>
+          </div>
+        </Link>
+      ) : (
+        !featured ? (
+          <div className="blog-empty-state">
+            <strong>{t("emptyTitle")}</strong>
+            <p>{t("emptyText")}</p>
+          </div>
+        ) : null
+      )}
 
       <div className="blog-results-header">
-        <span>{filteredPosts.length} résultat{filteredPosts.length > 1 ? "s" : ""}</span>
-        <p>Articles courts, structurés pour décider vite et appliquer proprement.</p>
+        <span>{t("results", { count: filteredPosts.length })}</span>
+        <p>
+          {hasFilters
+            ? t("filteredHint")
+            : t("defaultHint")}
+        </p>
       </div>
 
-      <div className="blog-list">
-        {filteredPosts.map((post) => (
-          <Link href={`/blog/${post.slug}`} key={post.slug} className="blog-list-item">
-            <div>
-              <span>{post.category} · {post.readTime}</span>
-              <h3>{post.title}</h3>
-              <p>{post.excerpt}</p>
-              <div className="blog-tag-row">
-                {post.tags.map((tag) => (
-                  <small key={tag}>{tag}</small>
-                ))}
+      {visiblePosts.length > 0 ? (
+        <div className="blog-list">
+          {visiblePosts.map((post) => (
+            <Link href={`/blog/${post.slug}`} key={post.slug} className="blog-list-item">
+              <img src={post.coverImage} alt={post.coverImageAlt ?? post.title} />
+              <div>
+                <span>{post.category}</span>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+                <div className="blog-card-meta">
+                  <small>{formatDate(post.date, locale)}</small>
+                  <small>{post.readTime}</small>
+                  <small>{t("views", { count: post.viewCount })}</small>
+                </div>
               </div>
-            </div>
-            <strong>Lire</strong>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="blog-empty-state">
+          <strong>{t("noResultsTitle")}</strong>
+          <p>{t("noResultsText")}</p>
+          <button type="button" onClick={resetFilters}>{t("resetFilters")}</button>
+        </div>
+      )}
     </section>
   );
 }

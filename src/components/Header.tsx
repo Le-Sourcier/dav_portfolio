@@ -3,26 +3,36 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { site } from "@/lib/portfolio";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
-  { href: "/#apropos", label: "À propos" },
-  { href: "/#expertise", label: "Expertise" },
-  { href: "/#projets", label: "Projets" },
-  { href: "/#parcours", label: "Parcours" },
-  { href: "/blog", label: "Blog" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#apropos", key: "about" },
+  { href: "/#expertise", key: "expertise" },
+  { href: "/#projets", key: "projects" },
+  { href: "/#parcours", key: "journey" },
+  { href: "/blog", key: "blog" },
+  { href: "/#contact", key: "contact" },
 ];
 
 interface HeaderProps {
   showProjects?: boolean;
+  showJourney?: boolean;
+  showBlog?: boolean;
 }
 
-export function Header({ showProjects = true }: HeaderProps) {
+export function Header({ showProjects = true, showJourney = true, showBlog = true }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const visibleNavItems = navItems.filter((item) => showProjects || item.href !== "/#projets");
+  const t = useTranslations("Navigation");
+  const visibleNavItems = navItems.filter((item) => {
+    if (!showProjects && item.href === "/#projets") return false;
+    if (!showJourney && item.href === "/#parcours") return false;
+    if (!showBlog && item.href === "/blog") return false;
+    return true;
+  });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -53,11 +63,12 @@ export function Header({ showProjects = true }: HeaderProps) {
       <nav className="nav-links" aria-label="Navigation principale">
         {visibleNavItems.map((item) => (
           <Link href={item.href} key={item.href}>
-            {item.label}
+            {t(item.key)}
           </Link>
         ))}
       </nav>
       <div className="header-actions">
+        <LanguageToggle />
         <ThemeToggle />
         <button
           type="button"
@@ -71,17 +82,17 @@ export function Header({ showProjects = true }: HeaderProps) {
           <span />
         </button>
         <a className="header-cta" href={`mailto:${site.email}`}>
-          Discuter
+          {t("discuss")}
         </a>
       </div>
       <nav id="mobile-menu" className="mobile-menu" aria-label="Navigation mobile">
         {visibleNavItems.map((item) => (
           <Link href={item.href} key={item.href} onClick={() => setIsMenuOpen(false)}>
-            {item.label}
+            {t(item.key)}
           </Link>
         ))}
         <a href={`mailto:${site.email}`} onClick={() => setIsMenuOpen(false)}>
-          Discuter
+          {t("discuss")}
         </a>
       </nav>
     </header>

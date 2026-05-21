@@ -16,7 +16,11 @@ export const buildBlogPostingJsonLd = (post: BlogPost, site: SiteContext) => ({
   articleSection: post.category,
   inLanguage: post.language ?? "fr",
   wordCount: post.wordCount,
-  image: post.coverImage ? `${site.url}${post.coverImage}` : undefined,
+  image: post.coverImage
+    ? post.coverImage.startsWith("http")
+      ? post.coverImage
+      : `${site.url}${post.coverImage}`
+    : undefined,
   author: { "@type": "Person", name: site.name },
   publisher: { "@type": "Person", name: site.name },
   mainEntityOfPage: `${site.url}/blog/${post.slug}`,

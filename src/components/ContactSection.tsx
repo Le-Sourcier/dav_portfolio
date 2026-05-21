@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
 import { site } from "@/lib/portfolio";
+import { contactsApi } from "@/services/api/contacts.api";
 
 const whatsappNumber = site.phone.replace(/\D/g, "");
 
@@ -14,6 +15,8 @@ export function ContactSection() {
     budget: "",
     message: "",
   });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [feedback, setFeedback] = useState("");
 
   const mailHref = useMemo(() => {
     const subject = encodeURIComponent(`Projet SaaS - ${form.company || form.name || "Premier échange"}`);
@@ -28,9 +31,31 @@ export function ContactSection() {
     "Bonjour David, j'aimerais discuter d'un projet SaaS ou d'une mission technique.",
   )}`;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    window.location.href = mailHref;
+    setStatus("loading");
+    setFeedback("");
+
+    try {
+      await contactsApi.create({
+        name: form.name,
+        email: form.email,
+        subject: `Projet SaaS - ${form.company || form.name || "Premier échange"}`,
+        message: [
+          form.company ? `Entreprise: ${form.company}` : "",
+          form.budget ? `Cadre: ${form.budget}` : "",
+          form.message,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+      });
+      setStatus("success");
+      setFeedback("Message envoyé. Je reviens vers vous rapidement.");
+      setForm({ name: "", email: "", company: "", budget: "", message: "" });
+    } catch (error) {
+      setStatus("error");
+      setFeedback(error instanceof Error ? error.message : "Impossible d'envoyer le message.");
+    }
   };
 
   return (
@@ -128,11 +153,16 @@ export function ContactSection() {
           />
         </label>
 
-        <button type="submit">Préparer l&apos;email</button>
+        <button type="submit" disabled={status === "loading"}>
+          {status === "loading" ? "Envoi..." : "Envoyer le brief"}
+        </button>
+
+        {feedback ? <p className={`form-feedback is-${status}`}>{feedback}</p> : null}
 
         <p className="form-note">
-          Le bouton ouvre votre application mail avec un message prérempli. Pour une réponse immédiate, utilisez
-          WhatsApp ou le téléphone.
+          Le message est transmis au backend. Pour une réponse immédiate, utilisez WhatsApp ou le téléphone.
+          <br />
+          <a href={mailHref}>Ouvrir plutôt mon application email</a>
         </p>
       </form>
     </section>

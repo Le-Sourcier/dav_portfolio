@@ -1,20 +1,31 @@
-import Image from "next/image";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import type { BlogPost } from "@/types/blog";
 
 type ArticleHeroProps = {
   post: BlogPost;
   authorInitials: string;
   authorName: string;
+  backHref?: string;
+  backLabel?: string;
+  actions?: ReactNode;
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", {
+const formatDate = (iso: string, locale = "fr") =>
+  new Date(iso).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
 
-export function ArticleHero({ post, authorInitials, authorName }: ArticleHeroProps) {
+export function ArticleHero({
+  post,
+  authorInitials,
+  authorName,
+  backHref,
+  backLabel,
+  actions,
+}: ArticleHeroProps) {
   const chips: { label: string; type?: "author" }[] = [
     { label: authorName, type: "author" },
     { label: post.readTime },
@@ -22,25 +33,32 @@ export function ArticleHero({ post, authorInitials, authorName }: ArticleHeroPro
   if (post.level) {
     chips.push({ label: post.level });
   }
-  chips.push({ label: formatDate(post.date) });
+  chips.push({ label: formatDate(post.date, post.language) });
 
   return (
-    <section className="article-hero-cover" aria-label={post.title}>
+    <section className="article-cover-hero" aria-label={post.title}>
       {post.coverImage ? (
-        <Image
+        <img
           src={post.coverImage}
           alt={post.coverImageAlt ?? post.title}
-          fill
-          sizes="(min-width: 1280px) 1180px, 100vw"
-          priority
-          className="article-hero-cover-img"
+          className="article-cover-hero-img"
         />
       ) : null}
-      <div className="article-hero-cover-veil" aria-hidden="true" />
-      <div className="article-hero-cover-content">
-        <p className="article-hero-cover-kicker">{post.category}</p>
+      <div className="article-cover-overlay" aria-hidden="true" />
+      <div className="article-cover-content">
+        <div className="article-cover-toolbar">
+          <div className="article-cover-toolbar-main">
+            {backHref && backLabel ? (
+              <Link href={backHref} className="article-cover-back-link">
+                {backLabel}
+              </Link>
+            ) : null}
+            <p className="article-cover-kicker">{post.category}</p>
+          </div>
+          {actions ? <div className="article-cover-actions">{actions}</div> : null}
+        </div>
         <h1>{post.title}</h1>
-        <div className="article-hero-cover-chips">
+        <div className="article-cover-meta">
           {chips.map((chip) => (
             <span key={chip.label} className={chip.type === "author" ? "is-author" : undefined}>
               {chip.type === "author" ? <small aria-hidden="true">{authorInitials}</small> : null}
