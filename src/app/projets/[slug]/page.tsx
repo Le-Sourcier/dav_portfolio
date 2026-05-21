@@ -22,6 +22,21 @@ function metricDelta(metric: ProjectMetric) {
   );
 }
 
+function metricUnit(metric: ProjectMetric) {
+  const unit = metric.unit?.trim() ?? "";
+  return unit.toLowerCase() === "n" ? "" : unit;
+}
+
+function metricValue(metric: ProjectMetric, value = metric.value) {
+  const unit = metricUnit(metric);
+  const formatted = new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 1,
+  }).format(value);
+
+  if (!unit) return formatted;
+  return ["%", "x"].includes(unit) ? `${formatted}${unit}` : `${formatted} ${unit}`;
+}
+
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
@@ -107,6 +122,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const projectYear = project.createdAt
     ? new Date(project.createdAt).getFullYear()
     : null;
+  const projectScope = [project.role, project.category].filter(Boolean).join(" · ");
+  const projectStackSignal = project.tech.slice(0, 3).join(" · ");
+  const hasContextHeadline = Boolean(
+    project.headline?.trim() &&
+      project.headline.trim() !== project.description.trim(),
+  );
+  const contextFacts = [
+    ["Périmètre", projectScope],
+    ["Stack", projectStackSignal],
+    ["Signal", project.metric],
+  ].filter(([, value]) => Boolean(value));
+  const hireSubject = encodeURIComponent(`Mission similaire à ${project.name}`);
+  const hireBody = encodeURIComponent(
+    `Bonjour David,\n\nJ'ai consulté l'étude de cas "${project.name}" et je souhaite discuter d'un besoin similaire.\n\nContexte rapide:\nBudget / délai:\nLien ou documentation utile:\n\nMerci.`,
+  );
 
   return (
     <>
@@ -137,25 +167,61 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <section className="case-study-shell">
           <article className="case-story">
-            <section className="case-intro">
-              <span>Contexte</span>
-              <p>{project.description}</p>
+            <section className="case-intro" aria-labelledby="case-context-title">
+              <div className="case-intro-label">
+                <span>Contexte</span>
+                {projectYear ? <small>{projectYear}</small> : null}
+              </div>
+              <div className="case-intro-copy">
+                <h2 id="case-context-title">
+                  {hasContextHeadline ? project.headline : "Point de départ."}
+                </h2>
+                <p>{project.description}</p>
+                {contextFacts.length > 0 ? (
+                  <dl className="case-context-facts">
+                    {contextFacts.map(([label, value]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
+              </div>
             </section>
 
             <section className="case-duo">
               {project.problem ? (
-                <div>
-                  <span>Challenge</span>
-                  <h2>Ce qui bloquait la progression.</h2>
+                <article className="case-duo-card">
+                  <div className="case-duo-top">
+                    <span>Challenge</span>
+                    <small>Avant intervention</small>
+                  </div>
+                  <h2>Blocage identifié.</h2>
                   <p>{project.problem}</p>
-                </div>
+                  <div className="case-duo-signal">
+                    <span>Risque traité</span>
+                    <strong>
+                      {projectScope || "Périmètre produit, données et livraison."}
+                    </strong>
+                  </div>
+                </article>
               ) : null}
               {project.solution ? (
-                <div>
-                  <span>Approche</span>
-                  <h2>La réponse technique livrée.</h2>
+                <article className="case-duo-card is-solution">
+                  <div className="case-duo-top">
+                    <span>Approche</span>
+                    <small>Après livraison</small>
+                  </div>
+                  <h2>Réponse construite.</h2>
                   <p>{project.solution}</p>
-                </div>
+                  <div className="case-duo-signal">
+                    <span>Socle livré</span>
+                    <strong>
+                      {projectStackSignal || "Architecture, interface et mesure."}
+                    </strong>
+                  </div>
+                </article>
               ) : null}
             </section>
 
@@ -176,33 +242,51 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <div className="case-metrics" aria-label="Métriques projet">
                     {project.metrics.map((metric) => {
                       const delta = metricDelta(metric);
-                      const progress = metric.previousValue
+                      const metricMax = Math.max(
+                        metric.value,
+                        metric.previousValue || 0,
+                        1,
+                      );
+                      const progress = Math.min(
+                        100,
+                        Math.max(0, (metric.value / metricMax) * 100),
+                      );
+                      const previousProgress = metric.previousValue
                         ? Math.min(
                             100,
-                            Math.max(
-                              0,
-                              (metric.value /
-                                Math.max(metric.value, metric.previousValue)) *
-                                100,
-                            ),
+                            Math.max(8, (metric.previousValue / metricMax) * 100),
                           )
-                        : 100;
+                        : 0;
                       return (
                         <article key={metric.name}>
-                          <span>{metric.name}</span>
-                          <strong>
-                            {metric.value}
-                            {metric.unit}
-                          </strong>
-                          <div className="case-metric-track" aria-hidden="true">
-                            <i style={{ width: `${progress}%` }} />
+                          <div className="case-metric-head">
+                            <span>{metric.name}</span>
+                            {delta !== null ? (
+                              <small>
+                                {delta > 0 ? "+" : ""}
+                                {delta}% vs avant
+                              </small>
+                            ) : null}
                           </div>
-                          {delta !== null ? (
-                            <small>
-                              {delta > 0 ? "+" : ""}
-                              {delta}% vs avant
-                            </small>
-                          ) : null}
+                          <strong>{metricValue(metric)}</strong>
+                          <div className="case-metric-compare" aria-hidden="true">
+                            {metric.previousValue ? (
+                              <div>
+                                <span>Avant</span>
+                                <i
+                                  style={{
+                                    width: `${previousProgress}%`,
+                                  }}
+                                />
+                                <b>{metricValue(metric, metric.previousValue)}</b>
+                              </div>
+                            ) : null}
+                            <div>
+                              <span>Après</span>
+                              <i className="is-after" style={{ width: `${progress}%` }} />
+                              <b>{metricValue(metric)}</b>
+                            </div>
+                          </div>
                         </article>
                       );
                     })}
@@ -434,6 +518,38 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </a>
             </div>
           </aside>
+        </section>
+
+        <section className="case-hire-cta" aria-labelledby="case-hire-title">
+          <div>
+            <span>Collaboration</span>
+            <h2 id="case-hire-title">
+              Passons d&apos;un besoin flou à un produit livrable.
+            </h2>
+          </div>
+          <div className="case-hire-note">
+            <p>
+              Diagnostic produit, architecture SaaS, backend, interface et
+              automatisations. L&apos;objectif reste simple : livrer une base
+              claire, maintenable et prête à évoluer.
+            </p>
+            <dl>
+              <div>
+                <dt>Format</dt>
+                <dd>CDI, freelance, mission longue</dd>
+              </div>
+              <div>
+                <dt>Focus</dt>
+                <dd>SaaS, API, back-office, automatisation</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="case-hire-actions">
+            <a href={`mailto:${site.email}?subject=${hireSubject}&body=${hireBody}`}>
+              Me confier une mission
+            </a>
+            <a href="/cv/david-logan-cv.pdf">Télécharger le CV</a>
+          </div>
         </section>
       </main>
       <Footer showProjects />
