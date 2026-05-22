@@ -1,5 +1,12 @@
 import { apiClient } from './client';
-import type { BlogPost, BlogPostFormData, BlogComment, BlogStats } from '@/types/admin.types';
+import type {
+  BlogComment,
+  BlogCommentFilters,
+  BlogCommentListResponse,
+  BlogPost,
+  BlogPostFormData,
+  BlogStats,
+} from '@/types/admin.types';
 
 export const blogApi = {
   async getAll(published?: boolean): Promise<BlogPost[]> {
@@ -32,6 +39,28 @@ export const blogApi = {
     data: { author: string; email: string; content: string }
   ): Promise<BlogComment> {
     return apiClient.post<BlogComment>(`/blog/${postId}/comments`, data);
+  },
+
+  async getComments(filters: BlogCommentFilters = {}): Promise<BlogCommentListResponse> {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== '' && value !== false) {
+        params.set(key, String(value));
+      }
+    });
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return apiClient.get<BlogCommentListResponse>(`/blog/comments${query}`);
+  },
+
+  async getCommentThread(commentId: string): Promise<BlogComment> {
+    return apiClient.get<BlogComment>(`/blog/comments/${commentId}/thread`);
+  },
+
+  async replyToComment(
+    commentId: string,
+    data: { author: string; email: string; content: string; mentions?: string[] }
+  ): Promise<BlogComment> {
+    return apiClient.post<BlogComment>(`/blog/comments/${commentId}/replies`, data);
   },
 
   async deleteComment(commentId: string): Promise<void> {

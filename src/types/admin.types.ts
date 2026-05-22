@@ -190,6 +190,7 @@ export interface BlogComment {
   mentions?: string[];
   createdAt: string;
   replies?: BlogComment[];
+  BlogPost?: Pick<BlogPost, "id" | "title" | "slug">;
 }
 
 export interface BlogPost {
@@ -236,6 +237,21 @@ export interface BlogStats {
     BlogPost,
     "id" | "title" | "slug" | "viewCount" | "shareCount"
   >[];
+}
+
+export interface BlogCommentFilters {
+  page?: number;
+  limit?: number;
+  postId?: string;
+  search?: string;
+  mentioned?: string;
+  parentOnly?: boolean;
+  sort?: "recent" | "oldest";
+}
+
+export interface BlogCommentListResponse {
+  comments: BlogComment[];
+  pagination: PaginationMeta;
 }
 
 // ========================

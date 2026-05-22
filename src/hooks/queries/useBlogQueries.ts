@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { blogApi } from '@/services/api';
-import type { BlogPost, BlogPostFormData } from '@/types/admin.types';
+import type { BlogCommentFilters, BlogPost, BlogPostFormData } from '@/types/admin.types';
 
 // Query Keys
 export const blogKeys = {
@@ -12,6 +12,8 @@ export const blogKeys = {
   detail: (id: string) => [...blogKeys.details(), id] as const,
   bySlug: (slug: string) => [...blogKeys.all, 'slug', slug] as const,
   stats: () => [...blogKeys.all, 'stats'] as const,
+  comments: (filters: BlogCommentFilters) => [...blogKeys.all, 'comments', filters] as const,
+  commentThread: (id: string) => [...blogKeys.all, 'comment-thread', id] as const,
 };
 
 // Get All Posts
@@ -119,14 +121,51 @@ export function useAddComment() {
   });
 }
 
+export function useBlogComments(filters: BlogCommentFilters) {
+  return useQuery({
+    queryKey: blogKeys.comments(filters),
+    queryFn: () => blogApi.getComments(filters),
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useBlogCommentThread(commentId: string) {
+  return useQuery({
+    queryKey: blogKeys.commentThread(commentId),
+    queryFn: () => blogApi.getCommentThread(commentId),
+    enabled: !!commentId,
+  });
+}
+
+export function useReplyToBlogComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      commentId,
+      data,
+    }: {
+      commentId: string;
+      data: { author: string; email: string; content: string; mentions?: string[] };
+    }) => blogApi.replyToComment(commentId, data),
+    onSuccess: (_, { commentId }) => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.all });
+      queryClient.invalidateQueries({ queryKey: blogKeys.commentThread(commentId) });
+      toast.success('Reponse envoyee');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de l\'envoi de la reponse');
+    },
+  });
+}
+
 export function useDeleteBlogComment() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) => blogApi.deleteComment(commentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: blogKeys.details() });
+      queryClient.invalidateQueries({ queryKey: blogKeys.all });
       toast.success('Commentaire supprime');
     },
     onError: (error: Error) => {

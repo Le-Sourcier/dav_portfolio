@@ -5,6 +5,7 @@ export { ExperiencesPage } from './ExperiencesPage';
 export { ExperienceEditorPage } from './ExperienceEditorPage';
 export { BlogPage } from './BlogPage';
 export { BlogEditorPage } from './BlogEditorPage';
+export { CommentsPage } from './CommentsPage';
 export { ContactsPage } from './ContactsPage';
 export { AppointmentsPage } from './AppointmentsPage';
 export { TestimonialsPage } from './TestimonialsPage';

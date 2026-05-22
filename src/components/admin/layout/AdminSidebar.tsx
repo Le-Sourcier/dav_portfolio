@@ -4,6 +4,7 @@ import {
   FolderKanban,
   Newspaper,
   MessageSquare,
+  MessageSquareText,
   CalendarDays,
   Mail,
   Star,
@@ -33,6 +34,7 @@ const navSections = [
     label: 'Communication',
     items: [
       { id: 'contacts', label: 'Messages', icon: MessageSquare },
+      { id: 'comments', label: 'Commentaires', icon: MessageSquareText },
       { id: 'appointments', label: 'Rendez-vous', icon: CalendarDays },
       { id: 'testimonials', label: 'Temoignages', icon: Star },
       { id: 'newsletter', label: 'Newsletter', icon: Mail },

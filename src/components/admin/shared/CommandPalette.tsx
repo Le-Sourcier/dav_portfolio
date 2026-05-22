@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, X, LayoutDashboard, FolderKanban, Briefcase,
   Newspaper, MessageSquare, CalendarDays, Star, Mail,
-  Settings, Plus, ArrowRight, Hash, FileText, User,
+  Settings, Plus, ArrowRight, Hash, FileText, User, MessageSquareText,
   Lock, Palette, Globe, CornerDownLeft,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
@@ -30,6 +30,7 @@ function getNavigationItems(setActiveTab: (tab: string) => void): SearchResult[]
     { id: 'nav-projects', label: 'Projets', description: 'Gestion des projets', icon: FolderKanban, category: 'Navigation', action: () => setActiveTab('projects') },
     { id: 'nav-experiences', label: 'Experiences', description: 'Parcours professionnel', icon: Briefcase, category: 'Navigation', action: () => setActiveTab('experiences') },
     { id: 'nav-blog', label: 'Blog', description: 'Articles & publications', icon: Newspaper, category: 'Navigation', action: () => setActiveTab('blog') },
+    { id: 'nav-comments', label: 'Commentaires', description: 'Moderation blog', icon: MessageSquareText, category: 'Navigation', action: () => setActiveTab('comments') },
     { id: 'nav-contacts', label: 'Messages', description: 'Boite de reception', icon: MessageSquare, category: 'Navigation', action: () => setActiveTab('contacts') },
     { id: 'nav-appointments', label: 'Rendez-vous', description: 'Planning', icon: CalendarDays, category: 'Navigation', action: () => setActiveTab('appointments') },
     { id: 'nav-testimonials', label: 'Temoignages', description: 'Avis clients', icon: Star, category: 'Navigation', action: () => setActiveTab('testimonials') },

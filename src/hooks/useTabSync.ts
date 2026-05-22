@@ -4,7 +4,7 @@ import { useUIStore } from '@/stores/uiStore';
 
 const VALID_TABS = [
   'dashboard', 'projects', 'experiences', 'blog',
-  'contacts', 'appointments', 'testimonials', 'newsletter', 'settings',
+  'comments', 'contacts', 'appointments', 'testimonials', 'newsletter', 'settings',
 ];
 
 /**
@@ -39,6 +39,10 @@ export function useTabSync() {
         searchParams.delete('tab');
       } else {
         searchParams.set('tab', activeTab);
+      }
+      if (activeTab !== 'comments') {
+        searchParams.delete('postId');
+        searchParams.delete('commentId');
       }
       setSearchParams(searchParams, { replace: true });
     }
