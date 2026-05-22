@@ -11,6 +11,12 @@ import {
   getCommentThread,
   replyToComment,
   deleteComment,
+  getTags,
+  getTagBySlug,
+  createTag,
+  updateTag,
+  deleteTag,
+  getTagStats,
   trackView,
   trackShare,
   getBlogStats,
@@ -25,6 +31,9 @@ import {
   createCommentValidator,
   commentIdValidator,
   adminReplyValidator,
+  blogTagIdValidator,
+  createBlogTagValidator,
+  updateBlogTagValidator,
 } from '../validators/blog.validator.js';
 import { commentLimiter, trackingLimiter } from '../middlewares/rateLimit.middleware.js';
 import { requireVisitorAuth, matchVisitorEmail } from '../middlewares/visitorAuth.middleware.js';
@@ -60,6 +69,14 @@ router.post('/comments/:commentId/replies', authMiddleware, adminMiddleware, val
 
 // DELETE /api/blog/comments/:commentId -- remove a comment/reply (admin)
 router.delete('/comments/:commentId', authMiddleware, adminMiddleware, validate(commentIdValidator), deleteComment);
+
+// Tags taxonomy
+router.get('/tags', getTags);
+router.get('/tags/stats', authMiddleware, adminMiddleware, getTagStats);
+router.get('/tags/slug/:slug', validate(blogSlugValidator), getTagBySlug);
+router.post('/tags', authMiddleware, adminMiddleware, validate(createBlogTagValidator), createTag);
+router.put('/tags/:tagId', authMiddleware, adminMiddleware, validate(updateBlogTagValidator), updateTag);
+router.delete('/tags/:tagId', authMiddleware, adminMiddleware, validate(blogTagIdValidator), deleteTag);
 
 /**
  * @swagger

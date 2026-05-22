@@ -7,7 +7,7 @@ import {
 import crypto from "crypto";
 import { sequelize } from "../config/database.js";
 import { config } from "../config/index.js";
-import { IBlogPost, IBlogComment } from "../types/entities.types.js";
+import { IBlogPost, IBlogComment, IBlogTag } from "../types/entities.types.js";
 
 // Comment model
 interface CommentCreationAttributes extends Optional<
@@ -98,6 +98,8 @@ class BlogPost
   declare viewCount: number;
   declare shareCount: number;
   declare tags?: string[];
+  declare tagIds?: string[];
+  declare blogTags?: IBlogTag[];
   declare comments?: IBlogComment[];
   declare title_en?: string;
   declare excerpt_en?: string;
@@ -179,6 +181,92 @@ BlogPost.init(
   },
 );
 
+// BlogTag model
+interface BlogTagCreationAttributes extends Optional<
+  IBlogTag,
+  "id" | "slug" | "description" | "color" | "isVisible" | "createdAt" | "updatedAt"
+> {}
+
+export class BlogTag
+  extends Model<IBlogTag, BlogTagCreationAttributes>
+  implements IBlogTag
+{
+  declare id: string;
+  declare name: string;
+  declare slug: string;
+  declare description: string | null;
+  declare color: string | null;
+  declare isVisible: boolean;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+}
+
+BlogTag.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING(80),
+      allowNull: false,
+      unique: true,
+    },
+    slug: {
+      type: DataTypes.STRING(120),
+      allowNull: false,
+      unique: true,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    color: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: "BlogTag",
+    tableName: "blog_tags",
+    indexes: [{ unique: true, fields: ["slug"] }],
+  },
+);
+
+export class BlogPostTag extends Model {
+  declare postId: string;
+  declare tagId: string;
+}
+
+BlogPostTag.init(
+  {
+    postId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+    },
+    tagId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: "BlogPostTag",
+    tableName: "blog_post_tags",
+    timestamps: false,
+    indexes: [{ fields: ["post_id"] }, { fields: ["tag_id"] }],
+  },
+);
+
 // ======================== BlogView model (dedup unique views) ========================
 
 export class BlogView extends Model {
@@ -255,5 +343,17 @@ BlogPost.hasMany(Comment, { foreignKey: "postId", as: "comments" });
 Comment.belongsTo(BlogPost, { foreignKey: "postId" });
 BlogPost.hasMany(BlogView, { foreignKey: "postId", as: "views" });
 BlogView.belongsTo(BlogPost, { foreignKey: "postId" });
+BlogPost.belongsToMany(BlogTag, {
+  through: BlogPostTag,
+  foreignKey: "postId",
+  otherKey: "tagId",
+  as: "blogTags",
+});
+BlogTag.belongsToMany(BlogPost, {
+  through: BlogPostTag,
+  foreignKey: "tagId",
+  otherKey: "postId",
+  as: "posts",
+});
 
 export default BlogPost;

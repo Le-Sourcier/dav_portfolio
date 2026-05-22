@@ -44,6 +44,14 @@ export const createBlogPostValidator = [
     .trim()
     .isLength({ max: 60 })
     .withMessage('Each tag must be less than 60 characters'),
+  body('tagIds')
+    .optional()
+    .isArray()
+    .withMessage('Tag IDs must be an array'),
+  body('tagIds.*')
+    .optional()
+    .isUUID()
+    .withMessage('Invalid tag ID'),
 ];
 
 export const updateBlogPostValidator = [
@@ -74,6 +82,14 @@ export const updateBlogPostValidator = [
     .trim()
     .isLength({ max: 60 })
     .withMessage('Each tag must be less than 60 characters'),
+  body('tagIds')
+    .optional()
+    .isArray()
+    .withMessage('Tag IDs must be an array'),
+  body('tagIds.*')
+    .optional()
+    .isUUID()
+    .withMessage('Invalid tag ID'),
 ];
 
 export const blogPostIdValidator = [
@@ -154,4 +170,64 @@ export const adminReplyValidator = [
     .trim()
     .isLength({ max: 100 })
     .withMessage('Each mention must be less than 100 characters'),
+];
+
+export const blogTagIdValidator = [
+  param('tagId')
+    .isUUID()
+    .withMessage('Invalid tag ID'),
+];
+
+export const createBlogTagValidator = [
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('Tag name is required')
+    .isLength({ max: 80 })
+    .withMessage('Tag name must be less than 80 characters'),
+  body('slug')
+    .optional()
+    .trim()
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .withMessage('Invalid tag slug'),
+  body('description')
+    .optional({ nullable: true })
+    .trim(),
+  body('color')
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 32 })
+    .withMessage('Color must be less than 32 characters'),
+  body('isVisible')
+    .optional()
+    .isBoolean()
+    .withMessage('Visibility must be a boolean'),
+];
+
+export const updateBlogTagValidator = [
+  ...blogTagIdValidator,
+  body('name')
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('Tag name cannot be empty')
+    .isLength({ max: 80 })
+    .withMessage('Tag name must be less than 80 characters'),
+  body('slug')
+    .optional()
+    .trim()
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .withMessage('Invalid tag slug'),
+  body('description')
+    .optional({ nullable: true })
+    .trim(),
+  body('color')
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 32 })
+    .withMessage('Color must be less than 32 characters'),
+  body('isVisible')
+    .optional()
+    .isBoolean()
+    .withMessage('Visibility must be a boolean'),
 ];

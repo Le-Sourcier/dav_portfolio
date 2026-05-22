@@ -133,6 +133,61 @@ export const deleteComment = async (req: Request<{ commentId: string }>, res: Re
   }
 };
 
+export const getTags = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const isAdmin = isValidAdminToken(req);
+    const tags = await blogService.findTags(isAdmin);
+    sendSuccess(res, tags, 'Blog tags retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTagBySlug = async (req: Request<{ slug: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const tag = await blogService.findTagBySlug(req.params.slug);
+    sendSuccess(res, tag, 'Blog tag retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createTag = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const tag = await blogService.createTag(req.body);
+    sendCreated(res, tag, 'Blog tag created successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateTag = async (req: Request<{ tagId: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const tag = await blogService.updateTag(req.params.tagId, req.body);
+    sendSuccess(res, tag, 'Blog tag updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteTag = async (req: Request<{ tagId: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    await blogService.deleteTag(req.params.tagId);
+    sendSuccess(res, null, 'Blog tag deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTagStats = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const stats = await blogService.getTagStats();
+    sendSuccess(res, stats, 'Blog tag stats retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const trackView = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
@@ -164,4 +219,25 @@ export const getBlogStats = async (_req: Request, res: Response, next: NextFunct
   }
 };
 
-export default { getAllPosts, getPostById, getPostBySlug, createPost, updatePost, deletePost, addComment, getComments, getCommentThread, replyToComment, deleteComment, trackView, trackShare, getBlogStats };
+export default {
+  getAllPosts,
+  getPostById,
+  getPostBySlug,
+  createPost,
+  updatePost,
+  deletePost,
+  addComment,
+  getComments,
+  getCommentThread,
+  replyToComment,
+  deleteComment,
+  getTags,
+  getTagBySlug,
+  createTag,
+  updateTag,
+  deleteTag,
+  getTagStats,
+  trackView,
+  trackShare,
+  getBlogStats,
+};

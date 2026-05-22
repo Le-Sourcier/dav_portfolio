@@ -10,6 +10,7 @@ import testimonialRoutes from './testimonial.routes.js';
 import chatbotRoutes from './chatbot.routes.js';
 import settingsRoutes from './settings.routes.js';
 import visitorRoutes from './visitor.routes.js';
+import analyticsRoutes from './analytics.routes.js';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/newsletter', newsletterRoutes);
 router.use('/testimonials', testimonialRoutes);
 router.use('/chatbot', chatbotRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/analytics', analyticsRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

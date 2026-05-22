@@ -1,5 +1,5 @@
-import BlogPost, { Comment, BlogView } from '../models/BlogPost.js';
-import { IBlogPost, IBlogComment } from '../types/entities.types.js';
+import BlogPost, { Comment, BlogView, BlogTag, BlogPostTag } from '../models/BlogPost.js';
+import { IBlogPost, IBlogComment, IBlogTag } from '../types/entities.types.js';
 import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
 import { generateSlug, calculateReadTime } from '../utils/helpers.js';
@@ -26,19 +26,28 @@ type CommentListResult = {
 };
 
 class BlogService {
+  private postIncludes() {
+    return [
+      {
+        model: BlogTag,
+        as: 'blogTags',
+        through: { attributes: [] },
+      },
+      {
+        model: Comment,
+        as: 'comments',
+        where: { parentId: null },
+        required: false,
+        include: [{ model: Comment, as: 'replies' }],
+      },
+    ];
+  }
+
   async findAll(published?: boolean): Promise<IBlogPost[]> {
     const where = published !== undefined ? { published } : {};
     const posts = await BlogPost.findAll({
       where,
-      include: [
-        {
-          model: Comment,
-          as: 'comments',
-          where: { parentId: null },
-          required: false,
-          include: [{ model: Comment, as: 'replies' }],
-        },
-      ],
+      include: this.postIncludes(),
       order: [['createdAt', 'DESC']],
     });
     return posts;
@@ -49,15 +58,7 @@ class BlogService {
     if (publishedOnly) where.published = true;
     const post = await BlogPost.findOne({
       where,
-      include: [
-        {
-          model: Comment,
-          as: 'comments',
-          where: { parentId: null },
-          required: false,
-          include: [{ model: Comment, as: 'replies' }],
-        },
-      ],
+      include: this.postIncludes(),
     });
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
@@ -68,16 +69,7 @@ class BlogService {
   async findBySlug(slug: string): Promise<IBlogPost> {
     const post = await BlogPost.findOne({
       where: { slug, published: true },
-      include: [
-        {
-          model: Comment,
-          as: "comments",
-          where: { parentId: null },
-          required: false,
-          include: [{ model: Comment, as: "replies" }],
-          order: [["createdAt", "ASC"]],
-        },
-      ],
+      include: this.postIncludes(),
     });
     if (!post) {
       throw new AppError("Blog post not found", HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
@@ -86,6 +78,7 @@ class BlogService {
   }
 
   async create(data: Omit<IBlogPost, 'id' | 'slug' | 'readTime' | 'createdAt' | 'updatedAt'>): Promise<IBlogPost> {
+    const { tagIds, tags, ...postData } = data;
     const slug = generateSlug(data.title);
     const readTime = calculateReadTime(data.content);
 
@@ -94,11 +87,13 @@ class BlogService {
     const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
 
     const post = await BlogPost.create({
-      ...data,
+      ...postData,
+      tags,
       slug: finalSlug,
       readTime,
     });
-    return post;
+    await this.syncPostTags(post, tagIds, tags);
+    return this.findById(post.id);
   }
 
   async update(id: string, data: Partial<IBlogPost>): Promise<IBlogPost> {
@@ -108,7 +103,8 @@ class BlogService {
     }
 
     // Update slug if title changes
-    const updateData: Partial<IBlogPost> = { ...data };
+    const { tagIds, tags, ...rest } = data;
+    const updateData: Partial<IBlogPost> = { ...rest, ...(tags ? { tags } : {}) };
     if (data.title && data.title !== post.title) {
       updateData.slug = generateSlug(data.title);
     }
@@ -119,7 +115,8 @@ class BlogService {
     }
 
     await post.update(updateData);
-    return post;
+    await this.syncPostTags(post, tagIds, tags);
+    return this.findById(id);
   }
 
   async delete(id: string): Promise<void> {
@@ -258,10 +255,112 @@ class BlogService {
   async findByCategory(category: string): Promise<IBlogPost[]> {
     const posts = await BlogPost.findAll({
       where: { category, published: true },
-      include: [{ model: Comment, as: 'comments' }],
+      include: this.postIncludes(),
       order: [['createdAt', 'DESC']],
     });
     return posts;
+  }
+
+  async findTags(includeHidden = false): Promise<IBlogTag[]> {
+    const tags = await BlogTag.findAll({
+      where: includeHidden ? {} : { isVisible: true },
+      order: [['name', 'ASC']],
+    });
+    return Promise.all(tags.map((tag) => this.withTagStats(tag)));
+  }
+
+  async findTagBySlug(slug: string): Promise<IBlogTag & { posts: IBlogPost[] }> {
+    const tag = await BlogTag.findOne({
+      where: { slug, isVisible: true },
+      include: [{
+        model: BlogPost,
+        as: 'posts',
+        where: { published: true },
+        required: false,
+        through: { attributes: [] },
+        include: [{ model: BlogTag, as: 'blogTags', through: { attributes: [] } }],
+      }],
+    });
+    if (!tag) {
+      throw new AppError('Blog tag not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    const withStats = await this.withTagStats(tag);
+    return { ...withStats, posts: ((tag as any).posts || []) as IBlogPost[] };
+  }
+
+  async createTag(data: Partial<IBlogTag>): Promise<IBlogTag> {
+    if (!data.name?.trim()) {
+      throw new AppError('Tag name is required', HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR);
+    }
+    const slug = data.slug?.trim() || generateSlug(data.name);
+    const tag = await BlogTag.create({
+      name: data.name.trim(),
+      slug,
+      description: data.description?.trim() || null,
+      color: data.color?.trim() || null,
+      isVisible: data.isVisible ?? true,
+    });
+    return this.withTagStats(tag);
+  }
+
+  async updateTag(id: string, data: Partial<IBlogTag>): Promise<IBlogTag> {
+    const tag = await BlogTag.findByPk(id);
+    if (!tag) {
+      throw new AppError('Blog tag not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    await tag.update({
+      ...(data.name !== undefined ? { name: data.name.trim() } : {}),
+      ...(data.slug !== undefined ? { slug: data.slug.trim() || generateSlug(data.name || tag.name) } : {}),
+      ...(data.description !== undefined ? { description: data.description?.trim() || null } : {}),
+      ...(data.color !== undefined ? { color: data.color?.trim() || null } : {}),
+      ...(data.isVisible !== undefined ? { isVisible: data.isVisible } : {}),
+    });
+    return this.withTagStats(tag);
+  }
+
+  async deleteTag(id: string): Promise<void> {
+    const tag = await BlogTag.findByPk(id);
+    if (!tag) {
+      throw new AppError('Blog tag not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    await BlogPostTag.destroy({ where: { tagId: id } });
+    await tag.destroy();
+  }
+
+  async getTagStats(): Promise<IBlogTag[]> {
+    const tags = await BlogTag.findAll({ order: [['name', 'ASC']] });
+    return Promise.all(tags.map((tag) => this.withTagStats(tag)));
+  }
+
+  private async syncPostTags(post: BlogPost, tagIds?: string[], tagNames?: string[]): Promise<void> {
+    if (!tagIds && !tagNames) return;
+    const ids = new Set<string>(tagIds?.filter(Boolean) || []);
+
+    for (const name of tagNames || []) {
+      const cleanName = name.trim();
+      if (!cleanName) continue;
+      const slug = generateSlug(cleanName);
+      const [tag] = await BlogTag.findOrCreate({
+        where: { slug },
+        defaults: { name: cleanName, slug, isVisible: true },
+      });
+      ids.add(tag.id);
+    }
+
+    await (post as any).setBlogTags(Array.from(ids));
+  }
+
+  private async withTagStats(tag: BlogTag): Promise<IBlogTag> {
+    const posts = await (tag as any).getPosts({ joinTableAttributes: [] }) as BlogPost[];
+    const postIds = posts.map((post) => post.id);
+    const commentsCount = postIds.length ? await Comment.count({ where: { postId: postIds } }) : 0;
+    return {
+      ...tag.toJSON(),
+      postsCount: posts.length,
+      viewsCount: posts.reduce((sum, post) => sum + (post.viewCount || 0), 0),
+      sharesCount: posts.reduce((sum, post) => sum + (post.shareCount || 0), 0),
+      commentsCount,
+    } as IBlogTag;
   }
 
   async incrementView(id: string, ip: string, userAgent: string): Promise<{ unique: boolean }> {

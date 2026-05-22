@@ -138,10 +138,27 @@ export interface IBlogPost {
   viewCount: number;
   shareCount: number;
   tags?: string[];
+  tagIds?: string[];
+  blogTags?: IBlogTag[];
   title_en?: string;
   excerpt_en?: string;
   content_en?: string;
   comments?: IBlogComment[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IBlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  color?: string | null;
+  isVisible: boolean;
+  postsCount?: number;
+  viewsCount?: number;
+  sharesCount?: number;
+  commentsCount?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

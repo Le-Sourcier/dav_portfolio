@@ -19,8 +19,46 @@ const sequelize = new Sequelize(
   }
 );
 
+export const createDatabaseIfMissing = async (): Promise<void> => {
+  const databaseName = config.database.name;
+  if (!/^[a-zA-Z0-9_-]+$/.test(databaseName)) {
+    throw new Error(`Unsafe database name: ${databaseName}`);
+  }
+
+  const adminSequelize = new Sequelize(
+    'postgres',
+    config.database.username,
+    config.database.password,
+    {
+      host: config.database.host,
+      port: config.database.port,
+      dialect: config.database.dialect,
+      logging: false,
+    }
+  );
+
+  try {
+    await adminSequelize.authenticate();
+    const [rows] = await adminSequelize.query(
+      'SELECT 1 FROM pg_database WHERE datname = :databaseName',
+      { replacements: { databaseName } }
+    );
+
+    if (Array.isArray(rows) && rows.length === 0) {
+      await adminSequelize.query(`CREATE DATABASE "${databaseName}"`);
+      logger.info(`Database "${databaseName}" created`);
+    }
+  } finally {
+    await adminSequelize.close();
+  }
+};
+
 export const connectDatabase = async (): Promise<void> => {
   try {
+    if (process.env.DB_AUTO_CREATE === 'true') {
+      await createDatabaseIfMissing();
+    }
+
     await sequelize.authenticate();
     logger.info('Database connection established successfully');
 

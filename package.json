@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "db:migrate": "tsx scripts/migrate.ts",
+    "db:setup": "tsx scripts/setup-database.ts",
+    "db:admin": "tsx scripts/sync-admin.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:seed:experiences": "tsx scripts/seed-experiences-only.ts"
   },
