@@ -1,16 +1,24 @@
 import { useState, useCallback } from 'react';
 import {
-  ArrowLeft, Save, Loader2, CheckCircle2, Send,
+  ArrowLeft, Loader2, CheckCircle2, Send,
   Plus, Trash2, Image, Trophy, ExternalLink,
   Building2, MapPin, Calendar, Briefcase, Cpu,
-  AlertCircle, ChevronRight, Layers,
+  AlertCircle, ChevronRight, Layers, BarChart3,
 } from 'lucide-react';
 import { useCreateExperience, useUpdateExperience } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
 import { LangToggle } from '@/components/admin/shared/LangToggle';
-import type { Experience, ExperienceFormData, ExperienceAchievement, ExperienceLink } from '@/types/admin.types';
+import type {
+  DiagramConnection,
+  DiagramNode,
+  Experience,
+  ExperienceAchievement,
+  ExperienceFormData,
+  ExperienceLink,
+  ImpactData,
+} from '@/types/admin.types';
 
 // ======================== PROPS ========================
 
@@ -29,10 +37,13 @@ const defaultForm: ExperienceFormData = {
   description: '',
   details: [''],
   coverImage: '',
+  illustrativeImages: [''],
   stack: [''],
   challenges: [''],
   achievements: [{ title: '', description: '' }],
   links: [{ label: '', url: '' }],
+  solutionDiagram: { nodes: [], connections: [] },
+  impactGraph: [{ label: '', value: 0 }],
 };
 
 // ======================== COMPONENT ========================
@@ -56,11 +67,13 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
       description_en: initialData.description_en || '',
       details: initialData.details?.length ? initialData.details : [''],
       coverImage: initialData.coverImage || '',
-      illustrativeImages: initialData.illustrativeImages || [],
+      illustrativeImages: initialData.illustrativeImages?.length ? initialData.illustrativeImages : [''],
       stack: initialData.stack?.length ? initialData.stack : [''],
       challenges: initialData.challenges?.length ? initialData.challenges : [''],
       achievements: initialData.achievements?.length ? initialData.achievements : [{ title: '', description: '' }],
       links: initialData.links?.length ? initialData.links : [{ label: '', url: '' }],
+      solutionDiagram: initialData.solutionDiagram || { nodes: [], connections: [] },
+      impactGraph: initialData.impactGraph?.length ? initialData.impactGraph : [{ label: '', value: 0 }],
     };
   });
 
@@ -70,7 +83,7 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
     setForm(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleArrayChange = useCallback((field: 'stack' | 'challenges' | 'details', index: number, value: string) => {
+  const handleArrayChange = useCallback((field: 'stack' | 'challenges' | 'details' | 'illustrativeImages', index: number, value: string) => {
     setForm(prev => {
       const arr = [...(prev[field] || [])];
       arr[index] = value;
@@ -78,11 +91,11 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
     });
   }, []);
 
-  const addArrayItem = useCallback((field: 'stack' | 'challenges' | 'details') => {
+  const addArrayItem = useCallback((field: 'stack' | 'challenges' | 'details' | 'illustrativeImages') => {
     setForm(prev => ({ ...prev, [field]: [...(prev[field] || []), ''] }));
   }, []);
 
-  const removeArrayItem = useCallback((field: 'stack' | 'challenges' | 'details', index: number) => {
+  const removeArrayItem = useCallback((field: 'stack' | 'challenges' | 'details' | 'illustrativeImages', index: number) => {
     setForm(prev => ({
       ...prev,
       [field]: (prev[field] || []).filter((_, i) => i !== index),
@@ -110,6 +123,98 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
       ...prev,
       achievements: (prev.achievements || []).filter((_, i) => i !== index),
     }));
+  }, []);
+
+  const handleImpactChange = useCallback((index: number, field: keyof ImpactData, value: string | number) => {
+    setForm(prev => {
+      const impactGraph = [...(prev.impactGraph || [])];
+      impactGraph[index] = { ...impactGraph[index], [field]: value };
+      return { ...prev, impactGraph };
+    });
+  }, []);
+
+  const addImpact = useCallback(() => {
+    setForm(prev => ({
+      ...prev,
+      impactGraph: [...(prev.impactGraph || []), { label: '', value: 0 }],
+    }));
+  }, []);
+
+  const removeImpact = useCallback((index: number) => {
+    setForm(prev => ({
+      ...prev,
+      impactGraph: (prev.impactGraph || []).filter((_, i) => i !== index),
+    }));
+  }, []);
+
+  const handleDiagramNodeChange = useCallback((index: number, field: keyof DiagramNode, value: string) => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      const nodes = [...(current.nodes || [])];
+      nodes[index] = { ...nodes[index], [field]: value } as DiagramNode;
+      return { ...prev, solutionDiagram: { ...current, nodes } };
+    });
+  }, []);
+
+  const addDiagramNode = useCallback(() => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      return {
+        ...prev,
+        solutionDiagram: {
+          ...current,
+          nodes: [...(current.nodes || []), { id: '', label: '', type: 'service' }],
+        },
+      };
+    });
+  }, []);
+
+  const removeDiagramNode = useCallback((index: number) => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      return {
+        ...prev,
+        solutionDiagram: {
+          ...current,
+          nodes: (current.nodes || []).filter((_, i) => i !== index),
+        },
+      };
+    });
+  }, []);
+
+  const handleDiagramConnectionChange = useCallback((index: number, field: keyof DiagramConnection, value: string) => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      const connections = [...(current.connections || [])];
+      connections[index] = { ...connections[index], [field]: value };
+      return { ...prev, solutionDiagram: { ...current, connections } };
+    });
+  }, []);
+
+  const addDiagramConnection = useCallback(() => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      return {
+        ...prev,
+        solutionDiagram: {
+          ...current,
+          connections: [...(current.connections || []), { from: '', to: '', label: '' }],
+        },
+      };
+    });
+  }, []);
+
+  const removeDiagramConnection = useCallback((index: number) => {
+    setForm(prev => {
+      const current = prev.solutionDiagram || { nodes: [], connections: [] };
+      return {
+        ...prev,
+        solutionDiagram: {
+          ...current,
+          connections: (current.connections || []).filter((_, i) => i !== index),
+        },
+      };
+    });
   }, []);
 
   // Links
@@ -167,6 +272,9 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
     const details = form.details?.filter(d => d.trim()) || [];
     if (details.length) cleaned.details = details;
 
+    const illustrativeImages = form.illustrativeImages?.filter(img => img.trim()) || [];
+    if (illustrativeImages.length) cleaned.illustrativeImages = illustrativeImages;
+
     const stack = form.stack?.filter(s => s.trim()) || [];
     if (stack.length) cleaned.stack = stack;
 
@@ -178,6 +286,18 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
 
     const links = (form.links || []).filter(l => l.label.trim() && l.url.trim());
     if (links.length) cleaned.links = links;
+
+    const impactGraph = (form.impactGraph || []).filter(item => item.label.trim());
+    if (impactGraph.length) cleaned.impactGraph = impactGraph;
+
+    const diagramNodes = (form.solutionDiagram?.nodes || []).filter(node => node.id.trim() && node.label.trim());
+    const diagramConnections = (form.solutionDiagram?.connections || []).filter(connection => connection.from.trim() && connection.to.trim());
+    if (diagramNodes.length || diagramConnections.length) {
+      cleaned.solutionDiagram = {
+        nodes: diagramNodes,
+        connections: diagramConnections,
+      };
+    }
 
     const options = {
       onSuccess: () => {
@@ -336,6 +456,16 @@ export function ExperienceEditorPage({ initialData, onBack }: ExperienceEditorPa
             )}
           </div>
 
+          <DynamicListSection
+            label="Images illustratives"
+            icon={<Image className="w-3 h-3" />}
+            items={form.illustrativeImages || ['']}
+            placeholder="URL d'une image supplementaire..."
+            onAdd={() => addArrayItem('illustrativeImages')}
+            onChange={(i, v) => handleArrayChange('illustrativeImages', i, v)}
+            onRemove={i => removeArrayItem('illustrativeImages', i)}
+          />
+
           {/* Description (Markdown Editor) */}
           {lang === 'fr' ? (
             <MarkdownEditor
@@ -422,12 +552,133 @@ api.listen(3000);
                       placeholder="Description..."
                       className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                     />
+                    <input
+                      value={ach.icon || ''}
+                      onChange={e => handleAchievementChange(i, 'icon', e.target.value)}
+                      placeholder="Icone optionnelle"
+                      className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 sm:col-span-2"
+                    />
                   </div>
                   <button onClick={() => removeAchievement(i)} className="p-1.5 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
+                <BarChart3 className="w-3 h-3" />
+                Graph d'impact
+              </label>
+              <button onClick={addImpact} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.impactGraph || []).map((item, i) => (
+                <div key={i} className="flex gap-1.5 items-center">
+                  <input
+                    value={item.label}
+                    onChange={e => handleImpactChange(i, 'label', e.target.value)}
+                    placeholder="Label"
+                    className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                  />
+                  <input
+                    type="number"
+                    value={item.value}
+                    onChange={e => handleImpactChange(i, 'value', Number(e.target.value))}
+                    placeholder="0"
+                    className="w-20 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center"
+                  />
+                  <button onClick={() => removeImpact(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                Diagramme de solution
+              </label>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">Noeuds</span>
+                <button onClick={addDiagramNode} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(form.solutionDiagram?.nodes || []).map((node, i) => (
+                  <div key={i} className="flex gap-1.5 items-center">
+                    <input
+                      value={node.id}
+                      onChange={e => handleDiagramNodeChange(i, 'id', e.target.value)}
+                      placeholder="id"
+                      className="w-24 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] font-mono outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={node.label}
+                      onChange={e => handleDiagramNodeChange(i, 'label', e.target.value)}
+                      placeholder="Label"
+                      className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={node.type}
+                      onChange={e => handleDiagramNodeChange(i, 'type', e.target.value)}
+                      placeholder="service"
+                      className="w-28 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    />
+                    <button onClick={() => removeDiagramNode(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">Connexions</span>
+                <button onClick={addDiagramConnection} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(form.solutionDiagram?.connections || []).map((connection, i) => (
+                  <div key={i} className="flex gap-1.5 items-center">
+                    <input
+                      value={connection.from}
+                      onChange={e => handleDiagramConnectionChange(i, 'from', e.target.value)}
+                      placeholder="from"
+                      className="w-24 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] font-mono outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={connection.to}
+                      onChange={e => handleDiagramConnectionChange(i, 'to', e.target.value)}
+                      placeholder="to"
+                      className="w-24 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] font-mono outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={connection.label || ''}
+                      onChange={e => handleDiagramConnectionChange(i, 'label', e.target.value)}
+                      placeholder="Label optionnel"
+                      className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                    />
+                    <button onClick={() => removeDiagramConnection(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -530,6 +781,7 @@ api.listen(3000);
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-orange-400" /> Stack technique</p>
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-red-400" /> Defis & Realisations</p>
               <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400" /> Liens utiles</p>
+              <p className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Images, graph & diagramme</p>
             </div>
           </div>
         </div>
