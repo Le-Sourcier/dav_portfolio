@@ -186,7 +186,10 @@ export interface BlogComment {
   email: string;
   content: string;
   postId: string;
+  parentId?: string | null;
+  mentions?: string[];
   createdAt: string;
+  replies?: BlogComment[];
 }
 
 export interface BlogPost {

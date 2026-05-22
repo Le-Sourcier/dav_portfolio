@@ -119,6 +119,22 @@ export function useAddComment() {
   });
 }
 
+export function useDeleteBlogComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (commentId: string) => blogApi.deleteComment(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: blogKeys.details() });
+      toast.success('Commentaire supprime');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de la suppression du commentaire');
+    },
+  });
+}
+
 // Track View (fire-and-forget)
 export function useTrackView() {
   return useMutation({

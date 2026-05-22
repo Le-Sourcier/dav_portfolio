@@ -34,6 +34,10 @@ export const blogApi = {
     return apiClient.post<BlogComment>(`/blog/${postId}/comments`, data);
   },
 
+  async deleteComment(commentId: string): Promise<void> {
+    return apiClient.delete(`/blog/comments/${commentId}`);
+  },
+
   async trackView(postId: string): Promise<void> {
     return apiClient.post(`/blog/${postId}/view`, {});
   },
