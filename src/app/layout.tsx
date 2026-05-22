@@ -6,6 +6,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { PortfolioAssistant } from "@/components/PortfolioAssistant";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { ClientAnalytics } from "@/components/ClientAnalytics";
 import { getRequestLocale } from "@/i18n/server";
 import { site } from "@/lib/portfolio";
 import { loadBlogPosts, loadExperiences } from "@/services/portfolio/contentLoaders";
@@ -120,6 +121,7 @@ export default async function RootLayout({
               posts={assistantPosts}
               experiences={assistantExperiences}
             />
+            <ClientAnalytics />
             <ToastProvider />
           </NextIntlClientProvider>
         </QueryProvider>

@@ -7,11 +7,7 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { BackToTop } from "@/components/blog/BackToTop";
-import {
-  proofStats,
-  site,
-  stack,
-} from "@/lib/portfolio";
+import { proofStats, site, stack } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
 import {
   loadBlogPosts,
@@ -37,15 +33,22 @@ export default async function Home() {
   const hasJourney = experience.length > 0;
   const hasBlog = blogPosts.length > 0;
   const hasTestimonials = testimonials.length > 0;
-  const dateFormatter = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const dateFormatter = new Intl.DateTimeFormat(
+    locale === "en" ? "en-US" : "fr-FR",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    },
+  );
 
   return (
     <>
-      <Header showProjects={hasProjects} showJourney={hasJourney} showBlog={hasBlog} />
+      <Header
+        showProjects={hasProjects}
+        showJourney={hasJourney}
+        showBlog={hasBlog}
+      />
 
       <main>
         <section className="hero-section">
@@ -276,7 +279,9 @@ export default async function Home() {
                     ) : null}
                     <div className="project-preview-overlay">
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      {project.metric ? <strong>{project.metric}</strong> : null}
+                      {project.metric ? (
+                        <strong>{project.metric}</strong>
+                      ) : null}
                     </div>
                   </div>
                   <div className="project-content">
@@ -323,7 +328,9 @@ export default async function Home() {
                 <span>SEO</span>
               </div>
               {experience.length > 3 ? (
-                <Link href="/experiences" className="secondary-button parcours-cta">
+                <Link
+                  href="/experiences"
+                  className="secondary-button parcours-cta">
                   Voir tous mes parcours
                 </Link>
               ) : null}
@@ -426,7 +433,12 @@ export default async function Home() {
                   key={post.slug}
                   className={`blog-card${post.coverImage ? " has-cover" : ""}`}>
                   {post.coverImage ? (
-                    <img src={post.coverImage} alt="" loading="lazy" className="blog-card-cover" />
+                    <img
+                      src={post.coverImage}
+                      alt=""
+                      loading="lazy"
+                      className="blog-card-cover"
+                    />
                   ) : null}
                   <span>
                     {post.category} · {post.readTime}
@@ -434,7 +446,8 @@ export default async function Home() {
                   <h3>{post.title}</h3>
                   <p>{post.excerpt}</p>
                   <small className="blog-card-meta">
-                    {(post.author || site.name)} · {dateFormatter.format(new Date(post.date))}
+                    {post.author || site.name} ·{" "}
+                    {dateFormatter.format(new Date(post.date))}
                   </small>
                 </Link>
               ))}
@@ -446,7 +459,11 @@ export default async function Home() {
 
         <ContactSection />
 
-        <Footer showProjects={hasProjects} showJourney={hasJourney} showBlog={hasBlog} />
+        <Footer
+          showProjects={hasProjects}
+          showJourney={hasJourney}
+          showBlog={hasBlog}
+        />
       </main>
       <BackToTop />
     </>

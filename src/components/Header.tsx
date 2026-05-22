@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { site } from "@/lib/portfolio";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/#apropos", key: "about" },
@@ -69,7 +68,6 @@ export function Header({ showProjects = true, showJourney = true, showBlog = tru
       </nav>
       <div className="header-actions">
         <LanguageToggle />
-        <ThemeToggle />
         <button
           type="button"
           className="mobile-menu-button"

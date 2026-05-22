@@ -3,12 +3,39 @@
 import { useSyncExternalStore } from "react";
 
 type ThemePreference = "system" | "light" | "dark";
+type ThemeToggleVariant = "text" | "icon";
 
 const themes: Array<{ value: ThemePreference; label: string; short: string }> = [
   { value: "system", label: "Thème du device", short: "Auto" },
   { value: "light", label: "Thème clair", short: "Clair" },
   { value: "dark", label: "Thème sombre", short: "Sombre" },
 ];
+
+function ThemeIcon({ type }: { type: ThemePreference }) {
+  if (type === "light") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
+      </svg>
+    );
+  }
+
+  if (type === "dark") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.5 14.2A7.5 7.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="5" width="16" height="11" rx="2" />
+      <path d="M9 20h6M12 16v4" />
+    </svg>
+  );
+}
 
 const storageKey = "ydl-theme";
 const themeChangeEvent = "ydl-theme-change";
@@ -53,7 +80,7 @@ function subscribeToThemeChanges(onStoreChange: () => void) {
   };
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ variant = "text" }: { variant?: ThemeToggleVariant }) {
   const preference = useSyncExternalStore(subscribeToThemeChanges, getThemePreference, () => "system");
 
   const updatePreference = (nextPreference: ThemePreference) => {
@@ -61,7 +88,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <div className="theme-toggle" aria-label="Choix du thème">
+    <div className={`theme-toggle ${variant === "icon" ? "theme-toggle--icon" : ""}`} aria-label="Choix du thème">
       {themes.map((theme) => (
         <button
           type="button"
@@ -71,7 +98,8 @@ export function ThemeToggle() {
           aria-pressed={preference === theme.value}
           title={theme.label}
         >
-          {theme.short}
+          {variant === "icon" ? <ThemeIcon type={theme.value} /> : theme.short}
+          {variant === "icon" ? <span className="sr-only">{theme.short}</span> : null}
         </button>
       ))}
     </div>
