@@ -103,6 +103,7 @@ const seedBlogPosts = async () => {
       readTime: "5 min de lecture",
       author: "Yao David Logan",
       published: true,
+      tags: ["Design", "Minimalisme", "Web"],
     },
     {
       title: "L'impact de l'IA sur le developpement frontend",
@@ -116,6 +117,7 @@ const seedBlogPosts = async () => {
       readTime: "6 min de lecture",
       author: "Yao David Logan",
       published: true,
+      tags: ["IA", "Frontend", "Productivite"],
     },
   ];
 
