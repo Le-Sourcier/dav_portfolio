@@ -7,6 +7,7 @@ import {
   updatePost,
   deletePost,
   addComment,
+  deleteComment,
   trackView,
   trackShare,
   getBlogStats,
@@ -187,6 +188,9 @@ router.delete('/:id', authMiddleware, adminMiddleware, validate(blogPostIdValida
  *         description: Post not found
  */
 router.post('/:id/comments', commentLimiter, requireVisitorAuth, matchVisitorEmail(), validate(createCommentValidator), addComment);
+
+// DELETE /api/blog/comments/:commentId -- remove a comment/reply (admin)
+router.delete('/comments/:commentId', authMiddleware, adminMiddleware, deleteComment);
 
 // POST /api/blog/:id/view   -- track a view (public)
 router.post('/:id/view', trackingLimiter, validate(blogPostIdValidator), trackView);

@@ -35,6 +35,15 @@ export const createBlogPostValidator = [
     .optional()
     .isBoolean()
     .withMessage('Published must be a boolean'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ max: 60 })
+    .withMessage('Each tag must be less than 60 characters'),
 ];
 
 export const updateBlogPostValidator = [
@@ -56,6 +65,15 @@ export const updateBlogPostValidator = [
     .trim()
     .isURL()
     .withMessage('Invalid image URL'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ max: 60 })
+    .withMessage('Each tag must be less than 60 characters'),
 ];
 
 export const blogPostIdValidator = [

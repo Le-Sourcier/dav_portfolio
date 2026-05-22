@@ -97,6 +97,7 @@ class BlogPost
   declare published: boolean;
   declare viewCount: number;
   declare shareCount: number;
+  declare tags?: string[];
   declare comments?: IBlogComment[];
   declare title_en?: string;
   declare excerpt_en?: string;
@@ -161,6 +162,11 @@ BlogPost.init(
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: false,
+    },
+    tags: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: [],
     },
     title_en: { type: DataTypes.STRING(255), allowNull: true },
     excerpt_en: { type: DataTypes.TEXT, allowNull: true },

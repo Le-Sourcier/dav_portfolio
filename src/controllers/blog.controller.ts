@@ -89,6 +89,15 @@ export const addComment = async (req: Request<{ id: string }>, res: Response, ne
   }
 };
 
+export const deleteComment = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    await blogService.deleteComment(req.params.commentId);
+    sendSuccess(res, null, 'Comment deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const trackView = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
@@ -120,4 +129,4 @@ export const getBlogStats = async (_req: Request, res: Response, next: NextFunct
   }
 };
 
-export default { getAllPosts, getPostById, getPostBySlug, createPost, updatePost, deletePost, addComment, trackView, trackShare, getBlogStats };
+export default { getAllPosts, getPostById, getPostBySlug, createPost, updatePost, deletePost, addComment, deleteComment, trackView, trackShare, getBlogStats };

@@ -137,6 +137,7 @@ export interface IBlogPost {
   published: boolean;
   viewCount: number;
   shareCount: number;
+  tags?: string[];
   title_en?: string;
   excerpt_en?: string;
   content_en?: string;

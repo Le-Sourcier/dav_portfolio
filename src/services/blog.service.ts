@@ -9,7 +9,15 @@ class BlogService {
     const where = published !== undefined ? { published } : {};
     const posts = await BlogPost.findAll({
       where,
-      include: [{ model: Comment, as: 'comments' }],
+      include: [
+        {
+          model: Comment,
+          as: 'comments',
+          where: { parentId: null },
+          required: false,
+          include: [{ model: Comment, as: 'replies' }],
+        },
+      ],
       order: [['createdAt', 'DESC']],
     });
     return posts;
@@ -20,7 +28,15 @@ class BlogService {
     if (publishedOnly) where.published = true;
     const post = await BlogPost.findOne({
       where,
-      include: [{ model: Comment, as: 'comments' }],
+      include: [
+        {
+          model: Comment,
+          as: 'comments',
+          where: { parentId: null },
+          required: false,
+          include: [{ model: Comment, as: 'replies' }],
+        },
+      ],
     });
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
@@ -121,6 +137,15 @@ class BlogService {
     });
 
     return comment;
+  }
+
+  async deleteComment(commentId: string): Promise<void> {
+    const comment = await Comment.findByPk(commentId);
+    if (!comment) {
+      throw new AppError('Comment not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+
+    await comment.destroy();
   }
 
   async findByCategory(category: string): Promise<IBlogPost[]> {
