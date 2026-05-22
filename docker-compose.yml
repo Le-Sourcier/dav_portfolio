@@ -1,0 +1,12 @@
+services:
+  lesourcier-admin:
+    build:
+      context: .
+    image: lesourcier-admin:latest
+    container_name: lesourcier-admin
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    ports:
+      - "3042:3000"
+    restart: unless-stopped
