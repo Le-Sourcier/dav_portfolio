@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { blogApi } from '@/services/api';
-import type { BlogCommentFilters, BlogPost, BlogPostFormData } from '@/types/admin.types';
+import type { BlogCommentFilters, BlogPost, BlogPostFormData, BlogTagFormData } from '@/types/admin.types';
 
 // Query Keys
 export const blogKeys = {
@@ -12,6 +12,8 @@ export const blogKeys = {
   detail: (id: string) => [...blogKeys.details(), id] as const,
   bySlug: (slug: string) => [...blogKeys.all, 'slug', slug] as const,
   stats: () => [...blogKeys.all, 'stats'] as const,
+  tags: () => [...blogKeys.all, 'tags'] as const,
+  tagStats: () => [...blogKeys.all, 'tag-stats'] as const,
   comments: (filters: BlogCommentFilters) => [...blogKeys.all, 'comments', filters] as const,
   commentThread: (id: string) => [...blogKeys.all, 'comment-thread', id] as const,
 };
@@ -194,5 +196,66 @@ export function useBlogStats() {
     queryKey: blogKeys.stats(),
     queryFn: () => blogApi.getStats(),
     staleTime: 30 * 1000,
+  });
+}
+
+export function useBlogTags() {
+  return useQuery({
+    queryKey: blogKeys.tags(),
+    queryFn: () => blogApi.getTags(),
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useBlogTagStats() {
+  return useQuery({
+    queryKey: blogKeys.tagStats(),
+    queryFn: () => blogApi.getTagStats(),
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useCreateBlogTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: BlogTagFormData) => blogApi.createTag(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.all });
+      toast.success('Tag cree');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de la creation du tag');
+    },
+  });
+}
+
+export function useUpdateBlogTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<BlogTagFormData> }) => blogApi.updateTag(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.all });
+      toast.success('Tag mis a jour');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de la mise a jour du tag');
+    },
+  });
+}
+
+export function useDeleteBlogTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => blogApi.deleteTag(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.all });
+      toast.success('Tag supprime');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erreur lors de la suppression du tag');
+    },
   });
 }

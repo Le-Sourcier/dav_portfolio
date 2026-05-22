@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import {
   ArrowLeft, Save, Loader2, CheckCircle2,
-  Image, Plus, Trash2, Send, Mail,
+  Image, Plus, Send, Mail,
 } from 'lucide-react';
-import { useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
+import { useBlogTags, useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
@@ -25,6 +25,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
   const createMutation = useCreateBlogPost();
   const updateMutation = useUpdateBlogPost();
   const sendNewsletterMutation = useSendArticleToSubscribers();
+  const { data: availableTags = [] } = useBlogTags();
   const [saved, setSaved] = useState(false);
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
@@ -40,7 +41,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         category: initialData.category,
         imageUrl: initialData.imageUrl || '',
         author: initialData.author || '',
-        tags: initialData.tags?.length ? initialData.tags : [''],
+        tags: initialData.tags?.length ? initialData.tags : [],
+        tagIds: initialData.blogTags?.map((tag) => tag.id) || initialData.tagIds || [],
         published: initialData.published,
       };
     }
@@ -54,7 +56,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       category: 'Tech',
       imageUrl: '',
       author: '',
-      tags: [''],
+      tags: [],
+      tagIds: [],
       published: false,
     };
   });
@@ -63,14 +66,17 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleTagChange = (index: number, value: string) => {
-    const tags = [...(formData.tags || [])];
-    tags[index] = value;
-    setFormData((prev) => ({ ...prev, tags }));
+  const toggleTag = (tagId: string) => {
+    setFormData((prev) => {
+      const current = prev.tagIds || [];
+      return {
+        ...prev,
+        tagIds: current.includes(tagId)
+          ? current.filter((id) => id !== tagId)
+          : [...current, tagId],
+      };
+    });
   };
-
-  const addTag = () => setFormData((prev) => ({ ...prev, tags: [...(prev.tags || []), ''] }));
-  const removeTag = (i: number) => setFormData((prev) => ({ ...prev, tags: (prev.tags || []).filter((_, idx) => idx !== i) }));
 
   const handleSave = (publish: boolean) => {
     if (!formData.title.trim()) {
@@ -93,7 +99,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       imageUrl: formData.imageUrl?.trim() || '',
       author: formData.author || '',
       published: publish ? true : formData.published,
-      tags: formData.tags?.filter((t) => t.trim()) || [],
+      tags: availableTags.filter((tag) => formData.tagIds?.includes(tag.id)).map((tag) => tag.name),
+      tagIds: formData.tagIds || [],
     };
 
     const options = {
@@ -319,24 +326,31 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-2">
               <label className="text-[11px] font-medium text-zinc-400">Tags</label>
-              <button onClick={addTag} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+              <button type="button" className="text-zinc-400 cursor-default">
                 <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="space-y-1.5">
-              {(formData.tags || ['']).map((tag, i) => (
-                <div key={i} className="flex gap-1.5">
-                  <input
-                    value={tag}
-                    onChange={(e) => handleTagChange(i, e.target.value)}
-                    placeholder="tag..."
-                    className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
-                  />
-                  <button onClick={() => removeTag(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
-                    <Trash2 className="w-3 h-3" />
+            <div className="flex flex-wrap gap-1.5">
+              {availableTags.length ? availableTags.map((tag) => {
+                const selected = formData.tagIds?.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className={cn(
+                      'px-2.5 py-1 rounded-md border text-[11px] font-semibold transition-colors',
+                      selected
+                        ? 'border-primary/50 bg-primary text-primary-foreground'
+                        : 'border-border/70 bg-card/55 text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {tag.name}
                   </button>
-                </div>
-              ))}
+                );
+              }) : (
+                <p className="text-[11px] text-zinc-400">Creez vos tags depuis la page Tags.</p>
+              )}
             </div>
           </div>
 

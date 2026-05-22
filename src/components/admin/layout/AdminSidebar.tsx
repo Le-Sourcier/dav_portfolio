@@ -3,6 +3,7 @@ import {
   Briefcase,
   FolderKanban,
   Newspaper,
+  Tags,
   MessageSquare,
   MessageSquareText,
   CalendarDays,
@@ -28,6 +29,7 @@ const navSections = [
       { id: 'projects', label: 'Projets', icon: FolderKanban },
       { id: 'experiences', label: 'Experiences', icon: Briefcase },
       { id: 'blog', label: 'Blog', icon: Newspaper },
+      { id: 'tags', label: 'Tags blog', icon: Tags },
     ],
   },
   {

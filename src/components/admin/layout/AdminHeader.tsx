@@ -12,6 +12,7 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   projects: { title: 'Projets', subtitle: 'Gestion des projets' },
   experiences: { title: 'Experiences', subtitle: 'Parcours professionnel' },
   blog: { title: 'Blog', subtitle: 'Articles & publications' },
+  tags: { title: 'Tags blog', subtitle: 'Taxonomie & monitoring' },
   comments: { title: 'Commentaires', subtitle: 'Moderation & reponses' },
   contacts: { title: 'Messages', subtitle: 'Boite de reception' },
   appointments: { title: 'Rendez-vous', subtitle: 'Planning' },

@@ -37,6 +37,23 @@ export interface ApiError {
   };
 }
 
+export interface TrafficAnalyticsPoint {
+  key: string;
+  label: string;
+  pageViews: number;
+  visitors: number;
+}
+
+export interface WeeklyActivityPoint {
+  key: string;
+  label: string;
+  pageViews: number;
+  messages: number;
+  appointments: number;
+  comments: number;
+  subscribers: number;
+}
+
 // ========================
 // Auth Types
 // ========================
@@ -210,10 +227,40 @@ export interface BlogPost {
   viewCount: number;
   shareCount: number;
   tags?: string[];
+  tagIds?: string[];
+  blogTags?: BlogTag[];
   comments?: BlogComment[];
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  color?: string | null;
+  isVisible: boolean;
+  postsCount?: number;
+  viewsCount?: number;
+  sharesCount?: number;
+  commentsCount?: number;
+  posts?: BlogPost[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type BlogTagFormData = Omit<
+  BlogTag,
+  | "id"
+  | "postsCount"
+  | "viewsCount"
+  | "sharesCount"
+  | "commentsCount"
+  | "posts"
+  | "createdAt"
+  | "updatedAt"
+>;
 
 export type BlogPostFormData = Omit<
   BlogPost,

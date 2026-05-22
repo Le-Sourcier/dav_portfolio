@@ -4,7 +4,7 @@ import { useUIStore } from '@/stores/uiStore';
 
 const VALID_TABS = [
   'dashboard', 'projects', 'experiences', 'blog',
-  'comments', 'contacts', 'appointments', 'testimonials', 'newsletter', 'settings',
+  'tags', 'comments', 'contacts', 'appointments', 'testimonials', 'newsletter', 'settings',
 ];
 
 /**

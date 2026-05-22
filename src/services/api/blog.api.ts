@@ -6,6 +6,8 @@ import type {
   BlogPost,
   BlogPostFormData,
   BlogStats,
+  BlogTag,
+  BlogTagFormData,
 } from '@/types/admin.types';
 
 export const blogApi = {
@@ -77,6 +79,30 @@ export const blogApi = {
 
   async getStats(): Promise<BlogStats> {
     return apiClient.get<BlogStats>('/blog/stats/overview');
+  },
+
+  async getTags(): Promise<BlogTag[]> {
+    return apiClient.get<BlogTag[]>('/blog/tags');
+  },
+
+  async getTagStats(): Promise<BlogTag[]> {
+    return apiClient.get<BlogTag[]>('/blog/tags/stats');
+  },
+
+  async getTagBySlug(slug: string): Promise<BlogTag> {
+    return apiClient.get<BlogTag>(`/blog/tags/slug/${slug}`);
+  },
+
+  async createTag(data: BlogTagFormData): Promise<BlogTag> {
+    return apiClient.post<BlogTag>('/blog/tags', data);
+  },
+
+  async updateTag(id: string, data: Partial<BlogTagFormData>): Promise<BlogTag> {
+    return apiClient.put<BlogTag>(`/blog/tags/${id}`, data);
+  },
+
+  async deleteTag(id: string): Promise<void> {
+    return apiClient.delete(`/blog/tags/${id}`);
   },
 };
 

@@ -10,6 +10,8 @@ export { testimonialsApi } from './testimonials.api';
 export { settingsApi } from './settings.api';
 export { chatbotApi } from './chatbot.api';
 export { visitorApi } from './visitor.api';
+export { analyticsApi } from './analytics.api';
+export type { TrafficPeriod } from './analytics.api';
 
 // Re-export apiClient methods + module APIs for backward compatibility
 import { apiClient } from './client';
@@ -21,6 +23,7 @@ import { contactsApi } from './contacts.api';
 import { appointmentsApi } from './appointments.api';
 import { newsletterApi } from './newsletter.api';
 import { testimonialsApi } from './testimonials.api';
+import { analyticsApi } from './analytics.api';
 
 /**
  * Unified API object with backward compatibility.
@@ -43,6 +46,7 @@ export const api = {
   appointments: appointmentsApi,
   newsletter: newsletterApi,
   testimonials: testimonialsApi,
+  analytics: analyticsApi,
 };
 
 export default api;

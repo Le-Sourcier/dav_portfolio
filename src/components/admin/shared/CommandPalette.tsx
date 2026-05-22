@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, X, LayoutDashboard, FolderKanban, Briefcase,
-  Newspaper, MessageSquare, CalendarDays, Star, Mail,
+  Newspaper, MessageSquare, CalendarDays, Star, Mail, Tags,
   Settings, Plus, ArrowRight, Hash, FileText, User, MessageSquareText,
   Lock, Palette, Globe, CornerDownLeft,
 } from 'lucide-react';
@@ -30,6 +30,7 @@ function getNavigationItems(setActiveTab: (tab: string) => void): SearchResult[]
     { id: 'nav-projects', label: 'Projets', description: 'Gestion des projets', icon: FolderKanban, category: 'Navigation', action: () => setActiveTab('projects') },
     { id: 'nav-experiences', label: 'Experiences', description: 'Parcours professionnel', icon: Briefcase, category: 'Navigation', action: () => setActiveTab('experiences') },
     { id: 'nav-blog', label: 'Blog', description: 'Articles & publications', icon: Newspaper, category: 'Navigation', action: () => setActiveTab('blog') },
+    { id: 'nav-tags', label: 'Tags blog', description: 'Taxonomie & monitoring', icon: Tags, category: 'Navigation', action: () => setActiveTab('tags') },
     { id: 'nav-comments', label: 'Commentaires', description: 'Moderation blog', icon: MessageSquareText, category: 'Navigation', action: () => setActiveTab('comments') },
     { id: 'nav-contacts', label: 'Messages', description: 'Boite de reception', icon: MessageSquare, category: 'Navigation', action: () => setActiveTab('contacts') },
     { id: 'nav-appointments', label: 'Rendez-vous', description: 'Planning', icon: CalendarDays, category: 'Navigation', action: () => setActiveTab('appointments') },

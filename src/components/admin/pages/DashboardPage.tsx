@@ -18,6 +18,7 @@ import {
   useVisibleTestimonials, useNewsletterStats,
   useContacts, useAppointments, useTestimonials,
   useNewsletterSubscribers,
+  useTrafficAnalytics, useWeeklyActivityAnalytics,
 } from '@/hooks/queries';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -53,46 +54,6 @@ function CardHeader({ icon: Icon, title, action }: { icon: React.ElementType; ti
 
 const COLORS = ['#0f766e', '#b8842f', '#2dd4bf', '#d7b464', '#0b4f49', '#f2c96b', '#6f6a60'];
 
-// --- Seeded pseudo-random for stable analytics data (same values per day) ---
-function seededRandom(seed: number) {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-function generateVisitorData(contentCount: number) {
-  const months = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const now = new Date();
-  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-  const rng = seededRandom(seed);
-  const currentMonth = now.getMonth();
-  const baseVisitors = 80 + contentCount * 15;
-
-  return months.slice(0, currentMonth + 1).map((m, i) => ({
-    name: m,
-    visiteurs: Math.floor(baseVisitors + rng() * 300 + i * 25),
-    pages: Math.floor(baseVisitors * 2 + rng() * 600 + i * 40),
-  }));
-}
-
-function generateWeeklyActivity(messagesCount: number, rdvCount: number) {
-  const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  const now = new Date();
-  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate() + 1;
-  const rng = seededRandom(seed);
-  const msgPerDay = Math.max(1, Math.ceil(messagesCount / 7));
-  const rdvPerDay = Math.max(0, Math.ceil(rdvCount / 7));
-
-  return days.map((d) => ({
-    name: d,
-    messages: Math.floor(rng() * msgPerDay * 2.5),
-    rdv: Math.floor(rng() * rdvPerDay * 2.5),
-    vues: Math.floor(15 + rng() * 50),
-  }));
-}
-
 function getGreeting(): string {
   const hour = new Date().getHours();
   if (hour < 12) return 'Bonjour';
@@ -116,16 +77,35 @@ export function DashboardPage() {
   const { profile } = useSettingsStore();
 
   const [chartPeriod, setChartPeriod] = useState<'week' | 'month'>('month');
+  const trafficPeriod = chartPeriod === 'month' ? '12m' : '7d';
+  const { data: trafficAnalytics = [] } = useTrafficAnalytics(trafficPeriod);
+  const { data: weeklyActivity = [] } = useWeeklyActivityAnalytics();
 
   const unread = typeof unreadCount === 'object' ? (unreadCount as any)?.count ?? 0 : unreadCount;
   const nlActive = typeof newsletterStats === 'object'
     ? (newsletterStats as any)?.active ?? (newsletterStats as any)?.totalActive ?? (newsletterStats as any)?.total ?? 0
     : 0;
 
-  // Computed data - seeded from real content counts so charts reflect actual portfolio size
   const totalContent = projects.length + experiences.length + blogPosts.length;
-  const visitorData = useMemo(() => generateVisitorData(totalContent), [totalContent]);
-  const weeklyData = useMemo(() => generateWeeklyActivity(contacts.length, appointments.length), [contacts.length, appointments.length]);
+  const visitorData = useMemo(
+    () => trafficAnalytics.map((point) => ({
+      name: point.label,
+      visiteurs: point.visitors,
+      pages: point.pageViews,
+    })),
+    [trafficAnalytics]
+  );
+  const weeklyData = useMemo(
+    () => weeklyActivity.map((point) => ({
+      name: point.label,
+      messages: point.messages,
+      rdv: point.appointments,
+      vues: point.pageViews,
+      commentaires: point.comments,
+      abonnes: point.subscribers,
+    })),
+    [weeklyActivity]
+  );
 
   const publishedPosts = blogPosts.filter((p) => p.published);
   const draftPosts = blogPosts.filter((p) => !p.published);

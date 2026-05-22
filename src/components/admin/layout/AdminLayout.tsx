@@ -12,6 +12,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
 import { ExperiencesPage } from '../pages/ExperiencesPage';
 import { BlogPage } from '../pages/BlogPage';
+import { BlogTagsPage } from '../pages/BlogTagsPage';
 import { CommentsPage } from '../pages/CommentsPage';
 import { ContactsPage } from '../pages/ContactsPage';
 import { AppointmentsPage } from '../pages/AppointmentsPage';
@@ -26,6 +27,7 @@ const pageComponents: Record<string, React.ComponentType> = {
   projects: ProjectsPage,
   experiences: ExperiencesPage,
   blog: BlogPage,
+  tags: BlogTagsPage,
   comments: CommentsPage,
   contacts: ContactsPage,
   appointments: AppointmentsPage,

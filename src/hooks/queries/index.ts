@@ -24,3 +24,6 @@ export * from './useTestimonialQueries';
 
 // Settings
 export * from './useSettingsQueries';
+
+// Analytics
+export * from './useAnalyticsQueries';
