@@ -7,6 +7,9 @@ import {
   updatePost,
   deletePost,
   addComment,
+  getComments,
+  getCommentThread,
+  replyToComment,
   deleteComment,
   trackView,
   trackShare,
@@ -20,6 +23,8 @@ import {
   blogPostIdValidator,
   blogSlugValidator,
   createCommentValidator,
+  commentIdValidator,
+  adminReplyValidator,
 } from '../validators/blog.validator.js';
 import { commentLimiter, trackingLimiter } from '../middlewares/rateLimit.middleware.js';
 import { requireVisitorAuth, matchVisitorEmail } from '../middlewares/visitorAuth.middleware.js';
@@ -43,6 +48,18 @@ const router = Router();
  *         description: List of blog posts
  */
 router.get('/', getAllPosts);
+
+// GET /api/blog/comments -- paginated comment moderation (admin)
+router.get('/comments', authMiddleware, adminMiddleware, getComments);
+
+// GET /api/blog/comments/:commentId/thread -- single thread (admin)
+router.get('/comments/:commentId/thread', authMiddleware, adminMiddleware, validate(commentIdValidator), getCommentThread);
+
+// POST /api/blog/comments/:commentId/replies -- admin reply to a comment
+router.post('/comments/:commentId/replies', authMiddleware, adminMiddleware, validate(adminReplyValidator), replyToComment);
+
+// DELETE /api/blog/comments/:commentId -- remove a comment/reply (admin)
+router.delete('/comments/:commentId', authMiddleware, adminMiddleware, validate(commentIdValidator), deleteComment);
 
 /**
  * @swagger
@@ -188,9 +205,6 @@ router.delete('/:id', authMiddleware, adminMiddleware, validate(blogPostIdValida
  *         description: Post not found
  */
 router.post('/:id/comments', commentLimiter, requireVisitorAuth, matchVisitorEmail(), validate(createCommentValidator), addComment);
-
-// DELETE /api/blog/comments/:commentId -- remove a comment/reply (admin)
-router.delete('/comments/:commentId', authMiddleware, adminMiddleware, deleteComment);
 
 // POST /api/blog/:id/view   -- track a view (public)
 router.post('/:id/view', trackingLimiter, validate(blogPostIdValidator), trackView);

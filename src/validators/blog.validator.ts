@@ -118,3 +118,40 @@ export const createCommentValidator = [
     .isUUID()
     .withMessage('Invalid parent comment ID'),
 ];
+
+export const commentIdValidator = [
+  param('commentId')
+    .isUUID()
+    .withMessage('Invalid comment ID'),
+];
+
+export const adminReplyValidator = [
+  param('commentId')
+    .isUUID()
+    .withMessage('Invalid comment ID'),
+  body('author')
+    .trim()
+    .notEmpty()
+    .withMessage('Author name is required')
+    .isLength({ max: 100 })
+    .withMessage('Author must be less than 100 characters'),
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Invalid email address'),
+  body('content')
+    .trim()
+    .notEmpty()
+    .withMessage('Reply content is required'),
+  body('mentions')
+    .optional()
+    .isArray()
+    .withMessage('Mentions must be an array'),
+  body('mentions.*')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Each mention must be less than 100 characters'),
+];

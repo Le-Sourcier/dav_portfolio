@@ -3,6 +3,27 @@ import { IBlogPost, IBlogComment } from '../types/entities.types.js';
 import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
 import { generateSlug, calculateReadTime } from '../utils/helpers.js';
+import { Op } from 'sequelize';
+
+type CommentListFilters = {
+  page?: number;
+  limit?: number;
+  postId?: string;
+  search?: string;
+  mentioned?: string;
+  parentOnly?: boolean;
+  sort?: 'recent' | 'oldest';
+};
+
+type CommentListResult = {
+  comments: IBlogComment[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
 
 class BlogService {
   async findAll(published?: boolean): Promise<IBlogPost[]> {
@@ -139,6 +160,82 @@ class BlogService {
     return comment;
   }
 
+  async addAdminReply(
+    parentId: string,
+    data: { author: string; email: string; content: string; mentions?: string[] },
+  ): Promise<IBlogComment> {
+    const parent = await Comment.findByPk(parentId);
+    if (!parent) {
+      throw new AppError('Comment not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+
+    const extractedMentions = this.extractMentions(data.content);
+    const explicitMentions = data.mentions?.map((mention) => mention.trim()).filter(Boolean) || [];
+    const mentions = Array.from(new Set([...explicitMentions, ...extractedMentions]));
+
+    return Comment.create({
+      author: data.author,
+      email: data.email,
+      content: data.content,
+      postId: parent.postId,
+      parentId: parent.id,
+      mentions,
+    });
+  }
+
+  async findComments(filters: CommentListFilters = {}): Promise<CommentListResult> {
+    const page = Math.max(1, filters.page || 1);
+    const limit = Math.min(100, Math.max(1, filters.limit || 20));
+    const offset = (page - 1) * limit;
+    const where: any = {};
+
+    if (filters.postId) where.postId = filters.postId;
+    if (filters.parentOnly) where.parentId = null;
+    if (filters.mentioned) {
+      where.mentions = { [Op.contains]: [filters.mentioned] };
+    }
+    if (filters.search) {
+      const like = { [Op.iLike]: `%${filters.search}%` };
+      where[Op.or] = [
+        { author: like },
+        { email: like },
+        { content: like },
+      ];
+    }
+
+    const { rows, count } = await Comment.findAndCountAll({
+      where,
+      include: [
+        { model: Comment, as: 'replies' },
+        { model: BlogPost, attributes: ['id', 'title', 'slug'], required: false },
+      ],
+      order: [['createdAt', filters.sort === 'oldest' ? 'ASC' : 'DESC']],
+      limit,
+      offset,
+      distinct: true,
+    });
+
+    return {
+      comments: rows,
+      pagination: {
+        page,
+        limit,
+        total: count,
+        totalPages: Math.max(1, Math.ceil(count / limit)),
+      },
+    };
+  }
+
+  async findCommentThread(commentId: string): Promise<IBlogComment> {
+    const comment = await Comment.findByPk(commentId, {
+      include: [{ model: Comment, as: 'replies' }],
+    });
+    if (!comment) {
+      throw new AppError('Comment not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+    }
+    return comment;
+  }
+
   async deleteComment(commentId: string): Promise<void> {
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
@@ -146,6 +243,16 @@ class BlogService {
     }
 
     await comment.destroy();
+  }
+
+  private extractMentions(content: string): string[] {
+    const mentionRegex = /@([A-Za-zÀ-ÿ][\wÀ-]*)/g;
+    const mentions: string[] = [];
+    let match: RegExpExecArray | null;
+    while ((match = mentionRegex.exec(content)) !== null) {
+      mentions.push(match[1]!);
+    }
+    return Array.from(new Set(mentions));
   }
 
   async findByCategory(category: string): Promise<IBlogPost[]> {

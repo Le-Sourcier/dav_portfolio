@@ -89,6 +89,41 @@ export const addComment = async (req: Request<{ id: string }>, res: Response, ne
   }
 };
 
+export const getComments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const result = await blogService.findComments({
+      page: req.query.page ? Number(req.query.page) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
+      postId: typeof req.query.postId === 'string' ? req.query.postId : undefined,
+      search: typeof req.query.search === 'string' ? req.query.search : undefined,
+      mentioned: typeof req.query.mentioned === 'string' ? req.query.mentioned : undefined,
+      parentOnly: req.query.parentOnly === 'true',
+      sort: req.query.sort === 'oldest' ? 'oldest' : 'recent',
+    });
+    sendSuccess(res, result, 'Comments retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCommentThread = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const comment = await blogService.findCommentThread(req.params.commentId);
+    sendSuccess(res, comment, 'Comment thread retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const replyToComment = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const comment = await blogService.addAdminReply(req.params.commentId, req.body);
+    sendCreated(res, comment, 'Reply added successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteComment = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     await blogService.deleteComment(req.params.commentId);
@@ -129,4 +164,4 @@ export const getBlogStats = async (_req: Request, res: Response, next: NextFunct
   }
 };
 
-export default { getAllPosts, getPostById, getPostBySlug, createPost, updatePost, deletePost, addComment, deleteComment, trackView, trackShare, getBlogStats };
+export default { getAllPosts, getPostById, getPostBySlug, createPost, updatePost, deletePost, addComment, getComments, getCommentThread, replyToComment, deleteComment, trackView, trackShare, getBlogStats };
