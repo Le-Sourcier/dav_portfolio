@@ -1,0 +1,12 @@
+services:
+  nexus-blogs:
+    build:
+      context: .
+    image: nexus-blogs:latest
+    container_name: nexus-blogs
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    ports:
+      - "3032:3000"
+    restart: unless-stopped
