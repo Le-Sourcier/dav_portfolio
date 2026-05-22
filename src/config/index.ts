@@ -59,7 +59,12 @@ export const config = {
   },
 
   // CORS
+  // Compat héritée : un seul FRONTEND_URL accepté.
   frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
+  // Nouvelle config : liste comma-separated (FRONTEND_URLS) qui supplante FRONTEND_URL si fournie.
+  // Exemple : FRONTEND_URLS=http://localhost:3000,https://admin.example.com,https://www.example.com
+  // L'usage doit passer par `config.corsOrigins` (calculé plus bas) pour bénéficier du parsing.
+  frontendUrls: process.env.FRONTEND_URLS || "",
 
   // Rate Limiting
   rateLimit: {
@@ -104,5 +109,31 @@ export const config = {
 
 export const isProduction = config.nodeEnv === "production";
 export const isDevelopment = config.nodeEnv === "development";
+
+/**
+ * Liste explicite et déduplique des origines CORS autorisées.
+ *
+ * Stratégie de résolution :
+ *   1. `FRONTEND_URLS` (liste comma-separated) — source principale
+ *   2. fallback `FRONTEND_URL` (string unique, compat)
+ *   3. dernier recours `http://localhost:3000` pour le dev local
+ *
+ * Chaque entrée est trim, les blancs sont ignorés, les doublons supprimés,
+ * et les slashs finaux sont retirés pour matcher le comportement du package `cors`.
+ */
+function parseCorsOrigins(): string[] {
+  const raw = (
+    config.frontendUrls ||
+    config.frontendUrl ||
+    "http://localhost:3000"
+  )
+    .split(",")
+    .map((value) => value.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+  return Array.from(new Set(raw));
+}
+
+export const corsOrigins = parseCorsOrigins();
+Object.assign(config, { corsOrigins });
 
 export default config;

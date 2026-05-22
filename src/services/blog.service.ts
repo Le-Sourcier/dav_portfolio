@@ -31,10 +31,19 @@ class BlogService {
   async findBySlug(slug: string): Promise<IBlogPost> {
     const post = await BlogPost.findOne({
       where: { slug, published: true },
-      include: [{ model: Comment, as: 'comments' }],
+      include: [
+        {
+          model: Comment,
+          as: "comments",
+          where: { parentId: null },
+          required: false,
+          include: [{ model: Comment, as: "replies" }],
+          order: [["createdAt", "ASC"]],
+        },
+      ],
     });
     if (!post) {
-      throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+      throw new AppError("Blog post not found", HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
     return post;
   }
@@ -85,15 +94,30 @@ class BlogService {
     await post.destroy();
   }
 
-  async addComment(postId: string, data: Omit<IBlogComment, 'id' | 'postId' | 'createdAt'>): Promise<IBlogComment> {
+  async addComment(
+    postId: string,
+    data: { author: string; email: string; content: string; parentId?: string | null },
+  ): Promise<IBlogComment> {
     const post = await BlogPost.findByPk(postId);
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
 
+    // Extract @mentions from content (e.g. @David, @Marie)
+    const mentionRegex = /@([A-Za-zÀ-ÿ][\wÀ-]*)/g;
+    const mentions: string[] = [];
+    let match: RegExpExecArray | null;
+    while ((match = mentionRegex.exec(data.content)) !== null) {
+      mentions.push(match[1]!);
+    }
+
     const comment = await Comment.create({
-      ...data,
+      author: data.author,
+      email: data.email,
+      content: data.content,
       postId,
+      parentId: data.parentId ?? null,
+      mentions,
     });
 
     return comment;

@@ -95,4 +95,8 @@ export const createCommentValidator = [
     .trim()
     .notEmpty()
     .withMessage('Comment content is required'),
+  body('parentId')
+    .optional({ values: 'falsy' })
+    .isUUID()
+    .withMessage('Invalid parent comment ID'),
 ];

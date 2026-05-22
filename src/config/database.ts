@@ -24,13 +24,19 @@ export const connectDatabase = async (): Promise<void> => {
     await sequelize.authenticate();
     logger.info('Database connection established successfully');
 
-    // Sync models in development
-    if (config.nodeEnv === 'development') {
+    if (config.nodeEnv === 'development' && process.env.DB_AUTO_SYNC === 'true') {
       await sequelize.sync({ alter: true });
       logger.info('Database models synchronized');
     }
   } catch (error) {
-    logger.error('Unable to connect to the database:', error);
+    const err = error as Error & { parent?: { message?: string; detail?: string; code?: string }; sql?: string };
+    logger.error('Database sync/connect failed', {
+      message: err.message,
+      parentMessage: err.parent?.message,
+      parentDetail: err.parent?.detail,
+      parentCode: err.parent?.code,
+      sql: err.sql,
+    });
     throw error;
   }
 };

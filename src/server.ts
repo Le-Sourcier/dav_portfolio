@@ -5,7 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
-import { config, isProduction } from "./config/index.js";
+import { config, corsOrigins, isProduction } from "./config/index.js";
 import { connectDatabase } from "./config/database.js";
 import { startCronJobs } from "./cron/appointmentCron.js";
 import { swaggerSpec } from "./config/swagger.js";
@@ -26,7 +26,7 @@ const server = http.createServer(app);
 // Initialize Socket.io
 const io = new SocketServer(server, {
   cors: {
-    origin: config.frontendUrl,
+    origin: corsOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -52,7 +52,7 @@ app.use(
 // CORS configuration — always use explicit origin list
 app.use(
   cors({
-    origin: [config.frontendUrl],
+    origin: corsOrigins,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Visitor-Token"],
     credentials: true,
@@ -148,6 +148,7 @@ const startServer = async () => {
 ========================================
    Environment: ${config.nodeEnv}
    Port: ${config.port}
+   CORS: ${corsOrigins.join(", ")}
    API: http://localhost:${config.port}/api
    Docs: http://localhost:${config.port}/api-docs
    Health: http://localhost:${config.port}/api/health

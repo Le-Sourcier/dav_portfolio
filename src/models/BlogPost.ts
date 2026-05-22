@@ -12,7 +12,7 @@ import { IBlogPost, IBlogComment } from "../types/entities.types.js";
 // Comment model
 interface CommentCreationAttributes extends Optional<
   IBlogComment,
-  "id" | "createdAt"
+  "id" | "createdAt" | "parentId" | "mentions"
 > {}
 
 export class Comment
@@ -24,6 +24,8 @@ export class Comment
   declare email: string;
   declare content: string;
   declare postId: string;
+  declare parentId: string | null;
+  declare mentions: string[];
   declare readonly createdAt: Date;
 }
 
@@ -51,6 +53,14 @@ Comment.init(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    parentId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    mentions: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -61,7 +71,7 @@ Comment.init(
     modelName: "Comment",
     tableName: "comments",
     updatedAt: false,
-    indexes: [{ fields: ["post_id"] }],
+    indexes: [{ fields: ["post_id"] }, { fields: ["parent_id"] }],
   },
 );
 
@@ -233,6 +243,8 @@ BlogView.init(
 );
 
 // Associations
+Comment.hasMany(Comment, { foreignKey: "parentId", as: "replies" });
+Comment.belongsTo(Comment, { foreignKey: "parentId", as: "parent" });
 BlogPost.hasMany(Comment, { foreignKey: "postId", as: "comments" });
 Comment.belongsTo(BlogPost, { foreignKey: "postId" });
 BlogPost.hasMany(BlogView, { foreignKey: "postId", as: "views" });

@@ -8,6 +8,7 @@ import {
   Admin,
 } from "../src/models/index.js";
 import { logger } from "../src/utils/logger.js";
+import { experiencesSeed } from "./data/experiences.seed.js";
 
 const seedProjects = async () => {
   const projects = [
@@ -78,47 +79,13 @@ const seedProjects = async () => {
 };
 
 const seedExperiences = async () => {
-  const experiences = [
-    {
-      title: "Developpeur Fullstack & Architecte Logiciel",
-      company: "Nexus Corporation",
-      location: "Lome, Togo",
-      dates: "Aout 2025 - Present",
-      description:
-        "Plateforme d'investissement financier et application mobile",
-      stack: [
-        "Next.js 14",
-        "Node.js",
-        "PostgreSQL",
-        "Redis",
-        "React Native",
-        "TypeScript",
-      ],
-      challenges: [
-        "Gestion de la haute disponibilite pour une plateforme financiere critique",
-        "Optimisation des performances de l'application mobile",
-        "Mise en place d'une architecture microservices evolutive",
-      ],
-    },
-    {
-      title: "Developpeur Fullstack",
-      company: "YAO.",
-      location: "Remote",
-      dates: "Janvier 2024 - Juillet 2025",
-      description:
-        "Plateforme de formation en ligne et marketplace de talents tech",
-      stack: ["React", "Node.js", "MongoDB", "AWS"],
-      challenges: [
-        "Integration de systemes de paiement africains",
-        "Optimisation pour connexions bas debit",
-      ],
-    },
-  ];
+  // Reset propre — la table experiences est entièrement gérée par ce script.
+  await Experience.destroy({ where: {}, truncate: true, cascade: true });
 
-  for (const exp of experiences) {
+  for (const exp of experiencesSeed) {
     await Experience.create(exp as any);
   }
-  logger.info(`Seeded ${experiences.length} experiences`);
+  logger.info(`Seeded ${experiencesSeed.length} experiences`);
 };
 
 const seedBlogPosts = async () => {

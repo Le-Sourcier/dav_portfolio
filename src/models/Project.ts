@@ -1,5 +1,5 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/database.js';
+import { DataTypes, Model, Optional } from "sequelize";
+import { sequelize } from "../config/database.js";
 import {
   IProject,
   ProjectCategory,
@@ -8,12 +8,17 @@ import {
   ChartData,
   SolutionDiagram,
   ImpactData,
-} from '../types/entities.types.js';
+} from "../types/entities.types.js";
 
-interface ProjectCreationAttributes
-  extends Optional<IProject, 'id' | 'createdAt' | 'updatedAt' | 'featured' | 'tech' | 'links'> {}
+interface ProjectCreationAttributes extends Optional<
+  IProject,
+  "id" | "createdAt" | "updatedAt" | "featured" | "tech" | "links"
+> {}
 
-class Project extends Model<IProject, ProjectCreationAttributes> implements IProject {
+class Project
+  extends Model<IProject, ProjectCreationAttributes>
+  implements IProject
+{
   declare id: string;
   declare slug: string;
   declare title: string;
@@ -67,7 +72,7 @@ Project.init(
     category: {
       type: DataTypes.STRING(120),
       allowNull: false,
-      defaultValue: 'Fullstack',
+      defaultValue: "Fullstack",
     },
     image: {
       type: DataTypes.TEXT,
@@ -150,10 +155,10 @@ Project.init(
   },
   {
     sequelize,
-    modelName: 'Project',
-    tableName: 'projects',
-    indexes: [{ unique: true, fields: ['slug'] }],
-  }
+    modelName: "Project",
+    tableName: "projects",
+    indexes: [{ unique: true, fields: ["slug"] }],
+  },
 );
 
 export default Project;
