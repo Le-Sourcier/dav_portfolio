@@ -4,18 +4,49 @@ import { localizeText } from "@/i18n/localize";
 import { requestApi } from "@/services/portfolio/apiRequest";
 import type {
   BackendBlogPost,
+  BackendBlogComment,
   BackendExperience,
   BackendTestimonial,
 } from "@/types/backend.types";
-import type { BlogPost, BlogSection } from "@/types/blog";
+import type { BlogPost, BlogComment, BlogSection } from "@/types/blog";
+
+function mapComment(c: BackendBlogComment): BlogComment {
+  return {
+    id: c.id,
+    author: c.author,
+    content: c.content,
+    createdAt: c.createdAt,
+    parentId: c.parentId,
+    mentions: c.mentions,
+    replies: Array.isArray(c.replies) ? c.replies.map(mapComment) : undefined,
+  };
+}
 
 export type PortfolioExperienceItem = {
+  id: string;
   company: string;
   role: string;
   period: string;
   focus: string;
   summary: string;
   points: string[];
+};
+
+export type PortfolioExperienceDetail = PortfolioExperienceItem & {
+  location?: string;
+  description: string;
+  details: string[];
+  links: { label: string; url: string }[];
+  coverImage?: string;
+  illustrativeImages: string[];
+  stack: string[];
+  challenges: string[];
+  achievements: { title: string; description: string; icon?: string }[];
+  impactGraph: { label: string; value: number }[];
+  solutionDiagram?: {
+    nodes: { id: string; label: string; type: string }[];
+    connections: { from: string; to: string; label?: string }[];
+  };
 };
 
 export type PortfolioTestimonialItem = {
@@ -137,12 +168,7 @@ function normalizeBlogPost(
     viewCount: Number(post.viewCount ?? 0),
     shareCount: Number(post.shareCount ?? 0),
     comments: Array.isArray(post.comments)
-      ? post.comments.map((comment) => ({
-          id: comment.id,
-          author: comment.author,
-          content: comment.content,
-          createdAt: comment.createdAt,
-        }))
+      ? post.comments.map(mapComment)
       : [],
     language: locale,
     featured,
@@ -159,7 +185,8 @@ function normalizeExperience(
   locale: AppLocale,
 ): PortfolioExperienceItem {
   const role = localizeText(locale, item.title, item.title_en);
-  const summary = localizeText(locale, item.description, item.description_en);
+  const rawSummary = localizeText(locale, item.description, item.description_en);
+  const summary = stripContent(rawSummary);
   const points = [
     ...(Array.isArray(item.challenges) ? item.challenges : []),
     ...(Array.isArray(item.stack) ? item.stack : []),
@@ -168,12 +195,46 @@ function normalizeExperience(
     .slice(0, 4);
 
   return {
+    id: item.id,
     company: item.company,
     role,
     period: item.dates,
     focus: item.location || item.stack?.[0] || item.company,
     summary,
     points,
+  };
+}
+
+function normalizeExperienceDetail(
+  item: BackendExperience,
+  locale: AppLocale,
+): PortfolioExperienceDetail {
+  const base = normalizeExperience(item, locale);
+  const description = normalizeMarkdownContent(
+    localizeText(locale, item.description, item.description_en),
+  );
+
+  return {
+    ...base,
+    location: item.location?.trim() || undefined,
+    description,
+    details: Array.isArray(item.details) ? item.details.filter(Boolean) : [],
+    links: Array.isArray(item.links)
+      ? item.links.filter((l) => l.label && l.url)
+      : [],
+    coverImage: normalizeMediaUrl(item.coverImage ?? undefined),
+    illustrativeImages: Array.isArray(item.illustrativeImages)
+      ? item.illustrativeImages
+          .map((img) => normalizeMediaUrl(img))
+          .filter((img): img is string => Boolean(img))
+      : [],
+    stack: Array.isArray(item.stack) ? item.stack.filter(Boolean) : [],
+    challenges: Array.isArray(item.challenges) ? item.challenges.filter(Boolean) : [],
+    achievements: Array.isArray(item.achievements)
+      ? item.achievements.filter((a) => a.title && a.description)
+      : [],
+    impactGraph: Array.isArray(item.impactGraph) ? item.impactGraph : [],
+    solutionDiagram: item.solutionDiagram ?? undefined,
   };
 }
 
@@ -231,6 +292,24 @@ export async function loadExperiences(
   } catch (error) {
     console.error(`[portfolio] Unable to load experiences from API (${envConfig.apiUrl}/experiences):`, error);
     return [];
+  }
+}
+
+export async function loadExperienceById(
+  id: string,
+  locale: AppLocale = defaultLocale,
+): Promise<PortfolioExperienceDetail | null> {
+  try {
+    const experience = await requestApi<BackendExperience>(
+      `/experiences/${encodeURIComponent(id)}`,
+    );
+    return normalizeExperienceDetail(experience, locale);
+  } catch (error) {
+    console.error(
+      `[portfolio] Unable to load experience "${id}" from API (${envConfig.apiUrl}/experiences/${id}):`,
+      error,
+    );
+    return null;
   }
 }
 

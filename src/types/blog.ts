@@ -22,6 +22,9 @@ export type BlogComment = {
   author: string;
   content: string;
   createdAt: string;
+  parentId?: string | null;
+  mentions?: string[];
+  replies?: BlogComment[];
 };
 
 export type BlogPost = {

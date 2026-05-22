@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { envConfig } from '@/config/env';
 import { useAuthStore } from '@/stores/authStore';
+import { getVisitorToken } from '@/stores/visitorStore';
 import type { ApiError, ApiResponse } from '@/types/api.types';
 
 const isBrowser = typeof window !== 'undefined';
@@ -16,6 +17,10 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = useAuthStore.getState().token;
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  const visitorToken = getVisitorToken();
+  if (visitorToken && config.headers) {
+    config.headers['x-visitor-token'] = visitorToken;
   }
   return config;
 });

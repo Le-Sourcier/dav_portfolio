@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { ArticleHero } from "@/components/blog/ArticleHero";
 import { BackToTop } from "@/components/blog/BackToTop";
+import { CommentsSection } from "@/components/blog/comments/CommentsSection";
 import { MarkdownContent } from "@/components/blog/MarkdownContent";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareBar } from "@/components/blog/ShareBar";
@@ -210,43 +211,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </div>
 
-          {post.comments.length > 0 ? (
-            <section className="article-comments" aria-labelledby="article-comments-title">
-              <div>
-                <span>{t("comments")}</span>
-                <h2 id="article-comments-title">{t("readerNotes")}</h2>
-              </div>
-              <div className="article-comments-list">
-                {post.comments.map((comment) => (
-                  <article key={comment.id}>
-                    <header>
-                      <strong>{comment.author}</strong>
-                      <time dateTime={comment.createdAt}>
-                        {formatDate(comment.createdAt, post.language)}
-                      </time>
-                    </header>
-                    <p>{comment.content}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ) : null}
+          <CommentsSection
+            postId={post.id}
+            initialComments={post.comments}
+            language={post.language}
+          />
 
           <nav className="article-pagination" aria-label="Navigation entre articles">
             {previousPost ? (
-              <Link href={`/blog/${previousPost.slug}`}>
-                <span>{t("previous")}</span>
-                <strong>{previousPost.title}</strong>
-                <small>{previousPost.category} · {previousPost.readTime}</small>
+              <Link href={`/blog/${previousPost.slug}`} className="article-pagination-card is-prev">
+                <span className="article-pagination-arrow" aria-hidden="true">&larr;</span>
+                <span className="article-pagination-text">
+                  <span className="article-pagination-label">{t("previous")}</span>
+                  <strong>{previousPost.title}</strong>
+                  <small>{previousPost.category} · {previousPost.readTime}</small>
+                </span>
               </Link>
             ) : (
               <span />
             )}
             {nextPost ? (
-              <Link href={`/blog/${nextPost.slug}`}>
-                <span>{t("next")}</span>
-                <strong>{nextPost.title}</strong>
-                <small>{nextPost.category} · {nextPost.readTime}</small>
+              <Link href={`/blog/${nextPost.slug}`} className="article-pagination-card is-next">
+                <span className="article-pagination-text">
+                  <span className="article-pagination-label">{t("next")}</span>
+                  <strong>{nextPost.title}</strong>
+                  <small>{nextPost.category} · {nextPost.readTime}</small>
+                </span>
+                <span className="article-pagination-arrow" aria-hidden="true">&rarr;</span>
               </Link>
             ) : (
               <span />

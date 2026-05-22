@@ -148,7 +148,10 @@ export interface BackendBlogComment {
   email: string;
   content: string;
   postId: string;
+  parentId: string | null;
+  mentions: string[];
   createdAt: string;
+  replies?: BackendBlogComment[];
 }
 
 export interface BackendBlogPost extends LocalizedTextField<"title" | "excerpt" | "content"> {

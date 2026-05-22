@@ -58,13 +58,15 @@ export function ArticleHero({
           {actions ? <div className="article-cover-actions">{actions}</div> : null}
         </div>
         <h1>{post.title}</h1>
-        <div className="article-cover-meta">
-          {chips.map((chip) => (
-            <span key={chip.label} className={chip.type === "author" ? "is-author" : undefined}>
-              {chip.type === "author" ? <small aria-hidden="true">{authorInitials}</small> : null}
-              {chip.label}
-            </span>
-          ))}
+        <div className="article-cover-meta-row">
+          <div className="article-cover-meta">
+            {chips.map((chip) => (
+              <span key={chip.label} className={chip.type === "author" ? "is-author" : undefined}>
+                {chip.type === "author" ? <small aria-hidden="true">{authorInitials}</small> : null}
+                {chip.label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>

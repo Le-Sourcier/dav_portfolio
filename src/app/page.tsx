@@ -5,6 +5,7 @@ import { ExpertiseCarousel } from "@/components/ExpertiseCarousel";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { BackToTop } from "@/components/blog/BackToTop";
 import {
   proofStats,
@@ -321,10 +322,15 @@ export default async function Home() {
                 <span>Automatisation</span>
                 <span>SEO</span>
               </div>
+              {experience.length > 3 ? (
+                <Link href="/experiences" className="secondary-button parcours-cta">
+                  Voir tous mes parcours
+                </Link>
+              ) : null}
             </div>
 
             <div className="parcours-timeline">
-              {experience.map((item, index) => (
+              {experience.slice(0, 3).map((item, index) => (
                 <article
                   className="parcours-card"
                   key={`${item.company}-${item.period}`}>
@@ -336,7 +342,7 @@ export default async function Home() {
                     <p className="parcours-focus">{item.focus}</p>
                     <h3>{item.role}</h3>
                     <p className="company">{item.company}</p>
-                    <p>{item.summary}</p>
+                    <p className="parcours-summary">{item.summary}</p>
                     {item.points.length > 0 ? (
                       <div className="parcours-tags">
                         {item.points.map((point) => (
@@ -344,6 +350,11 @@ export default async function Home() {
                         ))}
                       </div>
                     ) : null}
+                    <Link
+                      href={`/experiences/${item.id}`}
+                      className="text-link parcours-link">
+                      Voir le détail
+                    </Link>
                   </div>
                 </article>
               ))}
@@ -394,74 +405,7 @@ export default async function Home() {
         </section>
 
         {hasTestimonials ? (
-          <section className="section testimonials-section">
-            <div className="section-heading">
-              <p className="section-kicker">Témoignages</p>
-              <h2>
-                Une collaboration pensée pour la clarté et l&apos;exécution.
-              </h2>
-            </div>
-            <div className="testimonial-grid">
-              {testimonials.map((testimonial) => {
-                const initials = testimonial.name
-                  .split(/\s+/)
-                  .map((part) => part[0])
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase();
-                const filledStars = Math.round(testimonial.rating ?? 0);
-                const dateLabel = testimonial.createdAt
-                  ? dateFormatter.format(new Date(testimonial.createdAt))
-                  : null;
-                return (
-                  <article key={testimonial.id} className="testimonial-card">
-                    <div className="testimonial-card-header">
-                      <div
-                        className={`testimonial-avatar${testimonial.avatar ? " has-image" : ""}`}
-                        aria-hidden="true">
-                        {testimonial.avatar ? (
-                          <img src={testimonial.avatar} alt="" loading="lazy" />
-                        ) : (
-                          <span>{initials || "?"}</span>
-                        )}
-                      </div>
-                      <div className="testimonial-card-identity">
-                        <strong>{testimonial.name}</strong>
-                        <span>
-                          {[testimonial.role, testimonial.company]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </span>
-                      </div>
-                    </div>
-                    {testimonial.rating ? (
-                      <div
-                        className="testimonial-rating"
-                        aria-label={`Note: ${filledStars} sur 5`}>
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <span
-                            key={index}
-                            className={index < filledStars ? "is-filled" : ""}
-                            aria-hidden="true">
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                    <p className="testimonial-quote">“{testimonial.quote}”</p>
-                    {dateLabel ? (
-                      <time
-                        className="testimonial-date"
-                        dateTime={testimonial.createdAt}>
-                        {dateLabel}
-                      </time>
-                    ) : null}
-                  </article>
-                );
-              })}
-            </div>
-          </section>
+          <TestimonialsCarousel testimonials={testimonials} locale={locale} />
         ) : null}
 
         {hasBlog ? (

@@ -68,5 +68,32 @@
     "contactFocusValue": "SaaS, API, back-office, automation",
     "contactPrimary": "Discuss the topic",
     "downloadCv": "Download CV"
+  },
+  "BlogComments": {
+    "kicker": "Comments",
+    "title": "Reader reactions",
+    "count": "{count, plural, =0 {No comment yet} =1 {1 comment published} other {# comments published}}",
+    "empty": "Be the first to share your reaction.",
+    "namePlaceholder": "First name",
+    "emailPlaceholder": "you@email.com",
+    "otpHint": "No spam — email is only used to verify your identity.",
+    "getCode": "Get code",
+    "sending": "Sending…",
+    "resend": "Resend",
+    "resendIn": "{seconds}s",
+    "rememberMe": "Remember me",
+    "changeIdentity": "Change",
+    "verifyDesc": "Code sent to {email}",
+    "contentPlaceholder": "Share your thoughts or reply to a comment…",
+    "publish": "Publish",
+    "publishing": "Publishing…",
+    "successPosted": "Comment published.",
+    "nameRequired": "Name required.",
+    "emailInvalid": "Invalid email.",
+    "contentRequired": "Comment cannot be empty.",
+    "reply": "Reply",
+    "cancel": "Cancel",
+    "publishReply": "Reply",
+    "replyPlaceholder": "Reply to @{author}…"
   }
 }
