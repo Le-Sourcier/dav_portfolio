@@ -32,6 +32,17 @@ Côté paiement : intégration multi-passerelles avec chiffrement bout en bout, 
 The web frontend runs on Next.js 14 (App Router, RSC, streaming). The React Native mobile app shares the same API contracts and embeds an offline-first mode for critical screens. The admin dashboard consumes real-time streams over WebSocket and renders Chart.js visualizations.
 
 On the payment side: multi-gateway integration with end-to-end encryption, idempotent webhooks, automated reconciliation queue and full audit trails.`,
+  headline_en: "Multi-channel financial investment platform — web, mobile, admin and technical blog.",
+  result_en: "Platform deployed in production, mobile app under Google Play review, E2E-encrypted transactions with automatic reconciliation.",
+  metric_en: "4 surfaces (web, mobile, admin, blog) on a unified backend",
+  role_en: "Software Architect & Lead Fullstack",
+  results_en: [
+    "Next.js 14 web platform deployed in production at nexuscorporat.com",
+    "Cross-platform React Native mobile app submitted to Google Play Store",
+    "Multi-gateway payment integration with end-to-end encryption",
+    "Admin dashboard with WebSocket real-time flows and Chart.js visualizations",
+    "JWT authentication pipeline with granular RBAC per module",
+  ],
   result:
     "Plateforme déployée en production, app mobile en review Google Play, transactions chiffrées E2E avec réconciliation automatique.",
   metric: "4 surfaces (web, mobile, admin, blog) sur un backend unifié",

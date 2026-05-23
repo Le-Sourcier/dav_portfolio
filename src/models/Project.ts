@@ -45,6 +45,11 @@ class Project
   declare description_en?: string;
   declare problem_en?: string;
   declare solution_en?: string;
+  declare headline_en?: string;
+  declare result_en?: string;
+  declare metric_en?: string;
+  declare role_en?: string;
+  declare results_en?: string[];
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }
@@ -152,6 +157,11 @@ Project.init(
     description_en: { type: DataTypes.TEXT, allowNull: true },
     problem_en: { type: DataTypes.TEXT, allowNull: true },
     solution_en: { type: DataTypes.TEXT, allowNull: true },
+    headline_en: { type: DataTypes.TEXT, allowNull: true },
+    result_en: { type: DataTypes.TEXT, allowNull: true },
+    metric_en: { type: DataTypes.STRING(255), allowNull: true },
+    role_en: { type: DataTypes.STRING(255), allowNull: true },
+    results_en: { type: DataTypes.JSONB, allowNull: true, defaultValue: [] },
   },
   {
     sequelize,

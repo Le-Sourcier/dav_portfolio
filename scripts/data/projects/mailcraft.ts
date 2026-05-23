@@ -24,6 +24,17 @@ Génération PDF via Puppeteer pour les versions imprimables ou les archives. Mo
   solution_en: `Drag-and-drop editor built in React with a library of blocks validated across major mail clients. HTML rendering is server-side with Outlook fallbacks (VML for buttons, nested tables). A linter catches pitfalls (unsupported media queries, forbidden CSS properties) before export.
 
 PDF generation via Puppeteer for print versions or archives. Dark mode tested through simulated preview. Template API to reuse validated blocks across campaigns.`,
+  headline_en: "WYSIWYG newsletter editor with PDF generation and responsive template library.",
+  result_en: "Newsletter production time divided by 3 with reliable rendering on Gmail, Outlook and Apple Mail.",
+  metric_en: "Editorial production x3 without dedicated designer",
+  role_en: "Fullstack Engineer",
+  results_en: [
+    "Drag-and-drop WYSIWYG editor with block library",
+    "HTML generation compatible with Gmail, Outlook and Apple Mail",
+    "PDF export via Puppeteer for archiving and printing",
+    "Built-in linter that flags client incompatibilities",
+    "Simulated dark mode preview",
+  ],
   result:
     "Production newsletter divisée par 3 avec un rendu fiable sur Gmail, Outlook et Apple Mail.",
   metric: "Production éditoriale x3 sans designer dédié",

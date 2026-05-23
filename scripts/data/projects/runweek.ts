@@ -24,6 +24,17 @@ L'app mobile React Native synchronise en arrière-plan, gère le mode offline-fi
   solution_en: `Unified integration layer that talks to the four native SDKs (Garmin Health API, HealthKit, Samsung Health SDK, Mi Fitness API) through a common abstraction. Sessions are normalized into a single schema on the Node.js backend and stored in PostgreSQL.
 
 The React Native mobile app syncs in the background, handles offline-first mode and displays weekly dashboards (volume, intensity, elevation, average pace). A "training load" view computes the acute/chronic ratio to prevent overtraining.`,
+  headline_en: "Connected sports tracking unifying Garmin, Apple Watch, Samsung and Xiaomi in a single experience.",
+  result_en: "A single app for all wearable ecosystems on the market, with consolidated training load calculation.",
+  metric_en: "4 wearable ecosystems unified (Garmin, Apple, Samsung, Xiaomi)",
+  role_en: "Fullstack & Mobile Engineer",
+  results_en: [
+    "Native integration with 4 major wearable ecosystems",
+    "Offline-first mode for key screens (sessions, calendar)",
+    "Acute/chronic training load ratio calculation",
+    "Weekly dashboards (volume, intensity, elevation, pace)",
+    "Background multi-source sync without duplicates",
+  ],
   result:
     "Une seule app pour tous les écosystèmes wearable du marché, avec calcul de charge d'entraînement consolidée.",
   metric: "4 écosystèmes wearable unifiés (Garmin, Apple, Samsung, Xiaomi)",

@@ -69,6 +69,11 @@ export interface IProject {
   description_en?: string;
   problem_en?: string;
   solution_en?: string;
+  headline_en?: string;
+  result_en?: string;
+  metric_en?: string;
+  role_en?: string;
+  results_en?: string[];
   createdAt?: Date;
   updatedAt?: Date;
 }

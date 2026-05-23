@@ -24,6 +24,17 @@ Architecture Next.js minimaliste : pas de SSR coûteux, génération statique + 
   solution_en: `CSS and GSAP scroll-driven animations, images served in AVIF/WebP with fallbacks, systematic lazy-loading of off-viewport sections. All interactive elements are keyboard-accessible and properly announced by screen readers.
 
 Minimalist Next.js architecture: no expensive SSR, static generation with revalidation, partial hydration of interactive components.`,
+  headline_en: "Immersive web showcase for an electric vehicle: scroll-driven storytelling, performance and accessibility.",
+  result_en: "LCP < 2.5s on simulated 3G, Lighthouse 95+ accessibility, immersive experience without WebGL.",
+  metric_en: "Lighthouse 95+, LCP < 2.5s on simulated 3G",
+  role_en: "Frontend Engineer & Motion Design",
+  results_en: [
+    "Scroll-driven storytelling without WebGL",
+    "Images served in AVIF/WebP with fallbacks",
+    "AA accessibility compliance (keyboard, screen readers)",
+    "Lighthouse Performance 95+ and Accessibility 95+",
+    "Partial hydration of interactive components",
+  ],
   result:
     "LCP < 2.5s sur 3G simulé, Lighthouse 95+ accessibilité, expérience immersive sans WebGL.",
   metric: "Lighthouse 95+, LCP < 2.5s sur 3G simulé",

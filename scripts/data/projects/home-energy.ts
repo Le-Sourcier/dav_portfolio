@@ -24,6 +24,16 @@ L'interface Next.js conduit l'utilisateur par étapes courtes (surface, isolatio
   solution_en: `A Node.js calculation engine based on current thermal regulations, parameterized by climate zone and housing type. Coefficients are externalized in JSON to allow updates without redeployment.
 
 The Next.js interface guides the user through short steps (area, insulation, heating, windows) and shows results live: kWh/m²/year, annual cost, potential savings, CO₂ equivalent. An "action plan" prioritizes renovations by ROI.`,
+  headline_en: "SaaS energy consumption simulator: savings, CO₂ and real-time action plan.",
+  result_en: "Up to 70 % heating savings and 75 % CO₂ reduction measured on pilot cases.",
+  metric_en: "Up to 70 % heating savings, -75 % CO₂",
+  role_en: "Fullstack Engineer",
+  results_en: [
+    "Calculation engine parameterizable by climate zone and housing type",
+    "Readable output: kWh, cost, CO₂, renovation ROI",
+    "Action plan prioritized by return on investment",
+    "Coefficient updates without redeployment (JSON config)",
+  ],
   result:
     "Jusqu'à 70 % d'économies de chauffage et 75 % de réduction CO₂ mesurées sur les cas-pilotes.",
   metric: "Économies jusqu'à 70 % sur le chauffage, -75 % CO₂",

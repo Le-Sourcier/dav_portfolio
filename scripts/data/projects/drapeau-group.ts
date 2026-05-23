@@ -24,6 +24,17 @@ La passation a été préparée dès la conception : code documenté, README exh
   solution_en: `Next.js + Node.js architecture, deployed on a dedicated server configured for production (HTTPS, reverse proxy, backups). Content is structured by business line and managed through a lightweight admin layer.
 
 Handover was prepared from day one: documented code, comprehensive README, public GitHub repository, transfer sessions with the internal team.`,
+  headline_en: "Three-line corporate website for a Togolese civil engineering, equipment rental and real estate player.",
+  result_en: "Three-line corporate site delivered in 4 months and taken over seamlessly by the internal team.",
+  metric_en: "3 business lines, delivered in 4 months, transferred debt-free",
+  role_en: "Fullstack Engineer & Project Manager",
+  results_en: [
+    "Complete corporate site integrating all three business lines",
+    "Production server configuration (HTTPS, reverse proxy, backups)",
+    "Lightweight admin layer for content updates",
+    "Documented code and public GitHub repository",
+    "Full handover to internal team for maintenance",
+  ],
   result:
     "Site corporate trois-lignes-métier livré en 4 mois et repris sans accroc par l'équipe interne.",
   metric: "3 lignes métier, livré en 4 mois, transféré sans dette",

@@ -28,6 +28,17 @@ Côté UI : un dashboard Next.js avec filtres dynamiques, vue Kanban du pipeline
 Enrichment layer: OpenAI scores leads against client criteria (size, sector, buying signals) and personalizes outreach messages. Native CRM integration via REST API and idempotent webhooks.
 
 UI side: a Next.js dashboard with dynamic filters, a Kanban view of the prospecting pipeline and multi-format export (CSV, Excel, JSON).`,
+  headline_en: "AI-powered B2B prospecting: multi-channel sourcing, lead scoring and message personalization.",
+  result_en: "60 % conversion rate increase observed and ~15 h/week saved on sales teams.",
+  metric_en: "60 % more conversions, ~15 h saved per week",
+  role_en: "Software Architect & Fullstack Engineer",
+  results_en: [
+    "Automated sourcing on 4 public channels (Pages Jaunes, Pappers, GoAfrica, Google Maps)",
+    "AI lead scoring based on client business criteria",
+    "Automatic contact message personalization (templates + OpenAI)",
+    "Direct CRM integration via REST API and webhooks",
+    "Multi-format export and complete pipeline history",
+  ],
   result:
     "Augmentation de 60 % du taux de conversion observée et gain de ~15 h/semaine sur les équipes commerciales.",
   metric: "60 % de conversion en plus, ~15 h économisées par semaine",

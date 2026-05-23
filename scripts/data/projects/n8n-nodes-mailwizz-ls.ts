@@ -24,6 +24,16 @@ Le package est utilisé en production sur les chaînes d'automatisation des clie
   solution_en: `Typed fork published separately with the missing operations, while keeping surface compatibility with the official node. Integration tests against a MailWizz mock to stabilize contracts.
 
 The package is used in production on agency client automation chains and published on NPM as version 2.1.13.`,
+  headline_en: "Enhanced fork of the N8N MailWizz node: advanced list, segment and tag operations.",
+  result_en: "Agency operations covered (segments, tags, custom fields, unsubscribes), version 2.1.13 in production.",
+  metric_en: "Agency operations covered in version 2.1.13",
+  role_en: "Open-source author & maintainer",
+  results_en: [
+    "Fine-grained dynamic segment management",
+    "Multi-tag and custom field support",
+    "Unsubscribe webhooks relayed to N8N",
+    "Surface compatibility with the official node",
+  ],
   result:
     "Opérations agency couvertes (segments, tags, custom fields, désinscriptions), version 2.1.13 en production.",
   metric: "Opérations agency couvertes en version 2.1.13",

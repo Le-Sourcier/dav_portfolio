@@ -1,36 +1,53 @@
-import { QueryInterface, DataTypes } from 'sequelize';
+import 'dotenv/config';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/database.js';
 
-export async function up(queryInterface: QueryInterface): Promise<void> {
+async function addColumnIfMissing(table: string, column: string, definition: string): Promise<void> {
+  const tableInfo: { column_name: string }[] = await sequelize.query(
+    `SELECT column_name FROM information_schema.columns WHERE table_name = '${table}' AND column_name = '${column}'`,
+    { type: 'SELECT' },
+  );
+  if (tableInfo.length > 0) {
+    console.log(`[migration] column "${table}"."${column}" already present, skipping`);
+    return;
+  }
+  await sequelize.query(`ALTER TABLE "${table}" ADD COLUMN "${column}" ${definition}`);
+  console.log(`[migration] added column "${table}"."${column}"`);
+}
+
+async function run(): Promise<void> {
+  await sequelize.authenticate();
+  console.log('[migration] connected to database');
+
   // blog_posts
-  await queryInterface.addColumn('blog_posts', 'title_en', { type: DataTypes.STRING(255), allowNull: true });
-  await queryInterface.addColumn('blog_posts', 'excerpt_en', { type: DataTypes.TEXT, allowNull: true });
-  await queryInterface.addColumn('blog_posts', 'content_en', { type: DataTypes.TEXT, allowNull: true });
+  await addColumnIfMissing('blog_posts', 'title_en', 'VARCHAR(255)');
+  await addColumnIfMissing('blog_posts', 'excerpt_en', 'TEXT');
+  await addColumnIfMissing('blog_posts', 'content_en', 'TEXT');
 
   // projects
-  await queryInterface.addColumn('projects', 'title_en', { type: DataTypes.STRING(255), allowNull: true });
-  await queryInterface.addColumn('projects', 'description_en', { type: DataTypes.TEXT, allowNull: true });
-  await queryInterface.addColumn('projects', 'problem_en', { type: DataTypes.TEXT, allowNull: true });
-  await queryInterface.addColumn('projects', 'solution_en', { type: DataTypes.TEXT, allowNull: true });
+  await addColumnIfMissing('projects', 'title_en', 'VARCHAR(255)');
+  await addColumnIfMissing('projects', 'description_en', 'TEXT');
+  await addColumnIfMissing('projects', 'problem_en', 'TEXT');
+  await addColumnIfMissing('projects', 'solution_en', 'TEXT');
+  await addColumnIfMissing('projects', 'headline_en', 'TEXT');
+  await addColumnIfMissing('projects', 'result_en', 'TEXT');
+  await addColumnIfMissing('projects', 'metric_en', 'VARCHAR(255)');
+  await addColumnIfMissing('projects', 'role_en', 'VARCHAR(255)');
+  await addColumnIfMissing('projects', 'results_en', 'JSONB');
 
   // experiences
-  await queryInterface.addColumn('experiences', 'title_en', { type: DataTypes.STRING(255), allowNull: true });
-  await queryInterface.addColumn('experiences', 'description_en', { type: DataTypes.TEXT, allowNull: true });
+  await addColumnIfMissing('experiences', 'title_en', 'VARCHAR(255)');
+  await addColumnIfMissing('experiences', 'description_en', 'TEXT');
 
   // testimonials
-  await queryInterface.addColumn('testimonials', 'content_en', { type: DataTypes.TEXT, allowNull: true });
-  await queryInterface.addColumn('testimonials', 'role_en', { type: DataTypes.STRING(100), allowNull: true });
+  await addColumnIfMissing('testimonials', 'content_en', 'TEXT');
+  await addColumnIfMissing('testimonials', 'role_en', 'VARCHAR(100)');
+
+  console.log('[migration] done');
+  await sequelize.close();
 }
 
-export async function down(queryInterface: QueryInterface): Promise<void> {
-  await queryInterface.removeColumn('blog_posts', 'title_en');
-  await queryInterface.removeColumn('blog_posts', 'excerpt_en');
-  await queryInterface.removeColumn('blog_posts', 'content_en');
-  await queryInterface.removeColumn('projects', 'title_en');
-  await queryInterface.removeColumn('projects', 'description_en');
-  await queryInterface.removeColumn('projects', 'problem_en');
-  await queryInterface.removeColumn('projects', 'solution_en');
-  await queryInterface.removeColumn('experiences', 'title_en');
-  await queryInterface.removeColumn('experiences', 'description_en');
-  await queryInterface.removeColumn('testimonials', 'content_en');
-  await queryInterface.removeColumn('testimonials', 'role_en');
-}
+run().catch((error) => {
+  console.error('[migration] failed', error);
+  process.exit(1);
+});

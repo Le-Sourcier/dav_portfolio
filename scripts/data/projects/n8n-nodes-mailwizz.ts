@@ -24,6 +24,16 @@ Publié sur le registry public N8N et NPM, avec documentation, exemples de workf
   solution_en: `Type-safe N8N node in TypeScript covering the main operations: create/update/delete subscriber, list management, campaign send, transactional send. Encapsulated API auth, exponential backoff retry, automatic pagination.
 
 Published on the public N8N registry and NPM, with documentation, workflow examples and integration tests.`,
+  headline_en: "Unofficial N8N node for MailWizz — subscribers, lists, campaigns and transactional sends in one connector.",
+  result_en: "25,000+ NPM downloads, integrated in production marketing automation chains.",
+  metric_en: "25,000+ NPM downloads",
+  role_en: "Open-source author & maintainer",
+  results_en: [
+    "Coverage of key MailWizz operations (subscribers, lists, campaigns, transactional)",
+    "Encapsulated API auth with exponential backoff retry",
+    "Documentation, workflow examples and integration tests",
+    "Published on N8N public registry and NPM",
+  ],
   result:
     "25 000+ téléchargements NPM, intégré dans des chaînes d'automatisation marketing en production.",
   metric: "25 000+ téléchargements NPM",

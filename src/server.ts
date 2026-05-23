@@ -17,7 +17,7 @@ import {
   notFoundHandler,
 } from "./middlewares/error.middleware.js";
 import { requestLogger } from "./middlewares/logger.middleware.js";
-import { apiLimiter } from "./middlewares/rateLimit.middleware.js";
+
 
 // Initialize Express app
 const app = express();
@@ -65,9 +65,6 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Request logging
 app.use(requestLogger);
-
-// Rate limiting
-app.use("/api", apiLimiter);
 
 // Swagger documentation — only in non-production
 if (!isProduction) {

@@ -24,6 +24,16 @@ Conçu pour glisser dans des workflows existants sans changer la structure du gr
   solution_en: `N8N node that abstracts over 4 inference servers (LM Studio, Ollama, vLLM, TGI) — configuration by URL + model, chat/completion/embeddings operations. Streaming supported for long responses.
 
 Built to drop into existing workflows without changing graph structure: prompt input, text or embedding output, standard N8N error handling.`,
+  headline_en: "N8N node for self-hosted open-source GPT models — local LLM agent orchestration.",
+  result_en: "N8N orchestration × self-hosted open-source models in version 0.1.0, ready for on-prem use cases.",
+  metric_en: "4 inference backends supported in version 0.1.0",
+  role_en: "Open-source author & maintainer",
+  results_en: [
+    "Unified abstraction over LM Studio, Ollama, vLLM and Text Generation Inference",
+    "Chat, completion and embeddings operations",
+    "Streaming support for long responses",
+    "Error handling aligned with N8N patterns",
+  ],
   result:
     "Orchestration N8N x modèles open-source self-hosted en version 0.1.0, prête pour les usages on-prem.",
   metric: "4 backends d'inférence supportés en version 0.1.0",
