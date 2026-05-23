@@ -559,25 +559,59 @@ main {
   color: var(--gold);
 }
 
-:root[data-theme="dark"] .form-label-text {
-  color: rgba(247, 241, 231, 0.78);
-}
-
-:root[data-theme="dark"] .contact-form input,
-:root[data-theme="dark"] .contact-form select,
-:root[data-theme="dark"] .contact-form textarea {
-  border: 1px solid rgba(255, 247, 233, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 247, 233, 0.025);
+:root[data-theme="dark"] .contact-form .floating-field-control > input,
+:root[data-theme="dark"] .contact-form .floating-field-control > select,
+:root[data-theme="dark"] .contact-form .floating-field-control > textarea {
+  border: 1px solid rgba(255, 247, 233, 0.1);
+  background: rgba(255, 247, 233, 0.03);
   color: var(--foreground);
   box-shadow: none;
 }
 
-:root[data-theme="dark"] .contact-form input:hover,
-:root[data-theme="dark"] .contact-form select:hover,
-:root[data-theme="dark"] .contact-form textarea:hover {
-  border-color: rgba(255, 247, 233, 0.16);
-  background: rgba(255, 247, 233, 0.045);
+:root[data-theme="dark"] .floating-field-control > select {
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] .floating-field-control > select > option {
+  background-color: #111310;
+  color: var(--foreground);
+}
+
+:root[data-theme="dark"] .contact-form .floating-field-control > input:hover:not(:focus),
+:root[data-theme="dark"] .contact-form .floating-field-control > select:hover:not(:focus),
+:root[data-theme="dark"] .contact-form .floating-field-control > textarea:hover:not(:focus) {
+  border-color: rgba(255, 247, 233, 0.18);
+  background: rgba(255, 247, 233, 0.05);
+}
+
+:root[data-theme="dark"] .floating-field-label {
+  color: rgba(247, 241, 231, 0.5);
+}
+
+:root[data-theme="dark"] .floating-field.is-filled .floating-field-label,
+:root[data-theme="dark"] .floating-field-control > input:focus + .floating-field-label,
+:root[data-theme="dark"] .floating-field-control > select:focus + .floating-field-label,
+:root[data-theme="dark"] .floating-field-control > textarea:focus + .floating-field-label {
+  color: var(--gold);
+}
+
+:root[data-theme="dark"] .floating-field.is-invalid .floating-field-control > input,
+:root[data-theme="dark"] .floating-field.is-invalid .floating-field-control > select,
+:root[data-theme="dark"] .floating-field.is-invalid .floating-field-control > textarea {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+:root[data-theme="dark"] .floating-field.is-invalid .floating-field-label,
+:root[data-theme="dark"] .floating-field.is-invalid.is-filled .floating-field-label {
+  color: rgba(248, 113, 113, 0.78);
+}
+
+:root[data-theme="dark"] .floating-field-error {
+  color: rgba(248, 113, 113, 0.82);
+}
+
+:root[data-theme="dark"] .form-counter.is-warn {
+  color: rgb(251, 191, 36);
 }
 
 :root[data-theme="dark"] input:focus,
@@ -6832,26 +6866,21 @@ main {
   gap: 14px;
 }
 
-.contact-form label {
+/* === Floating fields === */
+.floating-field {
   display: grid;
-  gap: 8px;
-  color: #2c2a25;
-  font-size: 14px;
-  font-weight: 700;
+  gap: 6px;
 }
 
-.form-label-text {
-  color: rgba(46, 41, 32, 0.78);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.floating-field-control {
+  position: relative;
 }
 
-.contact-form input,
-.contact-form select,
-.contact-form textarea {
+.floating-field-control > input,
+.floating-field-control > select,
+.floating-field-control > textarea {
   width: 100%;
-  border: 1px solid rgba(17, 17, 17, 0.1);
+  border: 1px solid rgba(17, 17, 17, 0.12);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
   -webkit-backdrop-filter: blur(8px);
@@ -6860,50 +6889,151 @@ main {
   font: inherit;
   font-size: 15px;
   outline: none;
-  padding: 14px 16px;
+  padding: 22px 14px 10px;
   transition:
     border-color 200ms ease,
     box-shadow 220ms ease,
     background-color 200ms ease;
 }
 
-.contact-form textarea {
+.floating-field-control > textarea {
   min-height: 156px;
   resize: vertical;
   line-height: 1.6;
+  padding-top: 26px;
 }
 
-.contact-form select {
-  color-scheme: light;
+.floating-field-control > select {
   appearance: none;
   background-image:
-    linear-gradient(45deg, transparent 50%, rgba(17, 17, 17, 0.6) 50%),
-    linear-gradient(135deg, rgba(17, 17, 17, 0.6) 50%, transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55));
-  background-position: calc(100% - 18px) center, calc(100% - 13px) center, 0 0;
-  background-size: 5px 5px, 5px 5px, 100% 100%;
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 13px) calc(50% + 2px);
+  background-size: 5px 5px;
   background-repeat: no-repeat;
   padding-right: 36px;
+  color: var(--foreground);
 }
 
-.contact-form input::placeholder,
-.contact-form textarea::placeholder {
-  color: rgba(111, 106, 96, 0.52);
+/* Options du dropdown : couleurs lisibles selon le theme */
+.floating-field-control > select > option {
+  background-color: var(--panel);
+  color: var(--foreground);
+  font-weight: 500;
 }
 
-.contact-form input:hover,
-.contact-form select:hover,
-.contact-form textarea:hover {
-  border-color: rgba(17, 17, 17, 0.18);
+.floating-field-control > input::placeholder,
+.floating-field-control > textarea::placeholder {
+  color: transparent;
+}
+
+.floating-field-label {
+  position: absolute;
+  top: 16px;
+  left: 14px;
+  color: rgba(46, 41, 32, 0.6);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  transform-origin: left top;
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 180ms ease;
+}
+
+/* Label remonte : focus OU champ rempli OU c'est un select (qui affiche toujours une option) */
+.floating-field.is-filled .floating-field-label,
+.floating-field-control:has(select) > .floating-field-label,
+.floating-field-control > input:focus + .floating-field-label,
+.floating-field-control > select:focus + .floating-field-label,
+.floating-field-control > textarea:focus + .floating-field-label {
+  transform: translate3d(0, -10px, 0) scale(0.78);
+  color: var(--accent-strong);
+}
+
+.floating-field-control > input:hover:not(:focus),
+.floating-field-control > select:hover:not(:focus),
+.floating-field-control > textarea:hover:not(:focus) {
+  border-color: rgba(17, 17, 17, 0.22);
   background: rgba(255, 255, 255, 0.1);
 }
 
-.contact-form input:focus,
-.contact-form select:focus,
-.contact-form textarea:focus {
-  border-color: rgba(15, 118, 110, 0.5);
+.floating-field-control > input:focus,
+.floating-field-control > select:focus,
+.floating-field-control > textarea:focus {
+  border-color: rgba(15, 118, 110, 0.55);
   background: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+/* État invalide — accent rouge subtil */
+.floating-field.is-invalid .floating-field-control > input,
+.floating-field.is-invalid .floating-field-control > select,
+.floating-field.is-invalid .floating-field-control > textarea {
+  border-color: rgba(190, 18, 60, 0.42);
+}
+
+.floating-field.is-invalid .floating-field-label,
+.floating-field.is-invalid.is-filled .floating-field-label,
+.floating-field.is-invalid .floating-field-control > input:focus + .floating-field-label,
+.floating-field.is-invalid .floating-field-control > select:focus + .floating-field-label,
+.floating-field.is-invalid .floating-field-control > textarea:focus + .floating-field-label {
+  color: rgba(190, 18, 60, 0.85);
+}
+
+.floating-field-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding-left: 14px;
+  color: rgba(190, 18, 60, 0.85);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.floating-field-error::before {
+  content: "•";
+  font-size: 14px;
+  line-height: 1;
+}
+
+.floating-field-hint {
+  margin: 0;
+  padding-left: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Compteur de caractères */
+.form-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+.form-counter.is-warn {
+  color: rgb(217, 119, 6);
+  font-weight: 700;
+}
+
+/* Honeypot anti-bot — hors flux visuel sans .sr-only pour rester focusable par bot */
+.form-honeypot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Override : la règle générique .contact-form label gardée pour compat — neutralisée */
+.contact-form label {
+  display: block;
+  color: inherit;
+  font: inherit;
 }
 
 .form-cta {

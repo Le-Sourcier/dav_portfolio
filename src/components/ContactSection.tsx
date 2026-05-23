@@ -1,64 +1,66 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { site } from "@/lib/portfolio";
-import { contactsApi } from "@/services/api/contacts.api";
+import { useContactForm } from "@/hooks/useContactForm";
+import { FloatingField } from "@/components/contact/FloatingField";
 
 const whatsappNumber = site.phone.replace(/\D/g, "");
 
 export function ContactSection() {
   const t = useTranslations("Contact");
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    company: "",
-    budget: "",
-    message: "",
+
+  const validationMessages = useMemo(
+    () => ({
+      required: t("errorRequired"),
+      nameTooShort: t("errorNameTooShort"),
+      nameTooLong: t("errorNameTooLong"),
+      emailInvalid: t("errorEmailInvalid"),
+      emailTooLong: t("errorEmailTooLong"),
+      companyTooLong: t("errorCompanyTooLong"),
+      messageTooShort: t("errorMessageTooShort"),
+      messageTooLong: t("errorMessageTooLong"),
+    }),
+    [t],
+  );
+
+  const {
+    values,
+    errors,
+    touched,
+    status,
+    feedback,
+    cooldownLeft,
+    limits,
+    honeypotRef,
+    setField,
+    handleBlur,
+    handleSubmit,
+  } = useContactForm({
+    validationMessages,
+    successMessage: t("successFeedback"),
+    cooldownMessage: t("cooldownMessage", { seconds: 30 }),
+    genericErrorMessage: t("errorGeneric"),
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [feedback, setFeedback] = useState("");
 
   const mailHref = useMemo(() => {
-    const subject = encodeURIComponent(`Projet SaaS - ${form.company || form.name || "Premier échange"}`);
+    const subject = encodeURIComponent(`Projet SaaS - ${values.company || values.name || "Premier échange"}`);
     const body = encodeURIComponent(
-      `Bonjour David,\n\nNom: ${form.name}\nEmail: ${form.email}\nEntreprise: ${form.company}\nBudget / cadre: ${form.budget}\n\nContexte du projet:\n${form.message}\n\nMerci.`,
+      `Bonjour David,\n\nNom: ${values.name}\nEmail: ${values.email}\nEntreprise: ${values.company}\nBudget / cadre: ${values.budget}\n\nContexte du projet:\n${values.message}\n\nMerci.`,
     );
-
     return `mailto:${site.email}?subject=${subject}&body=${body}`;
-  }, [form]);
+  }, [values]);
 
   const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Bonjour David, j'aimerais discuter d'un projet SaaS ou d'une mission technique.",
   )}`;
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setStatus("loading");
-    setFeedback("");
-
-    try {
-      await contactsApi.create({
-        name: form.name,
-        email: form.email,
-        subject: `Projet SaaS - ${form.company || form.name || "Premier échange"}`,
-        message: [
-          form.company ? `Entreprise: ${form.company}` : "",
-          form.budget ? `Cadre: ${form.budget}` : "",
-          form.message,
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-      });
-      setStatus("success");
-      setFeedback(t("successFeedback"));
-      setForm({ name: "", email: "", company: "", budget: "", message: "" });
-    } catch (error) {
-      setStatus("error");
-      setFeedback(error instanceof Error ? error.message : "Impossible d'envoyer le message.");
-    }
-  };
+  const isCooldown = cooldownLeft > 0;
+  const isLoading = status === "loading";
+  const messageLength = values.message.length;
+  const messageNearLimit = messageLength > limits.messageMax * 0.9;
 
   return (
     <section id="contact" className="section contact-section">
@@ -91,7 +93,7 @@ export function ContactSection() {
         </div>
       </div>
 
-      <form className="contact-form" onSubmit={handleSubmit}>
+      <form className="contact-form" onSubmit={handleSubmit} noValidate>
         <div className="contact-form-glow" aria-hidden="true" />
         <div className="contact-form-inner">
           <div className="form-status-pill">
@@ -99,40 +101,87 @@ export function ContactSection() {
             <span className="form-status-label">{t("statusMetric")}</span>
           </div>
 
+          {/* Honeypot anti-bot — hors flux visuel, non focusable */}
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="form-honeypot"
+            defaultValue=""
+          />
+
           <div className="form-grid">
-            <label>
-              <span className="form-label-text">{t("nameLabel")}</span>
+            <FloatingField
+              id="contact-name"
+              label={t("nameLabel")}
+              hasValue={values.name.length > 0}
+              error={touched.name ? errors.name : undefined}
+            >
               <input
+                id="contact-name"
+                type="text"
                 required
-                value={form.name}
-                onChange={(event) => setForm({ ...form, name: event.target.value })}
-                placeholder={t("namePlaceholder")}
+                value={values.name}
+                maxLength={limits.nameMax}
+                onChange={(event) => setField("name", event.target.value)}
+                onBlur={() => handleBlur("name")}
+                placeholder=" "
+                autoComplete="name"
               />
-            </label>
-            <label>
-              <span className="form-label-text">{t("emailLabel")}</span>
+            </FloatingField>
+
+            <FloatingField
+              id="contact-email"
+              label={t("emailLabel")}
+              hasValue={values.email.length > 0}
+              error={touched.email ? errors.email : undefined}
+            >
               <input
-                required
+                id="contact-email"
                 type="email"
-                value={form.email}
-                onChange={(event) => setForm({ ...form, email: event.target.value })}
-                placeholder={t("emailPlaceholder")}
+                required
+                value={values.email}
+                maxLength={limits.emailMax}
+                onChange={(event) => setField("email", event.target.value)}
+                onBlur={() => handleBlur("email")}
+                placeholder=" "
+                autoComplete="email"
               />
-            </label>
+            </FloatingField>
           </div>
 
           <div className="form-grid">
-            <label>
-              <span className="form-label-text">{t("companyLabel")}</span>
+            <FloatingField
+              id="contact-company"
+              label={t("companyLabel")}
+              hasValue={values.company.length > 0}
+              error={touched.company ? errors.company : undefined}
+            >
               <input
-                value={form.company}
-                onChange={(event) => setForm({ ...form, company: event.target.value })}
-                placeholder={t("companyPlaceholder")}
+                id="contact-company"
+                type="text"
+                value={values.company}
+                maxLength={limits.companyMax}
+                onChange={(event) => setField("company", event.target.value)}
+                onBlur={() => handleBlur("company")}
+                placeholder=" "
+                autoComplete="organization"
               />
-            </label>
-            <label>
-              <span className="form-label-text">{t("budgetLabel")}</span>
-              <select value={form.budget} onChange={(event) => setForm({ ...form, budget: event.target.value })}>
+            </FloatingField>
+
+            <FloatingField
+              id="contact-budget"
+              label={t("budgetLabel")}
+              hasValue={values.budget.length > 0}
+            >
+              <select
+                id="contact-budget"
+                value={values.budget}
+                onChange={(event) => setField("budget", event.target.value)}
+              >
                 <option value="">{t("budgetDefault")}</option>
                 <option>{t("budgetFreelance")}</option>
                 <option>{t("budgetCdi")}</option>
@@ -140,23 +189,44 @@ export function ContactSection() {
                 <option>{t("budgetArchitecture")}</option>
                 <option>{t("budgetAutomation")}</option>
               </select>
-            </label>
+            </FloatingField>
           </div>
 
-          <label>
-            <span className="form-label-text">{t("messageLabel")}</span>
+          <FloatingField
+            id="contact-message"
+            label={t("messageLabel")}
+            hasValue={values.message.length > 0}
+            error={touched.message ? errors.message : undefined}
+            hint={
+              <span className={`form-counter${messageNearLimit ? " is-warn" : ""}`}>
+                {t("messageCounter", { current: messageLength, max: limits.messageMax })}
+              </span>
+            }
+          >
             <textarea
+              id="contact-message"
               required
               rows={6}
-              value={form.message}
-              onChange={(event) => setForm({ ...form, message: event.target.value })}
-              placeholder={t("messagePlaceholder")}
+              value={values.message}
+              maxLength={limits.messageMax}
+              onChange={(event) => setField("message", event.target.value)}
+              onBlur={() => handleBlur("message")}
+              placeholder=" "
             />
-          </label>
+          </FloatingField>
 
-          <button type="submit" className="form-cta" disabled={status === "loading"}>
+          <button
+            type="submit"
+            className="form-cta"
+            disabled={isLoading || isCooldown}
+            aria-busy={isLoading}
+          >
             <span className="form-cta-label">
-              {status === "loading" ? t("sendLoading") : t("sendDefault")}
+              {isLoading
+                ? t("sendLoading")
+                : isCooldown
+                  ? t("cooldownMessage", { seconds: Math.ceil(cooldownLeft / 1000) })
+                  : t("sendDefault")}
             </span>
             <span className="form-cta-arrow" aria-hidden="true">→</span>
           </button>
