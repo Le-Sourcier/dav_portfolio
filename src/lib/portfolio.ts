@@ -7,7 +7,7 @@ export const site = {
   phone: "+228 91680967",
   github: "https://github.com/Le-Sourcier",
   linkedin: "https://linkedin.com/in/yao-logan",
-  url: "https://yaodavidlogan.com",
+  url: "https://lesourcier.space",
   availability: "Disponible pour CDI, freelance et missions longues",
   promise:
     "Je conçois des plateformes SaaS rapides, sécurisées et prêtes à scaler pour des équipes qui veulent livrer sans dette technique.",
@@ -40,7 +40,8 @@ export const services = [
   {
     eyebrow: "Produit",
     title: "Architecture SaaS",
-    headline: "Structurer une plateforme claire avant qu'elle ne devienne difficile à maintenir.",
+    headline:
+      "Structurer une plateforme claire avant qu'elle ne devienne difficile à maintenir.",
     description:
       "Backends Node.js/TypeScript, RBAC, paiements, files d'attente, dashboards et APIs maintenables.",
     points: ["Découpage métier", "Contrats API", "Parcours critiques"],
@@ -48,7 +49,8 @@ export const services = [
   {
     eyebrow: "Interface",
     title: "Produit web & mobile",
-    headline: "Construire des interfaces rapides, lisibles et pensées pour l'usage réel.",
+    headline:
+      "Construire des interfaces rapides, lisibles et pensées pour l'usage réel.",
     description:
       "Interfaces React, Next.js et React Native avec hiérarchie claire, performance et finition produit.",
     points: ["Next.js", "React Native", "Design systems"],
@@ -56,7 +58,8 @@ export const services = [
   {
     eyebrow: "Ops",
     title: "Automatisation métier",
-    headline: "Réduire les tâches répétitives sans créer de dépendance fragile.",
+    headline:
+      "Réduire les tâches répétitives sans créer de dépendance fragile.",
     description:
       "Workflows n8n/Make, enrichissement de données, batchs et outils internes pour réduire les opérations manuelles.",
     points: ["n8n", "Batchs", "Data enrichment"],
@@ -76,14 +79,21 @@ export const projects = [
     slug: "servcraft",
     name: "ServCraft",
     category: "Open Source",
-    headline: "Framework backend pour lancer des APIs SaaS structurées plus vite.",
+    headline:
+      "Framework backend pour lancer des APIs SaaS structurées plus vite.",
     description:
       "ServCraft standardise la création d'APIs Node.js avec Fastify, Prisma, PostgreSQL, RBAC et conventions prêtes production.",
-    result: "Un socle backend réutilisable pour réduire le temps de setup et garder une architecture propre.",
+    result:
+      "Un socle backend réutilisable pour réduire le temps de setup et garder une architecture propre.",
     metric: "NPM publié · v0.4.9",
     role: "Conception, architecture, DX, packaging NPM",
     tech: ["TypeScript", "Fastify", "Prisma", "PostgreSQL", "RBAC"],
-    links: [{ label: "Voir sur NPM", href: "https://www.npmjs.com/package/servcraft" }],
+    links: [
+      {
+        label: "Voir sur NPM",
+        href: "https://www.npmjs.com/package/servcraft",
+      },
+    ],
     featured: true,
   },
   {
@@ -93,7 +103,8 @@ export const projects = [
     headline: "Pipeline d'enrichissement de données pour bases commerciales.",
     description:
       "Plateforme de traitement batch, automatisation FTP et enrichissement de fichiers pour améliorer la qualité des bases clients.",
-    result: "Des milliers d'enregistrements traités par lot avec moins de manipulations manuelles.",
+    result:
+      "Des milliers d'enregistrements traités par lot avec moins de manipulations manuelles.",
     metric: "Batchs de milliers de lignes",
     role: "Architecture fullstack, automatisation, files de traitement",
     tech: ["Next.js", "Node.js", "FTP Automation", "File Queues"],
@@ -113,7 +124,8 @@ export const projects = [
     headline: "Dashboard temps réel pour optimiser la consommation domestique.",
     description:
       "SaaS de calcul énergétique permettant de suivre la consommation, les économies et l'impact CO2 dans une interface claire.",
-    result: "Pilotage plus lisible de la dépense énergétique et recommandations orientées économies.",
+    result:
+      "Pilotage plus lisible de la dépense énergétique et recommandations orientées économies.",
     metric: "-70% chauffage estimé",
     role: "Produit, frontend, backend temps réel",
     tech: ["React", "Node.js", "Real-time"],
@@ -127,7 +139,8 @@ export const projects = [
     headline: "Suivi sportif connecté avec IA et intégrations wearables.",
     description:
       "Plateforme de suivi sportif avec Garmin, Apple Watch, Samsung, Xiaomi, analyse IA et programmes personnalisés.",
-    result: "Un espace de progression connecté entre données réelles, analyse et recommandations.",
+    result:
+      "Un espace de progression connecté entre données réelles, analyse et recommandations.",
     metric: "IA + wearables",
     role: "Intégrations API, backend, interface produit",
     tech: ["React", "Node.js", "API Integration", "IA"],
@@ -167,17 +180,72 @@ export const experience = [
 ];
 
 export const stack = [
-  { name: "Next.js", role: "Framework web", category: "Frontend", icon: "/stack/nextjs.svg" },
-  { name: "React", role: "Interfaces produit", category: "Frontend", icon: "/stack/react.svg" },
-  { name: "TypeScript", role: "Code robuste", category: "Langage", icon: "/stack/typescript.svg" },
-  { name: "Node.js", role: "Runtime backend", category: "Backend", icon: "/stack/nodejs.svg" },
-  { name: "Fastify", role: "APIs rapides", category: "Backend", icon: "/stack/fastify.svg" },
-  { name: "PostgreSQL", role: "Données critiques", category: "Data", icon: "/stack/postgresql.svg" },
-  { name: "Redis", role: "Cache & queues", category: "Data", icon: "/stack/redis.svg" },
-  { name: "Prisma", role: "ORM typé", category: "Data", icon: "/stack/prisma.svg" },
-  { name: "Docker", role: "Déploiement", category: "Infra", icon: "/stack/docker.svg" },
-  { name: "n8n", role: "Automatisation", category: "Ops", icon: "/stack/n8n.svg" },
-  { name: "IA", role: "Workflows augmentés", category: "AI", icon: "/stack/ai.svg" },
+  {
+    name: "Next.js",
+    role: "Framework web",
+    category: "Frontend",
+    icon: "/stack/nextjs.svg",
+  },
+  {
+    name: "React",
+    role: "Interfaces produit",
+    category: "Frontend",
+    icon: "/stack/react.svg",
+  },
+  {
+    name: "TypeScript",
+    role: "Code robuste",
+    category: "Langage",
+    icon: "/stack/typescript.svg",
+  },
+  {
+    name: "Node.js",
+    role: "Runtime backend",
+    category: "Backend",
+    icon: "/stack/nodejs.svg",
+  },
+  {
+    name: "Fastify",
+    role: "APIs rapides",
+    category: "Backend",
+    icon: "/stack/fastify.svg",
+  },
+  {
+    name: "PostgreSQL",
+    role: "Données critiques",
+    category: "Data",
+    icon: "/stack/postgresql.svg",
+  },
+  {
+    name: "Redis",
+    role: "Cache & queues",
+    category: "Data",
+    icon: "/stack/redis.svg",
+  },
+  {
+    name: "Prisma",
+    role: "ORM typé",
+    category: "Data",
+    icon: "/stack/prisma.svg",
+  },
+  {
+    name: "Docker",
+    role: "Déploiement",
+    category: "Infra",
+    icon: "/stack/docker.svg",
+  },
+  {
+    name: "n8n",
+    role: "Automatisation",
+    category: "Ops",
+    icon: "/stack/n8n.svg",
+  },
+  {
+    name: "IA",
+    role: "Workflows augmentés",
+    category: "AI",
+    icon: "/stack/ai.svg",
+  },
 ];
 
 export const testimonials = [
@@ -208,7 +276,8 @@ export const blogPosts = [
     excerpt:
       "Les décisions techniques qui donnent de la marge à un produit SaaS sans créer une plateforme impossible à maintenir.",
     coverImage: "/blog/cover-saas.svg",
-    coverImageAlt: "Schéma d'une architecture SaaS modulaire avec services découpés par responsabilité.",
+    coverImageAlt:
+      "Schéma d'une architecture SaaS modulaire avec services découpés par responsabilité.",
     category: "Architecture",
     date: "2026-05-12",
     updatedAt: "2026-05-15",
@@ -232,31 +301,32 @@ export const blogPosts = [
     sections: [
       {
         title: "Commencer par les vrais points de pression",
-        body:
-          "Avant de parler microservices, queues ou Kubernetes, il faut identifier ce qui casse réellement: la base de données, les requêtes lentes, les traitements longs, la synchronisation d'état ou les permissions. Un SaaS jeune a souvent besoin de frontières claires et de bons contrats internes avant d'avoir besoin d'une architecture distribuée.",
+        body: "Avant de parler microservices, queues ou Kubernetes, il faut identifier ce qui casse réellement: la base de données, les requêtes lentes, les traitements longs, la synchronisation d'état ou les permissions. Un SaaS jeune a souvent besoin de frontières claires et de bons contrats internes avant d'avoir besoin d'une architecture distribuée.",
       },
       {
         title: "Découper par responsabilité métier",
-        body:
-          "Un backend maintenable sépare les responsabilités: identité, facturation, permissions, notifications, analytics, fichiers et domaine produit. Même dans un monolithe, cette séparation réduit les régressions et rend l'extraction future plus simple.",
+        body: "Un backend maintenable sépare les responsabilités: identité, facturation, permissions, notifications, analytics, fichiers et domaine produit. Même dans un monolithe, cette séparation réduit les régressions et rend l'extraction future plus simple.",
         image: "/blog/figure-flow.svg",
-        imageAlt: "Flux source → service → file → résultat illustrant un découpage modulaire.",
-        imageCaption: "Un flux clair par domaine reste lisible même après plusieurs itérations.",
+        imageAlt:
+          "Flux source → service → file → résultat illustrant un découpage modulaire.",
+        imageCaption:
+          "Un flux clair par domaine reste lisible même après plusieurs itérations.",
       },
       {
         title: "Mesurer avant d'optimiser",
-        body:
-          "Les métriques changent la qualité des décisions. Temps de réponse, taux d'erreur, files en attente, temps batch et parcours utilisateurs doivent être observables. Sans mesure, l'optimisation devient une préférence personnelle.",
+        body: "Les métriques changent la qualité des décisions. Temps de réponse, taux d'erreur, files en attente, temps batch et parcours utilisateurs doivent être observables. Sans mesure, l'optimisation devient une préférence personnelle.",
       },
     ],
     faq: [
       {
-        question: "À partir de quand passer d'un monolithe à des services séparés ?",
+        question:
+          "À partir de quand passer d'un monolithe à des services séparés ?",
         answer:
           "Quand les équipes se marchent dessus, que les déploiements deviennent risqués ou qu'un domaine a des contraintes de scaling très différentes. Pas avant. Un monolithe modulaire bien découpé tient longtemps.",
       },
       {
-        question: "Faut-il choisir PostgreSQL ou une base NoSQL pour un SaaS B2B ?",
+        question:
+          "Faut-il choisir PostgreSQL ou une base NoSQL pour un SaaS B2B ?",
         answer:
           "PostgreSQL couvre 95% des besoins SaaS B2B: relations, transactions, JSONB pour la flexibilité, recherche full-text, row-level security. Le NoSQL se justifie pour des cas précis (séries temporelles, événements à très haut débit).",
       },
@@ -286,11 +356,13 @@ export const blogPosts = [
   },
   {
     slug: "automatisation-metier-roi",
-    title: "Automatisation métier: choisir les workflows qui créent un vrai ROI",
+    title:
+      "Automatisation métier: choisir les workflows qui créent un vrai ROI",
     excerpt:
       "Comment prioriser les automatisations utiles et éviter les workflows qui impressionnent mais ne changent rien au business.",
     coverImage: "/blog/cover-automation.svg",
-    coverImageAlt: "Schéma de workflow d'automatisation aboutissant à un bloc ROI augmenté.",
+    coverImageAlt:
+      "Schéma de workflow d'automatisation aboutissant à un bloc ROI augmenté.",
     category: "Automatisation",
     date: "2026-05-08",
     updatedAt: "2026-05-08",
@@ -314,21 +386,20 @@ export const blogPosts = [
     sections: [
       {
         title: "Partir du coût opérationnel",
-        body:
-          "Le meilleur candidat à l'automatisation est une tâche fréquente, fragile, mesurable et liée à une conséquence business: retard, erreur, perte de lead, mauvaise donnée ou support inutile.",
+        body: "Le meilleur candidat à l'automatisation est une tâche fréquente, fragile, mesurable et liée à une conséquence business: retard, erreur, perte de lead, mauvaise donnée ou support inutile.",
       },
       {
         title: "Garder une sortie humaine claire",
-        body:
-          "Un workflow robuste prévoit les cas d'échec. Il doit permettre de comprendre ce qui s'est passé, reprendre manuellement si nécessaire et éviter qu'une erreur silencieuse se transforme en dette opérationnelle.",
+        body: "Un workflow robuste prévoit les cas d'échec. Il doit permettre de comprendre ce qui s'est passé, reprendre manuellement si nécessaire et éviter qu'une erreur silencieuse se transforme en dette opérationnelle.",
         image: "/blog/figure-flow.svg",
-        imageAlt: "Diagramme d'un workflow avec étape d'erreur reprise manuellement.",
-        imageCaption: "Chaque automatisation premium prévoit son scénario d'échec.",
+        imageAlt:
+          "Diagramme d'un workflow avec étape d'erreur reprise manuellement.",
+        imageCaption:
+          "Chaque automatisation premium prévoit son scénario d'échec.",
       },
       {
         title: "Documenter le processus, pas seulement le scénario",
-        body:
-          "La vraie valeur vient quand l'équipe comprend le flux. Une automatisation premium inclut des logs, des alertes, des règles compréhensibles et une documentation courte.",
+        body: "La vraie valeur vient quand l'équipe comprend le flux. Une automatisation premium inclut des logs, des alertes, des règles compréhensibles et une documentation courte.",
       },
     ],
     faq: [
@@ -343,7 +414,8 @@ export const blogPosts = [
           "Heures économisées × coût horaire + erreurs évitées × coût d'une erreur − coût de maintenance du workflow. Si le résultat n'est pas largement positif après 3 mois, le scénario était mal choisi.",
       },
       {
-        question: "Que faire des automatisations 'orphelines' (personne ne sait à quoi elles servent) ?",
+        question:
+          "Que faire des automatisations 'orphelines' (personne ne sait à quoi elles servent) ?",
         answer:
           "Les désactiver pendant 30 jours et observer. Si personne ne se plaint, supprimer. Sinon documenter immédiatement avec l'utilisateur qui s'est manifesté.",
       },
@@ -372,7 +444,8 @@ export const blogPosts = [
     excerpt:
       "Un portfolio qui vend ne montre pas seulement une stack: il met en scène des preuves, des résultats et une manière de travailler.",
     coverImage: "/blog/cover-portfolio.svg",
-    coverImageAlt: "Maquette de portfolio premium avec preuves chiffrées et CTA visibles.",
+    coverImageAlt:
+      "Maquette de portfolio premium avec preuves chiffrées et CTA visibles.",
     category: "Produit",
     date: "2026-05-01",
     updatedAt: "2026-05-10",
@@ -396,26 +469,26 @@ export const blogPosts = [
     sections: [
       {
         title: "La preuve avant la promesse",
-        body:
-          "Les chiffres, les cas concrets, les captures et les responsabilités exactes parlent plus fort qu'une longue liste de technologies. Le visiteur doit comprendre ce qui a été livré et pourquoi c'était utile.",
+        body: "Les chiffres, les cas concrets, les captures et les responsabilités exactes parlent plus fort qu'une longue liste de technologies. Le visiteur doit comprendre ce qui a été livré et pourquoi c'était utile.",
       },
       {
         title: "Une hiérarchie pensée pour décider",
-        body:
-          "Le premier écran doit répondre vite: qui êtes-vous, quel problème résolvez-vous, pourquoi vous faire confiance, et comment vous contacter. Le reste doit approfondir, pas répéter.",
+        body: "Le premier écran doit répondre vite: qui êtes-vous, quel problème résolvez-vous, pourquoi vous faire confiance, et comment vous contacter. Le reste doit approfondir, pas répéter.",
         image: "/blog/figure-flow.svg",
-        imageAlt: "Hiérarchie d'information du haut de page d'un portfolio premium.",
-        imageCaption: "L'information descend du général au spécifique — décision rapide en haut.",
+        imageAlt:
+          "Hiérarchie d'information du haut de page d'un portfolio premium.",
+        imageCaption:
+          "L'information descend du général au spécifique — décision rapide en haut.",
       },
       {
         title: "Un contact sans friction",
-        body:
-          "Le meilleur formulaire est celui qui aide à écrire un bon brief. Les canaux directs doivent rester accessibles, surtout pour les clients pressés ou les recruteurs.",
+        body: "Le meilleur formulaire est celui qui aide à écrire un bon brief. Les canaux directs doivent rester accessibles, surtout pour les clients pressés ou les recruteurs.",
       },
     ],
     faq: [
       {
-        question: "Faut-il afficher tous ses projets ou seulement les meilleurs ?",
+        question:
+          "Faut-il afficher tous ses projets ou seulement les meilleurs ?",
         answer:
           "Trois à six projets bien racontés battent vingt projets survolés. Chaque projet doit répondre à : quel problème, quelle responsabilité, quel résultat mesurable.",
       },
