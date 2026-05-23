@@ -14,7 +14,9 @@
     "db:setup": "tsx scripts/setup-database.ts",
     "db:admin": "tsx scripts/sync-admin.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "db:seed:experiences": "tsx scripts/seed-experiences-only.ts"
+    "db:seed:experiences": "tsx scripts/seed-experiences-only.ts",
+    "db:seed:projects": "tsx scripts/seed-projects-only.ts",
+    "db:seed:blog": "tsx scripts/seed-blog-only.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

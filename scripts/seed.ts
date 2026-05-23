@@ -4,78 +4,25 @@ import {
   Project,
   Experience,
   BlogPost,
+  Comment,
+  BlogView,
   Testimonial,
   Admin,
 } from "../src/models/index.js";
 import { logger } from "../src/utils/logger.js";
 import { experiencesSeed } from "./data/experiences.seed.js";
+import { projectsSeed } from "./data/projects.seed.js";
+import { blogPostsSeed } from "./data/blog.seed.js";
 
 const seedProjects = async () => {
-  const projects = [
-    {
-      title: "Nexus Platform",
-      category: "Fullstack",
-      image:
-        "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/project-webdev-97b00c0c-1770728430056.webp",
-      description:
-        "Une plateforme d'investissement financier robuste avec architecture microservices.",
-      problem:
-        "Necessite d'une infrastructure hautement scalable capable de gerer des transactions financieres securisees en temps reel.",
-      solution:
-        "Architecture Microservices avec Next.js 14, Node.js et PostgreSQL, integrant Redis pour le caching et des WebSockets pour le temps reel.",
-      results: [
-        "Systeme de paiement securise multi-passerelles",
-        "Dashboard analytique temps reel",
-        "Architecture modulaire et evolutive",
-      ],
-      metrics: [
-        { name: "Scalabilite", value: 95, previousValue: 40, unit: "%" },
-        { name: "Uptime", value: 99.9, previousValue: 98, unit: "%" },
-        { name: "Vitesse", value: 0.8, previousValue: 2.5, unit: "s" },
-      ],
-      chartData: [
-        { name: "T1", value: 400 },
-        { name: "T2", value: 1200 },
-        { name: "T3", value: 2800 },
-        { name: "T4", value: 4500 },
-      ],
-      url: "https://nexuscorporat.com",
-    },
-    {
-      title: "Prospect-Pro AI",
-      category: "Software",
-      image:
-        "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/project-uiux-fa90eb77-1770728430779.webp",
-      description:
-        "Plateforme de prospection B2B augmentee par l'Intelligence Artificielle.",
-      problem:
-        "Les processus de prospection manuels etaient lents et peu precis pour les entreprises B2B.",
-      solution:
-        "Automatisation via IA (Python/TypeScript) pour le scoring de leads et la personnalisation des messages de contact.",
-      results: [
-        "Augmentation de 60% du taux de conversion",
-        "Gain de temps de 15h/semaine",
-        "Integration transparente avec les CRM majeurs",
-      ],
-      metrics: [
-        { name: "Precision IA", value: 92, previousValue: 50, unit: "%" },
-        { name: "Leads/mois", value: 850, previousValue: 200, unit: "n" },
-        { name: "ROI", value: 3.5, previousValue: 1.2, unit: "x" },
-      ],
-      chartData: [
-        { name: "Jan", value: 200 },
-        { name: "Fev", value: 450 },
-        { name: "Mar", value: 800 },
-        { name: "Avr", value: 1500 },
-      ],
-      url: "https://prospect-pro-sgrq.vercel.app",
-    },
-  ];
+  // Reset propre — la table projects est entièrement gérée par ce script.
+  await Project.sync({ force: false });
+  await Project.destroy({ where: {} });
 
-  for (const project of projects) {
+  for (const project of projectsSeed) {
     await Project.create(project as any);
   }
-  logger.info(`Seeded ${projects.length} projects`);
+  logger.info(`Seeded ${projectsSeed.length} projects`);
 };
 
 const seedExperiences = async () => {
@@ -89,42 +36,18 @@ const seedExperiences = async () => {
 };
 
 const seedBlogPosts = async () => {
-  const posts = [
-    {
-      title: "L'avenir du design minimaliste dans le web moderne",
-      slug: "avenir-design-minimaliste-web-moderne",
-      excerpt:
-        "Decouvrez comment le minimalisme continue de faconner nos experiences numeriques en 2025.",
-      content:
-        "<p>Le minimalisme n'est pas seulement une absence de decoration, c'est une quete de l'essentiel...</p>",
-      category: "Design",
-      imageUrl:
-        "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/future-of-design-9fa925ad-1770729236550.webp",
-      readTime: "5 min de lecture",
-      author: "Yao David Logan",
-      published: true,
-      tags: ["Design", "Minimalisme", "Web"],
-    },
-    {
-      title: "L'impact de l'IA sur le developpement frontend",
-      slug: "impact-ia-developpement-frontend",
-      excerpt:
-        "Comment les nouveaux outils d'IA transforment la maniere dont nous concevons les interfaces.",
-      content: "<p>L'IA ne remplace pas le developpeur, elle l'augmente...</p>",
-      category: "Technologie",
-      imageUrl:
-        "https://storage.googleapis.com/dala-prod-public-storage/generated-images/564508a5-e18e-4304-b909-f59e34b774ee/the-power-of-connection-5bc9afc2-1770729236444.webp",
-      readTime: "6 min de lecture",
-      author: "Yao David Logan",
-      published: true,
-      tags: ["IA", "Frontend", "Productivite"],
-    },
-  ];
+  // Reset dans l'ordre : views et comments d'abord (FK), posts ensuite.
+  await BlogPost.sync({ force: false });
+  await Comment.sync({ force: false });
+  await BlogView.sync({ force: false });
+  await BlogView.destroy({ where: {} });
+  await Comment.destroy({ where: {} });
+  await BlogPost.destroy({ where: {} });
 
-  for (const post of posts) {
+  for (const post of blogPostsSeed) {
     await BlogPost.create(post as any);
   }
-  logger.info(`Seeded ${posts.length} blog posts`);
+  logger.info(`Seeded ${blogPostsSeed.length} blog posts`);
 };
 
 const seedTestimonials = async () => {
