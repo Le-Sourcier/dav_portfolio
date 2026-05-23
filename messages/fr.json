@@ -239,6 +239,13 @@
     "countBadge": "{count} {count, plural, =1 {cas publié} other {cas publiés}}"
   },
   "ProjectDetail": {
+    "metaTitleSuffix": "- Étude de cas",
+    "perimeterFact": "Périmètre",
+    "stackFact": "Stack",
+    "signalFact": "Signal",
+    "mainSignalLabel": "Signal principal",
+    "hireSubject": "Mission similaire à {name}",
+    "hireBody": "Bonjour David,\n\nJ'ai consulté l'étude de cas « {name} » et je souhaite discuter d'un besoin similaire.\n\nContexte rapide :\nBudget / délai :\nLien ou documentation utile :\n\nMerci.",
     "backLink": "← Retour aux projets",
     "summaryAriaLabel": "Résumé du projet",
     "contextLabel": "Contexte",

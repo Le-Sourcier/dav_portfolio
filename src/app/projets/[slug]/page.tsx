@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BackToTop } from "@/components/blog/BackToTop";
@@ -49,19 +50,21 @@ export async function generateMetadata({
     return {};
   }
 
+  const t = await getTranslations("ProjectDetail");
   const description = [project.headline, project.result]
     .filter(Boolean)
     .join(" ")
     .trim();
+  const title = `${project.name} ${t("metaTitleSuffix")}`;
 
   return {
-    title: `${project.name} - Étude de cas`,
+    title,
     description,
     alternates: {
       canonical: `${site.url}/projets/${project.slug}`,
     },
     openGraph: {
-      title: `${project.name} - Étude de cas`,
+      title,
       description: project.result ?? description,
       url: `${site.url}/projets/${project.slug}`,
       type: "article",
@@ -76,7 +79,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${project.name} - Étude de cas`,
+      title,
       description: project.result ?? description,
       images: ["/opengraph-image"],
     },
@@ -91,6 +94,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   if (!project) {
     notFound();
   }
+
+  const t = await getTranslations("ProjectDetail");
 
   const chartMax = Math.max(...project.chartData.map((item) => item.value), 1);
   const chartMin = Math.min(...project.chartData.map((item) => item.value), 0);
@@ -132,14 +137,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       project.headline.trim() !== project.description.trim(),
   );
   const contextFacts = [
-    ["Périmètre", projectScope],
-    ["Stack", projectStackSignal],
-    ["Signal", project.metric],
+    [t("perimeterFact"), projectScope],
+    [t("stackFact"), projectStackSignal],
+    [t("signalFact"), project.metric],
   ].filter(([, value]) => Boolean(value));
-  const hireSubject = encodeURIComponent(`Mission similaire à ${project.name}`);
-  const hireBody = encodeURIComponent(
-    `Bonjour David,\n\nJ'ai consulté l'étude de cas "${project.name}" et je souhaite discuter d'un besoin similaire.\n\nContexte rapide:\nBudget / délai:\nLien ou documentation utile:\n\nMerci.`,
-  );
+  const hireSubject = encodeURIComponent(t("hireSubject", { name: project.name }));
+  const hireBody = encodeURIComponent(t("hireBody", { name: project.name }));
 
   return (
     <>
@@ -155,12 +158,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               href="/#projets"
               className="case-back-link"
               style={{ marginRight: "1rem" }}>
-              ← Retour aux projets
+              {t("backLink")}
             </Link>
             <span className="case-category">{project.category}</span>
             <h1>{project.name}</h1>
             <p>{project.headline}</p>
-            <div className="case-hero-meta" aria-label="Résumé du projet">
+            <div className="case-hero-meta" aria-label={t("summaryAriaLabel")}>
               <span>{project.role}</span>
               {projectYear ? <span>{projectYear}</span> : null}
               {project.metric ? <span>{project.metric}</span> : null}
@@ -172,12 +175,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <article className="case-story">
             <section className="case-intro" aria-labelledby="case-context-title">
               <div className="case-intro-label">
-                <span>Contexte</span>
+                <span>{t("contextLabel")}</span>
                 {projectYear ? <small>{projectYear}</small> : null}
               </div>
               <div className="case-intro-copy">
                 <h2 id="case-context-title">
-                  {hasContextHeadline ? project.headline : "Point de départ."}
+                  {hasContextHeadline ? project.headline : t("contextFallback")}
                 </h2>
                 <p>{project.description}</p>
                 {contextFacts.length > 0 ? (
@@ -197,15 +200,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.problem ? (
                 <article className="case-duo-card">
                   <div className="case-duo-top">
-                    <span>Challenge</span>
-                    <small>Avant intervention</small>
+                    <span>{t("challengeLabel")}</span>
+                    <small>{t("challengeBefore")}</small>
                   </div>
-                  <h2>Blocage identifié.</h2>
+                  <h2>{t("challengeTitle")}</h2>
                   <p>{project.problem}</p>
                   <div className="case-duo-signal">
-                    <span>Risque traité</span>
+                    <span>{t("riskLabel")}</span>
                     <strong>
-                      {projectScope || "Périmètre produit, données et livraison."}
+                      {projectScope || t("riskFallback")}
                     </strong>
                   </div>
                 </article>
@@ -213,15 +216,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.solution ? (
                 <article className="case-duo-card is-solution">
                   <div className="case-duo-top">
-                    <span>Approche</span>
-                    <small>Après livraison</small>
+                    <span>{t("approachLabel")}</span>
+                    <small>{t("approachAfter")}</small>
                   </div>
-                  <h2>Réponse construite.</h2>
+                  <h2>{t("approachTitle")}</h2>
                   <p>{project.solution}</p>
                   <div className="case-duo-signal">
-                    <span>Socle livré</span>
+                    <span>{t("foundationLabel")}</span>
                     <strong>
-                      {projectStackSignal || "Architecture, interface et mesure."}
+                      {projectStackSignal || t("foundationFallback")}
                     </strong>
                   </div>
                 </article>
@@ -233,16 +236,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 className="case-measure"
                 aria-labelledby="case-performance-title">
                 <div className="case-section-head">
-                  <span>Résultats</span>
-                  <h2 id="case-performance-title">Impact mesurable</h2>
-                  <p>
-                    Les métriques donnent une lecture rapide de l&apos;effet
-                    produit ou technique après livraison.
-                  </p>
+                  <span>{t("resultsLabel")}</span>
+                  <h2 id="case-performance-title">{t("resultsTitle")}</h2>
+                  <p>{t("resultsDescription")}</p>
                 </div>
 
                 {hasMetrics ? (
-                  <div className="case-metrics" aria-label="Métriques projet">
+                  <div className="case-metrics" aria-label={t("metricsAriaLabel")}>
                     {project.metrics.map((metric) => {
                       const delta = metricDelta(metric);
                       const metricMax = Math.max(
@@ -266,8 +266,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                             <span>{metric.name}</span>
                             {delta !== null ? (
                               <small>
-                                {delta > 0 ? "+" : ""}
-                                {delta}% vs avant
+                                {t("deltaLabel", { delta: delta > 0 ? `+${delta}` : String(delta) })}
                               </small>
                             ) : null}
                           </div>
@@ -275,7 +274,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                           <div className="case-metric-compare" aria-hidden="true">
                             {metric.previousValue ? (
                               <div>
-                                <span>Avant</span>
+                                <span>{t("beforeLabel")}</span>
                                 <i
                                   style={{
                                     width: `${previousProgress}%`,
@@ -285,7 +284,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                               </div>
                             ) : null}
                             <div>
-                              <span>Après</span>
+                              <span>{t("afterLabel")}</span>
                               <i className="is-after" style={{ width: `${progress}%` }} />
                               <b>{metricValue(metric)}</b>
                             </div>
@@ -297,10 +296,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 ) : null}
 
                 {project.chartData.length > 0 ? (
-                  <div className="case-chart" aria-label="Évolution projet">
+                  <div className="case-chart" aria-label={t("evolutionAriaLabel")}>
                     <div className="case-chart-head">
-                      <span>Évolution</span>
-                      <strong>Progression post-lancement</strong>
+                      <span>{t("evolutionLabel")}</span>
+                      <strong>{t("evolutionTitle")}</strong>
                     </div>
                     <div className="case-chart-visual">
                       <div className="case-chart-axis" aria-hidden="true">
@@ -318,7 +317,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         viewBox="0 0 100 48"
                         preserveAspectRatio="none"
                         role="img"
-                        aria-label="Courbe de progression du projet">
+                        aria-label={t("chartAriaLabel")}>
                         <defs>
                           <linearGradient
                             id={`case-chart-area-${project.slug}`}
@@ -407,12 +406,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 className="case-system"
                 aria-labelledby="case-architecture-title">
                 <div className="case-section-head">
-                  <span>Architecture</span>
-                  <h2 id="case-architecture-title">Système livré</h2>
-                  <p>
-                    Une lecture simple des blocs fonctionnels, de leurs
-                    responsabilités et des flux entre eux.
-                  </p>
+                  <span>{t("architectureLabel")}</span>
+                  <h2 id="case-architecture-title">{t("architectureTitle")}</h2>
+                  <p>{t("architectureDescription")}</p>
                 </div>
 
                 {project.solutionDiagram ? (
@@ -477,7 +473,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <aside className="case-aside">
             {project.result || project.metric ? (
               <div className="case-aside-main">
-                <span>Signal principal</span>
+                <span>{t("mainSignalLabel")}</span>
                 {project.metric ? <strong>{project.metric}</strong> : null}
                 <p>{project.result || project.description}</p>
               </div>
@@ -485,7 +481,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {project.results.length > 0 ? (
               <div className="case-aside-block">
-                <span>Livrables</span>
+                <span>{t("deliverablesLabel")}</span>
                 <ul>
                   {project.results.map((result) => (
                     <li key={result}>{result}</li>
@@ -496,7 +492,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {project.tech.length > 0 ? (
               <div className="case-aside-block">
-                <span>Stack</span>
+                <span>{t("stackLabel")}</span>
                 <div className="tag-list">
                   {project.tech.map((tech) => (
                     <span key={tech}>{tech}</span>
@@ -516,8 +512,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </a>
               ))}
               <a
-                href={`mailto:${site.email}?subject=${encodeURIComponent(`Projet similaire à ${project.name}`)}`}>
-                Discuter d&apos;un besoin similaire
+                href={`mailto:${site.email}?subject=${encodeURIComponent(t("hireSubject", { name: project.name }))}`}>
+                {t("discussLink")}
               </a>
             </div>
           </aside>
@@ -525,33 +521,27 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <section className="case-hire-cta" aria-labelledby="case-hire-title">
           <div>
-            <span>Collaboration</span>
-            <h2 id="case-hire-title">
-              Passons d&apos;un besoin flou à un produit livrable.
-            </h2>
+            <span>{t("collaborationLabel")}</span>
+            <h2 id="case-hire-title">{t("collaborationTitle")}</h2>
           </div>
           <div className="case-hire-note">
-            <p>
-              Diagnostic produit, architecture SaaS, backend, interface et
-              automatisations. L&apos;objectif reste simple : livrer une base
-              claire, maintenable et prête à évoluer.
-            </p>
+            <p>{t("collaborationDescription")}</p>
             <dl>
               <div>
-                <dt>Format</dt>
-                <dd>CDI, freelance, mission longue</dd>
+                <dt>{t("formatLabel")}</dt>
+                <dd>{t("formatValue")}</dd>
               </div>
               <div>
-                <dt>Focus</dt>
-                <dd>SaaS, API, back-office, automatisation</dd>
+                <dt>{t("focusLabel")}</dt>
+                <dd>{t("focusValue")}</dd>
               </div>
             </dl>
           </div>
           <div className="case-hire-actions">
             <a href={`mailto:${site.email}?subject=${hireSubject}&body=${hireBody}`}>
-              Me confier une mission
+              {t("ctaButton")}
             </a>
-            <a href="/cv/david-logan-cv.pdf">Télécharger le CV</a>
+            <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
       </main>

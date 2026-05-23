@@ -82,7 +82,7 @@ export interface ProjectLink {
 }
 
 export interface BackendProject
-  extends LocalizedTextField<"title" | "description" | "problem" | "solution"> {
+  extends LocalizedTextField<"title" | "description" | "problem" | "solution" | "headline" | "result" | "metric" | "role"> {
   id: string;
   slug: string;
   title: string;
@@ -102,6 +102,7 @@ export interface BackendProject
   links: ProjectLink[];
   featured: boolean;
   results: string[];
+  results_en?: string[] | null;
   metrics: ProjectMetric[];
   chartData: ChartDataPoint[];
   url?: string | null;

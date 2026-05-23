@@ -16,16 +16,21 @@ export function normalizeProject(item: BackendProject, locale: AppLocale = defau
     : Array.isArray(item.technologies)
       ? item.technologies
       : [];
-  const primaryResult = item.result || item.results?.find(Boolean) || '';
-  const primaryMetric = item.metric || formatMetric(item.metrics?.find((metric) => metric.name));
+  const primaryResult = localizeText(locale, item.result, item.result_en) || item.results?.find(Boolean) || '';
+  const primaryMetric = localizeText(locale, item.metric, item.metric_en) || formatMetric(item.metrics?.find((metric) => metric.name));
   const links = Array.isArray(item.links) ? [...item.links] : [];
   const title = localizeText(locale, item.title || item.name, item.title_en);
   const description = localizeText(locale, item.description, item.description_en);
   const problem = localizeText(locale, item.problem, item.problem_en);
   const solution = localizeText(locale, item.solution, item.solution_en);
+  const headline = localizeText(locale, item.headline, item.headline_en) || description || primaryResult;
+  const role = localizeText(locale, item.role, item.role_en) || item.category;
+  const results = locale === "en" && Array.isArray(item.results_en) && item.results_en.length > 0
+    ? item.results_en
+    : (Array.isArray(item.results) ? item.results : []);
 
   if (item.url && !links.some((link) => link.href === item.url)) {
-    links.push({ label: 'Voir le projet', href: item.url });
+    links.push({ label: locale === "en" ? 'View project' : 'Voir le projet', href: item.url });
   }
 
   return {
@@ -38,18 +43,23 @@ export function normalizeProject(item: BackendProject, locale: AppLocale = defau
     image: item.image || item.imageUrl || '',
     description,
     description_en: item.description_en,
-    headline: item.headline || description || primaryResult,
+    headline,
+    headline_en: item.headline_en,
     problem,
     problem_en: item.problem_en,
     solution,
     solution_en: item.solution_en,
     result: primaryResult,
+    result_en: item.result_en,
     metric: primaryMetric,
-    role: item.role || item.category,
+    metric_en: item.metric_en,
+    role,
+    role_en: item.role_en,
     tech,
     links,
     featured: Boolean(item.featured),
-    results: Array.isArray(item.results) ? item.results : [],
+    results,
+    results_en: Array.isArray(item.results_en) ? item.results_en : null,
     metrics: Array.isArray(item.metrics) ? item.metrics : [],
     chartData: Array.isArray(item.chartData) ? item.chartData : [],
     solutionDiagram: item.solutionDiagram ?? null,

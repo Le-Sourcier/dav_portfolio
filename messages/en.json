@@ -239,6 +239,13 @@
     "countBadge": "{count} {count, plural, =1 {case study} other {case studies}}"
   },
   "ProjectDetail": {
+    "metaTitleSuffix": "- Case study",
+    "perimeterFact": "Scope",
+    "stackFact": "Stack",
+    "signalFact": "Signal",
+    "mainSignalLabel": "Main signal",
+    "hireSubject": "Mission similar to {name}",
+    "hireBody": "Hello David,\n\nI reviewed the case study \"{name}\" and would like to discuss a similar need.\n\nQuick context:\nBudget / timeline:\nLink or useful documentation:\n\nThank you.",
     "backLink": "← Back to projects",
     "summaryAriaLabel": "Project summary",
     "contextLabel": "Context",
