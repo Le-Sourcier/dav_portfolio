@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 interface RadarPoint {
   label: string;
   value: number;
@@ -22,11 +24,12 @@ function polarToCartesian(angle: number, radius: number) {
  * Diagramme de Kiviat (radar chart) — affiche plusieurs axes d'impact
  * sur un polygone radial. Rendu SVG pur, sans dépendance.
  */
-export function ExperienceRadar({ points }: ExperienceRadarProps) {
+export async function ExperienceRadar({ points }: ExperienceRadarProps) {
+  const t = await getTranslations("ExperienceRadar");
   if (points.length < 3) {
     return (
       <div className="experience-radar-fallback">
-        Le diagramme radar nécessite au moins 3 axes d&apos;impact.
+        {t("fallbackMessage")}
       </div>
     );
   }
@@ -70,7 +73,7 @@ export function ExperienceRadar({ points }: ExperienceRadarProps) {
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         role="img"
-        aria-label="Diagramme de Kiviat des indicateurs d'impact">
+        aria-label={t("chartAriaLabel")}>
         <defs>
           <radialGradient id="radar-fill" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="var(--accent-strong)" stopOpacity="0.42" />

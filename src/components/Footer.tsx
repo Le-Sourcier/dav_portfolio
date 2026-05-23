@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { site } from "@/lib/portfolio";
+import { getTranslations } from "next-intl/server";
 
 type FooterProps = {
   showProjects?: boolean;
@@ -10,11 +11,13 @@ type FooterProps = {
   showBlog?: boolean;
 };
 
-export function Footer({
+export async function Footer({
   showProjects = true,
   showJourney = true,
   showBlog = true,
 }: FooterProps) {
+  const t = await getTranslations("Footer");
+
   return (
     <footer className="site-footer">
       <div className="footer-main">
@@ -37,32 +40,31 @@ export function Footer({
           </Link>
           <h2>{site.name}</h2>
           <p>
-            {site.title} spécialisé en SaaS, automatisation métier et
-            plateformes web/mobile scalables.
+            {t("description", { title: site.title })}
           </p>
         </div>
-        <nav aria-label="Navigation footer">
-          <span>Navigation</span>
-          <Link href="/#expertise">Expertise</Link>
-          {showProjects ? <Link href="/#projets">Projets</Link> : null}
-          {showJourney ? <Link href="/#parcours">Parcours</Link> : null}
-          {showBlog ? <Link href="/blog">Blog</Link> : null}
-          <Link href="/#contact">Contact</Link>
+        <nav aria-label={t("linksAriaLabel")}>
+          <span>{t("navTitle")}</span>
+          <Link href="/#expertise">{t("expertise")}</Link>
+          {showProjects ? <Link href="/projets">{t("projects")}</Link> : null}
+          {showJourney ? <Link href="/#parcours">{t("journey")}</Link> : null}
+          {showBlog ? <Link href="/blog">{t("blog")}</Link> : null}
+          <Link href="/#contact">{t("contact")}</Link>
         </nav>
-        <nav aria-label="Liens professionnels">
-          <span>Liens</span>
+        <nav aria-label={t("linksAriaLabel")}>
+          <span>{t("linksTitle")}</span>
           <a href={site.github} target="_blank" rel="noreferrer">
-            GitHub
+            {t("github")}
           </a>
           <a href={site.linkedin} target="_blank" rel="noreferrer">
-            LinkedIn
+            {t("linkedin")}
           </a>
-          <a href={`mailto:${site.email}`}>Email</a>
+          <a href={`mailto:${site.email}`}>{t("email")}</a>
         </nav>
       </div>
       <div className="footer-bottom">
         <span>
-          © {new Date().getFullYear()} {site.name}. Tous droits réservés.
+          {t("copyright", { year: new Date().getFullYear(), name: site.name })}
         </span>
         <div className="footer-bottom-actions">
           <CookiePreferencesButton />

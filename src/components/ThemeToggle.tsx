@@ -1,15 +1,10 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 
 type ThemePreference = "system" | "light" | "dark";
 type ThemeToggleVariant = "text" | "icon";
-
-const themes: Array<{ value: ThemePreference; label: string; short: string }> = [
-  { value: "system", label: "Thème du device", short: "Auto" },
-  { value: "light", label: "Thème clair", short: "Clair" },
-  { value: "dark", label: "Thème sombre", short: "Sombre" },
-];
 
 function ThemeIcon({ type }: { type: ThemePreference }) {
   if (type === "light") {
@@ -82,13 +77,20 @@ function subscribeToThemeChanges(onStoreChange: () => void) {
 
 export function ThemeToggle({ variant = "text" }: { variant?: ThemeToggleVariant }) {
   const preference = useSyncExternalStore(subscribeToThemeChanges, getThemePreference, () => "system");
+  const t = useTranslations("ThemeToggle");
+
+  const themes: Array<{ value: ThemePreference; label: string; short: string }> = [
+    { value: "system", label: t("systemLabel"), short: t("systemShort") },
+    { value: "light", label: t("lightLabel"), short: t("lightShort") },
+    { value: "dark", label: t("darkLabel"), short: t("darkShort") },
+  ];
 
   const updatePreference = (nextPreference: ThemePreference) => {
     applyTheme(nextPreference);
   };
 
   return (
-    <div className={`theme-toggle ${variant === "icon" ? "theme-toggle--icon" : ""}`} aria-label="Choix du thème">
+    <div className={`theme-toggle ${variant === "icon" ? "theme-toggle--icon" : ""}`} aria-label={t("ariaLabel")}>
       {themes.map((theme) => (
         <button
           type="button"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { ContactSection } from "@/components/ContactSection";
 import { ExpertiseCarousel } from "@/components/ExpertiseCarousel";
 import { Footer } from "@/components/Footer";
@@ -7,7 +8,7 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { BackToTop } from "@/components/blog/BackToTop";
-import { proofStats, site, stack } from "@/lib/portfolio";
+import { site, stack } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
 import {
   loadBlogPosts,
@@ -33,6 +34,12 @@ export default async function Home() {
   const hasJourney = experience.length > 0;
   const hasBlog = blogPosts.length > 0;
   const hasTestimonials = testimonials.length > 0;
+  const t = await getTranslations("HomePage");
+  const proofStats = [1, 2, 3, 4].map((i) => ({
+    value: t(`proofStat${i}Value`),
+    label: t(`proofStat${i}Label`),
+    detail: t(`proofStat${i}Detail`),
+  }));
   const dateFormatter = new Intl.DateTimeFormat(
     locale === "en" ? "en-US" : "fr-FR",
     {
@@ -54,93 +61,67 @@ export default async function Home() {
         <section className="hero-section">
           <div className="hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow">{site.availability}</p>
-              <h1>
-                Des plateformes SaaS plus rapides, plus fiables, plus simples à
-                vendre.
-              </h1>
-              <p className="hero-lead">{site.promise}</p>
+              <p className="eyebrow">{t("heroAvailability")}</p>
+              <h1>{t("heroTitle")}</h1>
+              <p className="hero-lead">{t("heroPromise")}</p>
 
               <div className="hero-actions">
                 <a
                   className="primary-button liquid-cta"
                   href={`mailto:${site.email}?subject=Projet%20SaaS%20ou%20mission`}>
-                  Me confier un projet
+                  {t("heroCta")}
                 </a>
                 {hasProjects ? (
                   <a className="secondary-button" href="#projets">
-                    Voir les cas concrets
+                    {t("heroSecondary")}
                   </a>
                 ) : null}
               </div>
 
-              <div className="trust-row" aria-label="Preuves principales">
-                <span>Multi-tenant</span>
-                <span>RBAC</span>
-                <span>Paiements</span>
-                <span>Back-office</span>
+              <div className="trust-row" aria-label={t("trustAriaLabel")}>
+                <span>{t("trustMultiTenant")}</span>
+                <span>{t("trustRbac")}</span>
+                <span>{t("trustPayments")}</span>
+                <span>{t("trustBackoffice")}</span>
               </div>
             </div>
 
             <div
               className="hero-visual saas-readiness-card"
-              aria-label="Audit de préparation SaaS">
+              aria-label={t("readinessAriaLabel")}>
               <div className="visual-header readiness-header">
                 <div>
-                  <span>YDL Product Audit</span>
-                  <strong>SaaS readiness</strong>
+                  <span>{t("readinessBrand")}</span>
+                  <strong>{t("readinessLabel")}</strong>
                 </div>
-                <p>Avant build</p>
+                <p>{t("readinessBefore")}</p>
               </div>
 
               <div className="readiness-score-panel">
                 <div>
-                  <span>MVP readiness</span>
-                  <strong>4 piliers</strong>
+                  <span>{t("readinessPanelLabel")}</span>
+                  <strong>{t("readinessPanelValue")}</strong>
                 </div>
-                <p>
-                  Auth, billing, ops et data cadrés pour lancer un SaaS
-                  commercialisable.
-                </p>
+                <p>{t("readinessPanelDesc")}</p>
               </div>
 
               <div className="readiness-checks">
                 {[
-                  [
-                    "Auth & rôles",
-                    "RBAC, sessions, invitations",
-                    "Prêt",
-                    "is-ready",
-                  ],
-                  [
-                    "Billing",
-                    "Plans, paiements, quotas",
-                    "À cadrer",
-                    "is-planned",
-                  ],
-                  [
-                    "Ops",
-                    "Logs, alertes, erreurs traçables",
-                    "À renforcer",
-                    "is-watch",
-                  ],
-                  [
-                    "Data",
-                    "Dashboards, exports, événements",
-                    "Prêt",
-                    "is-ready",
-                  ],
-                ].map(([title, detail, status, maturity]) => (
-                  <div className="readiness-check" key={title}>
+                  { titleKey: "readinessCheckAuth", detailKey: "readinessCheckAuthDetail", statusKey: "readinessCheckAuthStatus", maturity: "is-ready" },
+                  { titleKey: "readinessCheckBilling", detailKey: "readinessCheckBillingDetail", statusKey: "readinessCheckBillingStatus", maturity: "is-planned" },
+                  { titleKey: "readinessCheckOps", detailKey: "readinessCheckOpsDetail", statusKey: "readinessCheckOpsStatus", maturity: "is-watch" },
+                  { titleKey: "readinessCheckData", detailKey: "readinessCheckDataDetail", statusKey: "readinessCheckDataStatus", maturity: "is-ready" },
+                ].map(({ titleKey, detailKey, statusKey, maturity }) => (
+                  <div className="readiness-check" key={titleKey}>
                     <i aria-hidden="true" />
                     <div>
-                      <strong>{title}</strong>
-                      <span>{detail}</span>
+                      <strong>{t(titleKey)}</strong>
+                      <span>{t(detailKey)}</span>
                     </div>
                     <div
                       className={`readiness-maturity ${maturity}`}
-                      aria-label={`Maturité: ${status}`}>
-                      <small>{status}</small>
+                      aria-label={t("readinessMaturityLabel", { status: t(statusKey) })}>
+                      <small>{t(statusKey)}</small>
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
@@ -151,12 +132,12 @@ export default async function Home() {
 
               <div
                 className="readiness-architecture"
-                aria-label="Architecture cible">
-                <span>Interface client</span>
+                aria-label={t("architectureAriaLabel")}>
+                <span>{t("architectureClient")}</span>
                 <i aria-hidden="true" />
-                <span>API modulaire</span>
+                <span>{t("architectureApi")}</span>
                 <i aria-hidden="true" />
-                <span>PostgreSQL + jobs</span>
+                <span>{t("architectureData")}</span>
               </div>
             </div>
           </div>
@@ -164,7 +145,7 @@ export default async function Home() {
 
         <section
           className="section proof-band"
-          aria-label="Résultats mesurables">
+          aria-label={t("proofsAriaLabel")}>
           {proofStats.map((stat) => (
             <article key={stat.label}>
               <strong>{stat.value}</strong>
@@ -176,75 +157,58 @@ export default async function Home() {
 
         <section id="apropos" className="section about-section">
           <div className="about-copy">
-            <p className="section-kicker">À propos</p>
-            <h2>
-              Un profil fullstack orienté produit, pas seulement exécution
-              technique.
-            </h2>
-            <p>
-              Je conçois des plateformes web et SaaS avec une attention égale
-              pour l&apos;architecture, la vitesse de livraison,
-              l&apos;expérience utilisateur et les contraintes business.
-              L&apos;objectif: transformer une idée ou un process fragile en
-              produit clair, maintenable et prêt à vendre.
-            </p>
+            <p className="section-kicker">{t("aboutKicker")}</p>
+            <h2>{t("aboutTitle")}</h2>
+            <p>{t("aboutDescription")}</p>
             <div className="about-actions">
               <a
                 className="primary-button liquid-cta"
                 href={`mailto:${site.email}?subject=Mission%20fullstack%20SaaS&body=Bonjour%20David,%0A%0AJ'aimerais%20discuter%20d'une%20opportunit%C3%A9%20de%20collaboration.%0A`}>
-                M&apos;embaucher
+                {t("aboutCta")}
               </a>
               <a
                 className="secondary-button"
                 href="/cv/david-logan-cv.pdf"
                 download>
-                Télécharger le CV
+                {t("aboutCv")}
               </a>
             </div>
           </div>
 
           <div
             className="about-panel about-brief"
-            aria-label="Méthode de collaboration">
+            aria-label={t("methodAriaLabel")}>
             <div className="about-brief-top">
-              <span>Mission snapshot</span>
-              <strong>
-                Transformer un besoin flou en produit exploitable.
-              </strong>
+              <span>{t("methodPanelLabel")}</span>
+              <strong>{t("methodPanelTitle")}</strong>
             </div>
 
-            <div className="about-brief-flow" aria-label="Étapes de mission">
-              {["Diagnostic", "Architecture", "Build", "Stabilisation"].map(
-                (item, index) => (
-                  <div key={item}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{item}</strong>
-                  </div>
-                ),
-              )}
+            <div className="about-brief-flow" aria-label={t("methodFlowAriaLabel")}>
+              {[
+                t("methodStep1"),
+                t("methodStep2"),
+                t("methodStep3"),
+                t("methodStep4"),
+              ].map((item, index) => (
+                <div key={item}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{item}</strong>
+                </div>
+              ))}
             </div>
 
             <blockquote className="about-brief-note">
-              Je commence par cadrer les flux métier, les droits, les données et
-              les risques de livraison. Ensuite je construis une base produit
-              claire: API maintenable, interface lisible, automatisations utiles
-              et déploiement prêt à être repris par l&apos;équipe.
+              {t("methodBlockquote")}
             </blockquote>
 
             <div className="about-brief-bottom">
               <div>
-                <span>Livrables</span>
-                <p>
-                  API documentée · RBAC · paiements · dashboard admin ·
-                  monitoring · déploiement
-                </p>
+                <span>{t("methodDeliverablesLabel")}</span>
+                <p>{t("methodDeliverablesValue")}</p>
               </div>
               <div>
-                <span>Positionnement</span>
-                <p>
-                  Assez technique pour sécuriser l&apos;architecture, assez
-                  produit pour garder l&apos;usage au centre.
-                </p>
+                <span>{t("methodPositioningLabel")}</span>
+                <p>{t("methodPositioningValue")}</p>
               </div>
             </div>
           </div>
@@ -255,12 +219,9 @@ export default async function Home() {
         {hasProjects ? (
           <section id="projets" className="section projects-section">
             <div className="section-heading">
-              <p className="section-kicker">Projets sélectionnés</p>
-              <h2>Des preuves concrètes, pas seulement une stack.</h2>
-              <p>
-                Chaque projet met en avant le contexte, le résultat attendu et
-                la valeur technique réellement livrée.
-              </p>
+              <p className="section-kicker">{t("projectsKicker")}</p>
+              <h2>{t("projectsTitle")}</h2>
+              <p>{t("projectsDescription")}</p>
             </div>
 
             <div className="project-grid">
@@ -299,7 +260,7 @@ export default async function Home() {
                     <Link
                       href={`/projets/${project.slug}`}
                       className="text-link">
-                      Voir l&apos;étude de cas
+                      {t("projectsReadCase")}
                     </Link>
                   </div>
                 </article>
@@ -309,29 +270,22 @@ export default async function Home() {
         ) : null}
 
         {hasJourney ? (
-          <section id="parcours" className="section parcours-section">
+          <section id="parcours" className="section parcours-section pt-20">
             <div className="parcours-copy">
-              <p className="section-kicker">Parcours</p>
-              <h2>
-                Un parcours construit autour du produit, de la performance et de
-                l&apos;automatisation.
-              </h2>
-              <p>
-                Chaque expérience renforce le même socle: transformer une
-                contrainte métier en plateforme claire, maintenable et prête à
-                évoluer.
-              </p>
+              <p className="section-kicker">{t("journeyKicker")}</p>
+              <h2>{t("journeyTitle")}</h2>
+              <p>{t("journeyDescription")}</p>
               <div className="parcours-proof">
-                <span>Produit</span>
-                <span>Backend</span>
-                <span>Automatisation</span>
-                <span>SEO</span>
+                <span>{t("journeyTagProduct")}</span>
+                <span>{t("journeyTagBackend")}</span>
+                <span>{t("journeyTagAutomation")}</span>
+                <span>{t("journeyTagSeo")}</span>
               </div>
               {experience.length > 3 ? (
                 <Link
                   href="/experiences"
                   className="secondary-button parcours-cta">
-                  Voir tous mes parcours
+                  {t("journeyAllLink")}
                 </Link>
               ) : null}
             </div>
@@ -360,7 +314,7 @@ export default async function Home() {
                     <Link
                       href={`/experiences/${item.id}`}
                       className="text-link parcours-link">
-                      Voir le détail
+                      {t("journeyDetailLink")}
                     </Link>
                   </div>
                 </article>
@@ -371,26 +325,19 @@ export default async function Home() {
 
         <section className="section stack-section">
           <div className="stack-intro">
-            <p className="section-kicker">Stack</p>
-            <h2>
-              Un écosystème technique calibré pour produire, scaler et
-              maintenir.
-            </h2>
-            <p>
-              Les outils ne sont pas une collection de logos. Ils forment une
-              chaîne de production cohérente: interface, API, données,
-              déploiement et automatisation.
-            </p>
+            <p className="section-kicker">{t("stackKicker")}</p>
+            <h2>{t("stackTitle")}</h2>
+            <p>{t("stackDescription")}</p>
             <div className="stack-principles">
-              <span>Produit</span>
-              <span>Scalabilité</span>
-              <span>Maintenance</span>
+              <span>{t("stackPrincipleProduct")}</span>
+              <span>{t("stackPrincipleScale")}</span>
+              <span>{t("stackPrincipleMaintenance")}</span>
             </div>
           </div>
           <div className="stack-brand-showcase">
             <div
               className="stack-marquee"
-              aria-label="Technologies principales">
+              aria-label={t("stackAriaLabel")}>
               <div className="stack-marquee-track">
                 {[...stack, ...stack].map((item, index) => (
                   <div
@@ -412,18 +359,18 @@ export default async function Home() {
         </section>
 
         {hasTestimonials ? (
-          <TestimonialsCarousel testimonials={testimonials} locale={locale} />
+          <TestimonialsCarousel testimonials={testimonials} />
         ) : null}
 
         {hasBlog ? (
           <section id="blog" className="section blog-section">
             <div className="section-heading blog-heading">
               <div>
-                <p className="section-kicker">Blog</p>
-                <h2>Notes techniques pour construire mieux.</h2>
+                <p className="section-kicker">{t("blogKicker")}</p>
+                <h2>{t("blogTitle")}</h2>
               </div>
               <Link href="/blog" className="secondary-button">
-                Tous les articles
+                {t("blogAllLink")}
               </Link>
             </div>
             <div className="blog-card-grid">
@@ -431,24 +378,29 @@ export default async function Home() {
                 <Link
                   href={`/blog/${post.slug}`}
                   key={post.slug}
-                  className={`blog-card${post.coverImage ? " has-cover" : ""}`}>
-                  {post.coverImage ? (
-                    <img
-                      src={post.coverImage}
-                      alt=""
-                      loading="lazy"
-                      className="blog-card-cover"
-                    />
-                  ) : null}
-                  <span>
-                    {post.category} · {post.readTime}
-                  </span>
-                  <h3>{post.title}</h3>
+                  className={`blog-card home-blog-card${post.coverImage ? " has-cover" : ""}`}>
+                  <div className="home-blog-card-media">
+                    {post.coverImage ? (
+                      <img
+                        src={post.coverImage}
+                        alt=""
+                        loading="lazy"
+                        className="blog-card-cover"
+                      />
+                    ) : null}
+                    <div className="home-blog-card-overlay">
+                      <span>
+                        {post.category} · {post.readTime}
+                      </span>
+                      <h3>{post.title}</h3>
+                    </div>
+                  </div>
                   <p>{post.excerpt}</p>
                   <small className="blog-card-meta">
                     {post.author || site.name} ·{" "}
                     {dateFormatter.format(new Date(post.date))}
                   </small>
+                  <strong className="blog-card-action">{t("blogReadArticle")}</strong>
                 </Link>
               ))}
             </div>

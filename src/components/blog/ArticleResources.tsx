@@ -1,10 +1,13 @@
 import type { BlogResource } from "@/types/blog";
+import { getTranslations } from "next-intl/server";
 
 type ArticleResourcesProps = {
   resources: BlogResource[];
 };
 
-export function ArticleResources({ resources }: ArticleResourcesProps) {
+export async function ArticleResources({ resources }: ArticleResourcesProps) {
+  const t = await getTranslations("ArticleResources");
+
   if (resources.length === 0) {
     return null;
   }
@@ -12,8 +15,8 @@ export function ArticleResources({ resources }: ArticleResourcesProps) {
   return (
     <section className="article-resources" aria-labelledby="article-resources-title">
       <div>
-        <p className="section-kicker">Pour aller plus loin</p>
-        <h2 id="article-resources-title">Ressources sélectionnées.</h2>
+        <p className="section-kicker">{t("kicker")}</p>
+        <h2 id="article-resources-title">{t("title")}</h2>
       </div>
       <ul>
         {resources.map((resource) => (

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface ExperienceTocProps {
   items: { id: string; label: string }[];
 }
 
 export function ExperienceToc({ items }: ExperienceTocProps) {
+  const t = useTranslations("ExperienceToc");
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export function ExperienceToc({ items }: ExperienceTocProps) {
   if (items.length === 0) return null;
 
   return (
-    <nav className="xp-toc" aria-label="Sommaire">
+    <nav className="xp-toc" aria-label={t("navAriaLabel")}>
       <ul>
         {items.map((item) => (
           <li

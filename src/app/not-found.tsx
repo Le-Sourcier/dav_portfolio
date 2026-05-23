@@ -1,47 +1,46 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { site } from "@/lib/portfolio";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("NotFound");
   return (
     <>
       <Header showProjects={false} />
       <main className="not-found-page">
         <section className="not-found-shell" aria-labelledby="not-found-title">
           <div className="not-found-copy">
-            <p className="section-kicker">404</p>
-            <h1 id="not-found-title">Cette page n&apos;existe pas ou a changé d&apos;adresse.</h1>
-            <p>
-              Le contenu demandé n&apos;est pas disponible. Vous pouvez revenir à l&apos;accueil,
-              consulter les articles ou me contacter directement si vous cherchiez une ressource précise.
-            </p>
+            <p className="section-kicker">{t("kicker")}</p>
+            <h1 id="not-found-title">{t("title")}</h1>
+            <p>{t("description")}</p>
             <div className="not-found-actions">
               <Link className="primary-button liquid-cta" href="/">
-                Retour à l&apos;accueil
+                {t("homeButton")}
               </Link>
               <Link className="secondary-button" href="/blog">
-                Voir le blog
+                {t("blogButton")}
               </Link>
               <a className="secondary-button" href={`mailto:${site.email}?subject=Page%20introuvable`}>
-                Me contacter
+                {t("contactButton")}
               </a>
             </div>
           </div>
 
-          <div className="not-found-panel" aria-label="Diagnostic de navigation">
-            <span>Route introuvable</span>
-            <strong>404</strong>
+          <div className="not-found-panel" aria-label={t("panelAriaLabel")}>
+            <span>{t("panelLabel")}</span>
+            <strong>{t("panelValue")}</strong>
             <div>
-              <p>URL absente</p>
+              <p>{t("diagUrlAbsente")}</p>
               <i aria-hidden="true" />
             </div>
             <div>
-              <p>Contenu déplacé</p>
+              <p>{t("diagContenuDeplace")}</p>
               <i aria-hidden="true" />
             </div>
             <div>
-              <p>Retour possible</p>
+              <p>{t("diagRetourPossible")}</p>
               <i aria-hidden="true" />
             </div>
           </div>

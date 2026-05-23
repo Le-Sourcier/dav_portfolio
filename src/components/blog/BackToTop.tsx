@@ -1,6 +1,7 @@
 "use client";
 
 import { CSSProperties, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type BackToTopStyle = CSSProperties & {
   "--scroll-progress": string;
@@ -9,6 +10,7 @@ type BackToTopStyle = CSSProperties & {
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
+  const t = useTranslations("BackToTop");
 
   useEffect(() => {
     const update = () => {
@@ -37,7 +39,7 @@ export function BackToTop() {
       type="button"
       className={`article-back-to-top${visible ? " is-visible" : ""}`}
       onClick={handleClick}
-      aria-label="Revenir en haut de la page"
+      aria-label={t("ariaLabel")}
       style={{ "--scroll-progress": progressAngle } as BackToTopStyle}
     >
       <svg className="article-back-to-top-arrow" viewBox="0 0 24 24" aria-hidden="true">
@@ -50,7 +52,7 @@ export function BackToTop() {
           strokeWidth="2"
         />
       </svg>
-      <span>Haut</span>
+      <span>{t("text")}</span>
     </button>
   );
 }

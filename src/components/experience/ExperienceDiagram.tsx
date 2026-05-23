@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 
 interface ExperienceDiagramProps {
@@ -8,22 +9,27 @@ interface ExperienceDiagramProps {
 }
 
 const COLUMN_ORDER = ["client", "gateway", "service", "database", "external", "ai"] as const;
-const COLUMN_LABELS: Record<(typeof COLUMN_ORDER)[number], string> = {
-  client: "Clients",
-  gateway: "Passerelle",
-  service: "Services",
-  database: "Données",
-  external: "Externes",
-  ai: "Intelligence",
-};
 
 type NodeRect = { x: number; y: number; width: number; height: number };
 
 export function ExperienceDiagram({ diagram }: ExperienceDiagramProps) {
+  const t = useTranslations("ExperienceDiagram");
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<Map<string, HTMLElement>>(new Map());
   const [rects, setRects] = useState<Map<string, NodeRect>>(new Map());
   const [size, setSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+
+  const columnLabel = (type: string): string => {
+    const map: Record<string, string> = {
+      client: t("columnClient"),
+      gateway: t("columnGateway"),
+      service: t("columnService"),
+      database: t("columnDatabase"),
+      external: t("columnExternal"),
+      ai: t("columnAi"),
+    };
+    return map[type] ?? type;
+  };
 
   const grouped = COLUMN_ORDER.map((type) => ({
     type,
@@ -129,7 +135,7 @@ export function ExperienceDiagram({ diagram }: ExperienceDiagramProps) {
       <div className="xp-diagram-grid">
         {grouped.map((column) => (
           <div key={column.type} className="xp-diagram-column" data-type={column.type}>
-            <p className="xp-diagram-column-label">{COLUMN_LABELS[column.type]}</p>
+            <p className="xp-diagram-column-label">{columnLabel(column.type)}</p>
             <div className="xp-diagram-stack">
               {column.nodes.map((node) => (
                 <article

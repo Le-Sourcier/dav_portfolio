@@ -1,32 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppLocale } from "@/i18n/config";
+import { useLocale, useTranslations } from "next-intl";
 import type { PortfolioTestimonialItem } from "@/services/portfolio/contentLoaders";
 
 interface TestimonialsCarouselProps {
   testimonials: PortfolioTestimonialItem[];
-  locale: AppLocale;
 }
-
-const COPY = {
-  fr: {
-    kicker: "Témoignages",
-    title: "Une collaboration pensée pour la clarté et l'exécution.",
-    lead: "Des retours bruts de partenaires et clients qui ont vu la mission passer du cadrage à la livraison.",
-    previous: "Voir le témoignage précédent",
-    next: "Voir le témoignage suivant",
-    ratingLabel: (filled: number) => `Note: ${filled} sur 5`,
-  },
-  en: {
-    kicker: "Testimonials",
-    title: "Collaboration built for clarity and execution.",
-    lead: "Honest feedback from clients and partners who saw the work move from scoping to delivery.",
-    previous: "Show previous testimonial",
-    next: "Show next testimonial",
-    ratingLabel: (filled: number) => `Rating: ${filled} of 5`,
-  },
-} as const;
 
 function getInitials(name: string): string {
   return (
@@ -40,13 +20,14 @@ function getInitials(name: string): string {
   );
 }
 
-export function TestimonialsCarousel({ testimonials, locale }: TestimonialsCarouselProps) {
+export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps) {
+  const t = useTranslations("Testimonials");
+  const locale = useLocale();
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideStep, setSlideStep] = useState(530);
   const [maxTranslate, setMaxTranslate] = useState(0);
 
-  const copy = COPY[locale] ?? COPY.fr;
   const dateFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(locale === "en" ? "en-US" : "fr-FR", {
@@ -118,21 +99,21 @@ export function TestimonialsCarousel({ testimonials, locale }: TestimonialsCarou
   return (
     <section className="testimonials-carousel-section">
       <div className="testimonials-copy">
-        <p className="section-kicker">{copy.kicker}</p>
-        <h2>{copy.title}</h2>
-        <p>{copy.lead}</p>
-        <div className="carousel-controls" aria-label={copy.kicker}>
+        <p className="section-kicker">{t("kicker")}</p>
+        <h2>{t("title")}</h2>
+        <p>{t("lead")}</p>
+        <div className="carousel-controls" aria-label={t("kicker")}>
           <button
             type="button"
             onClick={() => scroll("previous")}
-            aria-label={copy.previous}
+            aria-label={t("previous")}
             disabled={!canPrevious}>
             ‹
           </button>
           <button
             type="button"
             onClick={() => scroll("next")}
-            aria-label={copy.next}
+            aria-label={t("next")}
             disabled={!canNext}>
             ›
           </button>
@@ -173,7 +154,7 @@ export function TestimonialsCarousel({ testimonials, locale }: TestimonialsCarou
               {testimonial.rating ? (
                 <div
                   className="testimonial-rating"
-                  aria-label={copy.ratingLabel(filledStars)}>
+                  aria-label={t("ratingLabel", { filled: filledStars })}>
                   {Array.from({ length: 5 }).map((_, index) => (
                     <span
                       key={index}

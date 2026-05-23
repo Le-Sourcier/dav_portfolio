@@ -1,10 +1,13 @@
 import type { BlogFaqEntry } from "@/types/blog";
+import { getTranslations } from "next-intl/server";
 
 type ArticleFaqProps = {
   entries: BlogFaqEntry[];
 };
 
-export function ArticleFaq({ entries }: ArticleFaqProps) {
+export async function ArticleFaq({ entries }: ArticleFaqProps) {
+  const t = await getTranslations("ArticleFaq");
+
   if (entries.length === 0) {
     return null;
   }
@@ -12,8 +15,8 @@ export function ArticleFaq({ entries }: ArticleFaqProps) {
   return (
     <section className="article-faq" aria-labelledby="article-faq-title">
       <div>
-        <p className="section-kicker">FAQ</p>
-        <h2 id="article-faq-title">Questions fréquentes sur ce sujet.</h2>
+        <p className="section-kicker">{t("kicker")}</p>
+        <h2 id="article-faq-title">{t("title")}</h2>
       </div>
       <div className="article-faq-list">
         {entries.map((entry, index) => (

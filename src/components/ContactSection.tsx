@@ -2,12 +2,14 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { site } from "@/lib/portfolio";
 import { contactsApi } from "@/services/api/contacts.api";
 
 const whatsappNumber = site.phone.replace(/\D/g, "");
 
 export function ContactSection() {
+  const t = useTranslations("Contact");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -50,7 +52,7 @@ export function ContactSection() {
           .join("\n\n"),
       });
       setStatus("success");
-      setFeedback("Message envoyé. Je reviens vers vous rapidement.");
+      setFeedback(t("successFeedback"));
       setForm({ name: "", email: "", company: "", budget: "", message: "" });
     } catch (error) {
       setStatus("error");
@@ -61,30 +63,27 @@ export function ContactSection() {
   return (
     <section id="contact" className="section contact-section">
       <div className="contact-copy">
-        <p className="section-kicker">Contact</p>
-        <h2>Discutons de votre prochaine étape produit.</h2>
-        <p>
-          Choisissez un canal direct ou préparez un brief structuré. Le formulaire ouvre votre client email avec un
-          message prêt à envoyer.
-        </p>
+        <p className="section-kicker">{t("kicker")}</p>
+        <h2>{t("title")}</h2>
+        <p>{t("description")}</p>
 
-        <div className="direct-actions" aria-label="Actions de contact direct">
-          <a href={`mailto:${site.email}`} aria-label={`Envoyer un email à ${site.email}`} title="Email">
+        <div className="direct-actions" aria-label={t("directAriaLabel")}>
+          <a href={`mailto:${site.email}`} aria-label={t("emailAriaLabel", { email: site.email })} title={t("emailTitle")}>
             <span className="contact-link-icon">
               <Image src="/icons/gmail.svg" alt="" width={24} height={24} aria-hidden="true" />
             </span>
           </a>
-          <a href={`tel:${site.phone.replaceAll(" ", "")}`} aria-label={`Appeler ${site.phone}`} title="Téléphone">
+          <a href={`tel:${site.phone.replaceAll(" ", "")}`} aria-label={t("phoneAriaLabel", { phone: site.phone })} title={t("phoneTitle")}>
             <span className="contact-link-icon">
               <Image src="/icons/telephone.svg" alt="" width={24} height={24} aria-hidden="true" />
             </span>
           </a>
-          <a href={whatsappHref} target="_blank" rel="noreferrer" aria-label="Ouvrir WhatsApp" title="WhatsApp">
+          <a href={whatsappHref} target="_blank" rel="noreferrer" aria-label={t("whatsappAriaLabel")} title={t("whatsappTitle")}>
             <span className="contact-link-icon">
               <Image src="/icons/whatsapp.svg" alt="" width={24} height={24} aria-hidden="true" />
             </span>
           </a>
-          <a href={site.linkedin} target="_blank" rel="noreferrer" aria-label="Ouvrir LinkedIn" title="LinkedIn">
+          <a href={site.linkedin} target="_blank" rel="noreferrer" aria-label={t("linkedinAriaLabel")} title={t("linkedinTitle")}>
             <span className="contact-link-icon">
               <Image src="/icons/linkedin.svg" alt="" width={24} height={24} aria-hidden="true" />
             </span>
@@ -95,74 +94,74 @@ export function ContactSection() {
       <form className="contact-form" onSubmit={handleSubmit}>
         <div className="form-status">
           <span />
-          Disponible pour CDI, freelance et missions longues
+          {t("statusText")}
         </div>
 
         <div className="form-grid">
           <label>
-            Nom
+            {t("nameLabel")}
             <input
               required
               value={form.name}
               onChange={(event) => setForm({ ...form, name: event.target.value })}
-              placeholder="Votre nom"
+              placeholder={t("namePlaceholder")}
             />
           </label>
           <label>
-            Email
+            {t("emailLabel")}
             <input
               required
               type="email"
               value={form.email}
               onChange={(event) => setForm({ ...form, email: event.target.value })}
-              placeholder="vous@entreprise.com"
+              placeholder={t("emailPlaceholder")}
             />
           </label>
         </div>
 
         <div className="form-grid">
           <label>
-            Entreprise
+            {t("companyLabel")}
             <input
               value={form.company}
               onChange={(event) => setForm({ ...form, company: event.target.value })}
-              placeholder="Nom de l'entreprise"
+              placeholder={t("companyPlaceholder")}
             />
           </label>
           <label>
-            Cadre
+            {t("budgetLabel")}
             <select value={form.budget} onChange={(event) => setForm({ ...form, budget: event.target.value })}>
-              <option value="">Sélectionner</option>
-              <option>Mission freelance</option>
-              <option>CDI / équipe produit</option>
-              <option>Audit technique</option>
-              <option>Architecture SaaS</option>
-              <option>Automatisation métier</option>
+              <option value="">{t("budgetDefault")}</option>
+              <option>{t("budgetFreelance")}</option>
+              <option>{t("budgetCdi")}</option>
+              <option>{t("budgetAudit")}</option>
+              <option>{t("budgetArchitecture")}</option>
+              <option>{t("budgetAutomation")}</option>
             </select>
           </label>
         </div>
 
         <label>
-          Besoin
+          {t("messageLabel")}
           <textarea
             required
             rows={6}
             value={form.message}
             onChange={(event) => setForm({ ...form, message: event.target.value })}
-            placeholder="Contexte, objectif business, délai, stack existante, blocages..."
+            placeholder={t("messagePlaceholder")}
           />
         </label>
 
         <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "Envoi..." : "Envoyer le brief"}
+          {status === "loading" ? t("sendLoading") : t("sendDefault")}
         </button>
 
         {feedback ? <p className={`form-feedback is-${status}`}>{feedback}</p> : null}
 
         <p className="form-note">
-          Le message est transmis au backend. Pour une réponse immédiate, utilisez WhatsApp ou le téléphone.
+          {t("formNote")}
           <br />
-          <a href={mailHref}>Ouvrir plutôt mon application email</a>
+          <a href={mailHref}>{t("openMailApp")}</a>
         </p>
       </form>
     </section>

@@ -9,6 +9,7 @@ import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import { ExperienceSignal } from "@/components/experience/ExperienceSignal";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { site } from "@/lib/portfolio";
+import { getTranslations } from "next-intl/server";
 
 interface ExperienceDetailProps {
   experience: PortfolioExperienceDetail;
@@ -16,11 +17,10 @@ interface ExperienceDetailProps {
 
 const ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
 
-export function ExperienceDetail({ experience }: ExperienceDetailProps) {
-  const contactSubject = encodeURIComponent(`Mission similaire à ${experience.role}`);
-  const contactBody = encodeURIComponent(
-    `Bonjour David,\n\nJ'ai consulté votre expérience chez ${experience.company} et je souhaite discuter d'un besoin similaire.\n\nContexte rapide:\nBudget / délai:\n\nMerci.`,
-  );
+export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
+  const t = await getTranslations("ExperienceDetail");
+  const contactSubject = encodeURIComponent(t("contactSubject", { role: experience.role }));
+  const contactBody = encodeURIComponent(t("contactBody", { company: experience.company }));
 
   const hasMission = Boolean(experience.description);
   const hasAchievements = experience.achievements.length > 0;
@@ -33,13 +33,13 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
   const hasGallery = experience.illustrativeImages.length > 0;
 
   const toc: { id: string; label: string }[] = [
-    hasMission && { id: "mission", label: "Mission" },
-    hasChallenges && { id: "challenges", label: "Défis" },
-    hasAchievements && { id: "achievements", label: "Réalisations" },
-    hasDetails && { id: "perimeter", label: "Périmètre" },
-    hasDiagram && { id: "architecture", label: "Architecture" },
-    hasImpact && { id: "impact", label: "Impact" },
-    hasGallery && { id: "gallery", label: "Visuels" },
+    hasMission && { id: "mission", label: t("tocMission") },
+    hasChallenges && { id: "challenges", label: t("tocChallenges") },
+    hasAchievements && { id: "achievements", label: t("tocAchievements") },
+    hasDetails && { id: "perimeter", label: t("tocPerimeter") },
+    hasDiagram && { id: "architecture", label: t("tocArchitecture") },
+    hasImpact && { id: "impact", label: t("tocImpact") },
+    hasGallery && { id: "gallery", label: t("tocGallery") },
   ].filter(
     (item): item is { id: string; label: string } => typeof item === "object" && item !== null,
   );
@@ -57,7 +57,7 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
       <div className="xp-shell">
         <div className="xp-flow">
           {hasMission ? (
-            <ExperienceSection id="mission" kicker="Mission" title="Le contexte">
+            <ExperienceSection id="mission" kicker={t("missionKicker")} title={t("missionTitle")}>
               <div className="xp-mission">
                 <MarkdownContent content={experience.description} />
               </div>
@@ -67,8 +67,8 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasChallenges ? (
             <ExperienceSection
               id="challenges"
-              kicker="Défis"
-              title="Ce qu'il fallait résoudre">
+              kicker={t("challengesKicker")}
+              title={t("challengesTitle")}>
               <ol className="xp-challenges">
                 {experience.challenges.map((challenge, index) => (
                   <li key={challenge}>
@@ -83,9 +83,9 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasAchievements ? (
             <ExperienceSection
               id="achievements"
-              kicker="Réalisations"
-              title="Ce qui a été livré"
-              lead="Les contributions structurantes durant cette mission.">
+              kicker={t("achievementsKicker")}
+              title={t("achievementsTitle")}
+              lead={t("achievementsLead")}>
               <ExperienceAchievements achievements={experience.achievements} />
             </ExperienceSection>
           ) : null}
@@ -93,8 +93,8 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasDetails ? (
             <ExperienceSection
               id="perimeter"
-              kicker="Périmètre"
-              title="Sur quoi j'ai travaillé">
+              kicker={t("perimeterKicker")}
+              title={t("perimeterTitle")}>
               <ul className="xp-perimeter">
                 {experience.details.map((detail) => (
                   <li key={detail}>{detail}</li>
@@ -106,9 +106,9 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasDiagram && experience.solutionDiagram ? (
             <ExperienceSection
               id="architecture"
-              kicker="Architecture"
-              title="Le système conçu"
-              lead="Une lecture rapide des blocs et de leurs flux."
+              kicker={t("architectureKicker")}
+              title={t("architectureTitle")}
+              lead={t("architectureLead")}
               wide>
               <ExperienceDiagram diagram={experience.solutionDiagram} />
             </ExperienceSection>
@@ -117,9 +117,9 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasImpact ? (
             <ExperienceSection
               id="impact"
-              kicker="Impact"
-              title="Les indicateurs clés"
-              lead="Mesure synthétique des effets produits."
+              kicker={t("impactKicker")}
+              title={t("impactTitle")}
+              lead={t("impactLead")}
               wide>
               {experience.impactGraph.length >= 4 ? (
                 <ExperienceRadar points={experience.impactGraph} />
@@ -144,31 +144,29 @@ export function ExperienceDetail({ experience }: ExperienceDetailProps) {
           {hasGallery ? (
             <ExperienceSection
               id="gallery"
-              kicker="Visuels"
-              title="Galerie"
+              kicker={t("galleryKicker")}
+              title={t("galleryTitle")}
               wide>
               <ExperienceGallery images={experience.illustrativeImages} />
             </ExperienceSection>
           ) : null}
 
           <section className="xp-closing" aria-labelledby="xp-closing-title">
-            <p className="xp-section-kicker">Collaboration</p>
+            <p className="xp-section-kicker">{t("closingKicker")}</p>
             <h2 id="xp-closing-title">
-              Une mission similaire à mener ? Discutons-en.
+              {t("closingTitle")}
             </h2>
             <p>
-              Diagnostic produit, architecture, livraison. L&apos;objectif reste
-              le même : transformer un besoin flou en plateforme claire,
-              maintenable et prête à évoluer.
+              {t("closingDescription")}
             </p>
             <div className="xp-closing-actions">
               <a
                 className="primary-button liquid-cta"
                 href={`mailto:${site.email}?subject=${contactSubject}&body=${contactBody}`}>
-                Me confier une mission
+                {t("closingCta")}
               </a>
               <a className="xp-hero-link" href="/cv/david-logan-cv.pdf">
-                Télécharger le CV
+                {t("closingCv")}
                 <span aria-hidden="true">↓</span>
               </a>
             </div>

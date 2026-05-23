@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
+import { useTranslations } from "next-intl";
 
 export function CookieConsent() {
   const { isReady, hasConsented, accept } = useCookieConsent();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
+  const t = useTranslations("CookieConsent");
 
   if (!isReady || hasConsented) return null;
 
@@ -15,32 +17,29 @@ export function CookieConsent() {
   };
 
   return (
-    <div className="cookie-consent-shell" role="dialog" aria-label="Gestion du consentement cookies">
+    <div className="cookie-consent-shell" role="dialog" aria-label={t("dialogAriaLabel")}>
       <div className="cookie-consent-card">
         <div className="cookie-consent-grid">
           <div className="cookie-consent-mark" aria-hidden="true">
             <span />
           </div>
           <div className="cookie-consent-copy">
-            <p className="eyebrow">Confidentialité</p>
-            <h2>Mesure d’audience, seulement si vous l’acceptez.</h2>
-            <p>
-              Les cookies essentiels gardent le site stable. L’audience facultative m’aide à voir quelles pages servent
-              vraiment aux visiteurs. Aucun cookie publicitaire, aucune revente.
-            </p>
+<p className="eyebrow">{t("eyebrow")}</p>
+            <h2>{t("title")}</h2>
+            <p>{t("description")}</p>
           </div>
           <div className="cookie-consent-actions">
             <button type="button" className="cookie-consent-ghost" onClick={() => setDetailsOpen((value) => !value)}>
-              {detailsOpen ? "Masquer" : "Paramètres"}
+              {t(detailsOpen ? "hideDetails" : "showDetails")}
             </button>
             <button type="button" className="cookie-consent-ghost" onClick={() => accept("essential")}>
-              Essentiels
+              {t("essentialBtn")}
             </button>
             <button type="button" className="cookie-consent-ghost" onClick={savePreferences}>
-              Enregistrer
+              {t("saveBtn")}
             </button>
             <button type="button" className="cookie-consent-primary" onClick={() => accept("all")}>
-              Tout accepter
+              {t("acceptAll")}
             </button>
           </div>
         </div>
@@ -49,41 +48,41 @@ export function CookieConsent() {
           <div className="cookie-preferences">
             <div className="cookie-preference-row">
               <div className="cookie-preference-main">
-                <span>Essentiels</span>
-                <p>Consentement, langue, thème et session visiteur.</p>
+                <span>{t("essentialLabel")}</span>
+                <p>{t("essentialDesc")}</p>
               </div>
-              <small>Obligatoire</small>
+              <small>{t("mandatory")}</small>
               <button
                 type="button"
                 className="cookie-consent-switch is-on is-locked"
                 disabled
-                aria-label="Cookies essentiels obligatoires"
+                aria-label={t("essentialAriaLabel")}
               >
                 <span />
               </button>
             </div>
             <div className="cookie-preference-meta">
-              Nécessaires pour mémoriser vos préférences et faire fonctionner les formulaires. Durée maximale : 12 mois.
+              {t("essentialMeta")}
             </div>
 
             <div className="cookie-preference-row">
               <div className="cookie-preference-main">
-                <span>Mesure d’audience</span>
-                <p>Pages vues, langue, référent technique, identifiant anonyme.</p>
+                <span>{t("analyticsLabel")}</span>
+                <p>{t("analyticsDesc")}</p>
               </div>
-              <small>Facultatif</small>
+              <small>{t("optional")}</small>
               <button
                 type="button"
                 className={`cookie-consent-switch ${analyticsEnabled ? "is-on" : ""}`}
                 onClick={() => setAnalyticsEnabled((value) => !value)}
                 aria-pressed={analyticsEnabled}
-                aria-label="Activer ou désactiver la mesure d'audience"
+                aria-label={t("analyticsAriaLabel")}
               >
                 <span />
               </button>
             </div>
             <div className="cookie-preference-meta">
-              Sert uniquement à comprendre quelles pages sont utiles pour améliorer le portfolio. Pas de publicité, pas de tiers.
+              {t("analyticsMeta")}
             </div>
           </div>
         </div>

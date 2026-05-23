@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { services } from "@/lib/portfolio";
 
 export function ExpertiseCarousel() {
+  const t = useTranslations("ExpertiseSection");
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideStep, setSlideStep] = useState(530);
@@ -58,17 +60,14 @@ export function ExpertiseCarousel() {
   return (
     <section id="expertise" className="expertise-carousel-section">
       <div className="expertise-copy">
-        <p className="section-kicker">Expertise</p>
-        <h2>Des expertises pensées comme des leviers produit.</h2>
-        <p>
-          Chaque intervention vise un résultat concret: livrer plus vite, clarifier l&apos;architecture, sécuriser les flux
-          et réduire la charge opérationnelle.
-        </p>
-        <div className="carousel-controls" aria-label="Contrôles expertise">
+        <p className="section-kicker">{t("kicker")}</p>
+        <h2>{t("title")}</h2>
+        <p>{t("description")}</p>
+        <div className="carousel-controls" aria-label={t("controlsAriaLabel")}>
           <button
             type="button"
             onClick={() => scroll("previous")}
-            aria-label="Voir l'expertise précédente"
+            aria-label={t("previousAriaLabel")}
             disabled={!canPrevious}
           >
             ‹
@@ -76,7 +75,7 @@ export function ExpertiseCarousel() {
           <button
             type="button"
             onClick={() => scroll("next")}
-            aria-label="Voir l'expertise suivante"
+            aria-label={t("nextAriaLabel")}
             disabled={!canNext}
           >
             ›

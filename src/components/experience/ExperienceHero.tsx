@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { site } from "@/lib/portfolio";
+import { getTranslations } from "next-intl/server";
 
 interface ExperienceHeroProps {
   experience: PortfolioExperienceDetail;
@@ -8,11 +9,12 @@ interface ExperienceHeroProps {
   contactBody: string;
 }
 
-export function ExperienceHero({
+export async function ExperienceHero({
   experience,
   contactSubject,
   contactBody,
 }: ExperienceHeroProps) {
+  const t = await getTranslations("ExperienceHero");
   const meta = Array.from(
     new Set(
       [experience.period, experience.location].filter(
@@ -28,7 +30,7 @@ export function ExperienceHero({
   return (
     <section className="xp-hero" aria-label={experience.role}>
       <Link href="/#parcours" className="xp-hero-back">
-        ← Retour aux parcours
+        {t("backLink")}
       </Link>
 
       <div className="xp-hero-grid">
@@ -45,7 +47,7 @@ export function ExperienceHero({
           <span className="xp-hero-rule" aria-hidden="true" />
 
           {experience.stack.length > 0 ? (
-            <p className="xp-hero-stack" aria-label="Stack technique">
+            <p className="xp-hero-stack" aria-label={t("stackAriaLabel")}>
               {experience.stack.map((tech, index) => (
                 <span key={tech}>
                   {index > 0 ? <i aria-hidden="true">·</i> : null}
@@ -59,7 +61,7 @@ export function ExperienceHero({
             <a
               className="primary-button liquid-cta"
               href={`mailto:${site.email}?subject=${contactSubject}&body=${contactBody}`}>
-              Discuter d&apos;un projet
+              {t("ctaButton")}
             </a>
             {primaryLink ? (
               <a
@@ -97,7 +99,7 @@ export function ExperienceHero({
           </div>
           {focusTag ? (
             <div className="xp-hero-visual-tag">
-              <span>Focus</span>
+              <span>{t("focusLabel")}</span>
               <strong>{focusTag}</strong>
             </div>
           ) : null}

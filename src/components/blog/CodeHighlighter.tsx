@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type CodeHighlighterProps = {
   code: string;
@@ -242,6 +243,7 @@ function highlightCode(rawCode: string, lang: string): string {
 }
 
 export function CodeHighlighter({ code, language = "text", filename }: CodeHighlighterProps) {
+  const t = useTranslations("CodeHighlighter");
   const [copied, setCopied] = useState(false);
   const lang = normalizeLanguage(language);
   const label = languageLabels[lang] ?? languageLabels[language] ?? language.toUpperCase();
@@ -268,7 +270,7 @@ export function CodeHighlighter({ code, language = "text", filename }: CodeHighl
         </div>
         <strong>{filename ?? label}</strong>
         <button type="button" onClick={copyCode}>
-          {copied ? "Copié" : "Copier"}
+          {copied ? t("copiedButton") : t("copyButton")}
         </button>
       </div>
       <div className="code-highlighter-body">

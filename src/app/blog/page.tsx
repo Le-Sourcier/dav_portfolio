@@ -6,22 +6,26 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { site } from "@/lib/portfolio";
+import { getTranslations } from "next-intl/server";
 import { getRequestLocale } from "@/i18n/server";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description:
-    "Articles de Yao David Logan sur architecture SaaS, automatisation métier, Next.js et construction de produits web.",
-  alternates: {
-    canonical: `${site.url}/blog`,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("BlogPage");
+  return {
+    title: t("pageTitle"),
+    description: t("metaDescription"),
+    alternates: {
+      canonical: `${site.url}/blog`,
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
+  const t = await getTranslations("BlogPage");
   const locale = await getRequestLocale();
   const [projects, blogPosts] = await Promise.all([
     loadProjects(locale),
@@ -34,7 +38,7 @@ export default async function BlogPage() {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Blog Yao David Logan",
-    description: metadata.description,
+    description: t("metaDescription"),
     url: `${site.url}/blog`,
     author: {
       "@type": "Person",
@@ -61,17 +65,14 @@ export default async function BlogPage() {
         />
         <section className="blog-hero section">
           <div>
-            <p className="section-kicker">Blog</p>
-            <h1>Réflexions techniques pour construire des produits plus solides.</h1>
-            <p>
-              Des notes concrètes sur architecture SaaS, automatisation, produit et qualité d&apos;exécution. Le but:
-              aider à prendre de meilleures décisions techniques avant que la complexité coûte trop cher.
-            </p>
+            <p className="section-kicker">{t("sectionKicker")}</p>
+            <h1>{t("sectionTitle")}</h1>
+            <p>{t("sectionDescription")}</p>
           </div>
           <aside className="blog-hero-card" aria-label="Résumé du blog">
-            <span>Bibliothèque</span>
+            <span>{t("libraryLabel")}</span>
             <strong>{blogPosts.length}</strong>
-            <p>articles publiés</p>
+            <p>{t("articlesLabel")}</p>
             <div>
               {categories.map((category) => (
                 <small key={category}>{category}</small>

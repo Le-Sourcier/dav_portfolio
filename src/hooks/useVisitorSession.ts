@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useVisitorStore } from "@/stores/visitorStore";
 import { visitorApi } from "@/services/api/visitor.api";
 
@@ -22,6 +23,7 @@ interface UseVisitorSessionResult {
 }
 
 export function useVisitorSession(): UseVisitorSessionResult {
+  const shared = useTranslations("Shared");
   const { name, email, token, remember, setIdentity, setToken, reset } = useVisitorStore();
   const [otpStatus, setOtpStatus] = useState<OtpStatus>("idle");
   const [otpError, setOtpError] = useState<string | null>(null);
@@ -37,13 +39,13 @@ export function useVisitorSession(): UseVisitorSessionResult {
         setOtpStatus("sent");
         return true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Erreur inattendue";
+        const message = error instanceof Error ? error.message : shared("unexpectedError");
         setOtpError(message);
         setOtpStatus("error");
         return false;
       }
     },
-    [setIdentity],
+    [setIdentity, shared],
   );
 
   const verifyOtp = useCallback(
@@ -57,13 +59,13 @@ export function useVisitorSession(): UseVisitorSessionResult {
         setOtpStatus("idle");
         return true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Code invalide";
+        const message = error instanceof Error ? error.message : shared("invalidCode");
         setOtpError(message);
         setOtpStatus("error");
         return false;
       }
     },
-    [email, name, setToken],
+    [email, name, setToken, shared],
   );
 
   const clearSession = useCallback(() => {

@@ -27,6 +27,7 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("recent");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const categories = useMemo(
     () => Array.from(new Set(posts.map((post) => post.category).filter(Boolean))),
     [posts],
@@ -90,20 +91,54 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
           <div className="blog-filter-row">
             <label className="blog-search">
               <span>{t("search")}</span>
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("searchPlaceholder")}
-              />
-            </label>
-            <label className="blog-sort">
-              <span>{t("sort")}</span>
-              <select value={sort} onChange={(event) => setSort(event.target.value as SortKey)}>
-                <option value="recent">{t("sortRecent")}</option>
-                <option value="popular">{t("sortPopular")}</option>
-                <option value="discussed">{t("sortDiscussed")}</option>
-              </select>
+              <div className="filter-search-shell">
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t("searchPlaceholder")}
+                />
+                <button
+                  type="button"
+                  className="filter-settings-button"
+                  aria-label={t("sort")}
+                  aria-expanded={settingsOpen}
+                  onClick={() => setSettingsOpen((current) => !current)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h10" />
+                    <path d="M18 7h2" />
+                    <path d="M16 5v4" />
+                    <path d="M4 17h2" />
+                    <path d="M10 17h10" />
+                    <path d="M8 15v4" />
+                  </svg>
+                </button>
+                {settingsOpen ? (
+                  <div className="filter-settings-popover">
+                    <span>{t("sort")}</span>
+                    <div>
+                      {[
+                        ["recent", t("sortRecent")],
+                        ["popular", t("sortPopular")],
+                        ["discussed", t("sortDiscussed")],
+                      ].map(([value, label]) => (
+                        <button
+                          type="button"
+                          key={value}
+                          className={sort === value ? "is-active" : ""}
+                          onClick={() => {
+                            setSort(value as SortKey);
+                            setSettingsOpen(false);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </label>
           </div>
           <div className="blog-category-tabs" aria-label="Catégories du blog">
