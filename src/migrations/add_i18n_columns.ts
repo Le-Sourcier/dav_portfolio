@@ -1,13 +1,13 @@
 import 'dotenv/config';
-import { DataTypes } from 'sequelize';
+import { DataTypes, QueryTypes } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
 async function addColumnIfMissing(table: string, column: string, definition: string): Promise<void> {
-  const tableInfo: { column_name: string }[] = await sequelize.query(
-    `SELECT column_name FROM information_schema.columns WHERE table_name = '${table}' AND column_name = '${column}'`,
-    { type: 'SELECT' },
+  const rows = await sequelize.query(
+    `SELECT 1 FROM information_schema.columns WHERE table_name = :table AND column_name = :column LIMIT 1`,
+    { type: QueryTypes.SELECT, replacements: { table, column } },
   );
-  if (tableInfo.length > 0) {
+  if (rows.length > 0) {
     console.log(`[migration] column "${table}"."${column}" already present, skipping`);
     return;
   }
