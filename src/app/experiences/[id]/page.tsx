@@ -8,7 +8,7 @@ import { getRequestLocale } from "@/i18n/server";
 import { site } from "@/lib/portfolio";
 import { loadExperienceById } from "@/services/portfolio/contentLoaders";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 type ExperiencePageProps = {

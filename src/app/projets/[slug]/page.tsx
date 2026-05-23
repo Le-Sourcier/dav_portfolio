@@ -10,7 +10,7 @@ import { site } from "@/lib/portfolio";
 import { loadProjectBySlug } from "@/services/portfolio/projectsLoader";
 import type { ProjectMetric } from "@/types/portfolio.types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 type ProjectPageProps = {
