@@ -92,77 +92,83 @@ export function ContactSection() {
       </div>
 
       <form className="contact-form" onSubmit={handleSubmit}>
-        <div className="form-status">
-          <span />
-          {t("statusText")}
-        </div>
+        <div className="contact-form-glow" aria-hidden="true" />
+        <div className="contact-form-inner">
+          <div className="form-status-pill">
+            <span className="form-status-dot" aria-hidden="true" />
+            <span className="form-status-label">{t("statusMetric")}</span>
+          </div>
 
-        <div className="form-grid">
+          <div className="form-grid">
+            <label>
+              <span className="form-label-text">{t("nameLabel")}</span>
+              <input
+                required
+                value={form.name}
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+                placeholder={t("namePlaceholder")}
+              />
+            </label>
+            <label>
+              <span className="form-label-text">{t("emailLabel")}</span>
+              <input
+                required
+                type="email"
+                value={form.email}
+                onChange={(event) => setForm({ ...form, email: event.target.value })}
+                placeholder={t("emailPlaceholder")}
+              />
+            </label>
+          </div>
+
+          <div className="form-grid">
+            <label>
+              <span className="form-label-text">{t("companyLabel")}</span>
+              <input
+                value={form.company}
+                onChange={(event) => setForm({ ...form, company: event.target.value })}
+                placeholder={t("companyPlaceholder")}
+              />
+            </label>
+            <label>
+              <span className="form-label-text">{t("budgetLabel")}</span>
+              <select value={form.budget} onChange={(event) => setForm({ ...form, budget: event.target.value })}>
+                <option value="">{t("budgetDefault")}</option>
+                <option>{t("budgetFreelance")}</option>
+                <option>{t("budgetCdi")}</option>
+                <option>{t("budgetAudit")}</option>
+                <option>{t("budgetArchitecture")}</option>
+                <option>{t("budgetAutomation")}</option>
+              </select>
+            </label>
+          </div>
+
           <label>
-            {t("nameLabel")}
-            <input
+            <span className="form-label-text">{t("messageLabel")}</span>
+            <textarea
               required
-              value={form.name}
-              onChange={(event) => setForm({ ...form, name: event.target.value })}
-              placeholder={t("namePlaceholder")}
+              rows={6}
+              value={form.message}
+              onChange={(event) => setForm({ ...form, message: event.target.value })}
+              placeholder={t("messagePlaceholder")}
             />
           </label>
-          <label>
-            {t("emailLabel")}
-            <input
-              required
-              type="email"
-              value={form.email}
-              onChange={(event) => setForm({ ...form, email: event.target.value })}
-              placeholder={t("emailPlaceholder")}
-            />
-          </label>
+
+          <button type="submit" className="form-cta" disabled={status === "loading"}>
+            <span className="form-cta-label">
+              {status === "loading" ? t("sendLoading") : t("sendDefault")}
+            </span>
+            <span className="form-cta-arrow" aria-hidden="true">→</span>
+          </button>
+
+          {feedback ? <p className={`form-feedback is-${status}`}>{feedback}</p> : null}
+
+          <p className="form-note">
+            {t("formNote")}
+            <br />
+            <a href={mailHref}>{t("openMailApp")}</a>
+          </p>
         </div>
-
-        <div className="form-grid">
-          <label>
-            {t("companyLabel")}
-            <input
-              value={form.company}
-              onChange={(event) => setForm({ ...form, company: event.target.value })}
-              placeholder={t("companyPlaceholder")}
-            />
-          </label>
-          <label>
-            {t("budgetLabel")}
-            <select value={form.budget} onChange={(event) => setForm({ ...form, budget: event.target.value })}>
-              <option value="">{t("budgetDefault")}</option>
-              <option>{t("budgetFreelance")}</option>
-              <option>{t("budgetCdi")}</option>
-              <option>{t("budgetAudit")}</option>
-              <option>{t("budgetArchitecture")}</option>
-              <option>{t("budgetAutomation")}</option>
-            </select>
-          </label>
-        </div>
-
-        <label>
-          {t("messageLabel")}
-          <textarea
-            required
-            rows={6}
-            value={form.message}
-            onChange={(event) => setForm({ ...form, message: event.target.value })}
-            placeholder={t("messagePlaceholder")}
-          />
-        </label>
-
-        <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? t("sendLoading") : t("sendDefault")}
-        </button>
-
-        {feedback ? <p className={`form-feedback is-${status}`}>{feedback}</p> : null}
-
-        <p className="form-note">
-          {t("formNote")}
-          <br />
-          <a href={mailHref}>{t("openMailApp")}</a>
-        </p>
       </form>
     </section>
   );

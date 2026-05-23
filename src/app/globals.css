@@ -31,9 +31,13 @@
   --readiness-border-tail: rgba(184, 132, 47, 0.32);
   --readiness-border-glow: rgba(15, 118, 110, 0.34);
   --body-background:
-    linear-gradient(135deg, rgba(15, 118, 110, 0.08), transparent 34rem),
-    linear-gradient(315deg, rgba(184, 132, 47, 0.1), transparent 28rem),
-    var(--background);
+    radial-gradient(90% 60% at 50% 0%, rgba(184, 132, 47, 0.08), transparent 60%),
+    radial-gradient(70% 50% at 100% 50%, rgba(15, 118, 110, 0.07), transparent 65%),
+    radial-gradient(70% 50% at 0% 60%, rgba(184, 132, 47, 0.06), transparent 65%),
+    linear-gradient(180deg, rgba(17, 17, 17, 0.025), transparent 30%, rgba(17, 17, 17, 0.04) 100%),
+    linear-gradient(rgba(17, 17, 17, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.04) 1px, transparent 1px),
+    linear-gradient(150deg, #faf4e6 0%, #f7f1e3 50%, #f4ecd6 100%);
   color-scheme: light;
 }
 
@@ -58,11 +62,13 @@
   --readiness-border-tail: rgba(215, 180, 100, 0.36);
   --readiness-border-glow: rgba(215, 180, 100, 0.4);
   --body-background:
-    radial-gradient(circle at 18% 22%, rgba(215, 180, 100, 0.12), transparent 26rem),
-    radial-gradient(circle at 88% 14%, rgba(45, 212, 191, 0.08), transparent 24rem),
-    linear-gradient(rgba(255, 247, 233, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 247, 233, 0.035) 1px, transparent 1px),
-    linear-gradient(115deg, #181713 0%, #090a09 48%, #071114 100%);
+    radial-gradient(85% 50% at 50% 0%, rgba(215, 180, 100, 0.16), transparent 55%),
+    radial-gradient(55% 60% at 100% 45%, rgba(15, 118, 110, 0.28), transparent 60%),
+    radial-gradient(50% 55% at 0% 50%, rgba(184, 132, 47, 0.16), transparent 60%),
+    radial-gradient(70% 60% at 50% 100%, rgba(0, 0, 0, 0.65), transparent 75%),
+    linear-gradient(rgba(255, 247, 233, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 247, 233, 0.05) 1px, transparent 1px),
+    linear-gradient(160deg, #0a0c0a 0%, #060807 38%, #04100d 72%, #020404 100%);
   color-scheme: dark;
 }
 
@@ -87,7 +93,8 @@ body {
   overflow-x: clip;
   margin: 0;
   background: var(--body-background);
-  background-size: auto, auto, 96px 96px, 96px 96px, auto;
+  background-attachment: fixed;
+  background-size: auto, auto, auto, auto, 72px 72px, 72px 72px, auto;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   transition:
@@ -95,19 +102,62 @@ body {
     color 180ms ease;
 }
 
+/* Lueurs latérales immersives — discrètes, animées en respiration lente */
 body::before {
+  position: fixed;
+  inset: -10%;
+  z-index: -2;
+  background:
+    radial-gradient(35% 50% at 0% 50%, rgba(184, 132, 47, 0.16), transparent 65%),
+    radial-gradient(35% 50% at 100% 50%, rgba(15, 118, 110, 0.16), transparent 65%);
+  filter: blur(40px);
+  content: "";
+  pointer-events: none;
+  animation: aurora-drift 28s ease-in-out infinite alternate;
+}
+
+/* Vignette périphérique pour la profondeur cinéma */
+body::after {
   position: fixed;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.18) 72%, rgba(0, 0, 0, 0.42) 100%);
+    radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.12) 95%);
   content: "";
-  opacity: 0;
   pointer-events: none;
 }
 
 :root[data-theme="dark"] body::before {
-  opacity: 1;
+  background:
+    radial-gradient(40% 55% at 0% 50%, rgba(215, 180, 100, 0.18), transparent 65%),
+    radial-gradient(40% 55% at 100% 50%, rgba(15, 118, 110, 0.22), transparent 65%);
+  filter: blur(48px);
+}
+
+:root[data-theme="dark"] body::after {
+  background:
+    radial-gradient(ellipse at center, transparent 32%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+@keyframes aurora-drift {
+  0% {
+    opacity: 0.85;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(-1.5%, 1%, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translate3d(1.5%, -1%, 0) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 a {
@@ -423,12 +473,16 @@ main {
 }
 
 :root[data-theme="dark"] .primary-button,
-:root[data-theme="dark"] .contact-form button,
+:root[data-theme="dark"] .form-cta,
 :root[data-theme="dark"] .newsletter-form button,
 :root[data-theme="dark"] .article-sidebar-cta a {
   background: linear-gradient(135deg, #d7b464, #f2c96b);
   color: #090a09;
   box-shadow: 0 18px 42px rgba(215, 180, 100, 0.18);
+}
+
+:root[data-theme="dark"] .form-cta-subtitle {
+  color: rgba(9, 10, 9, 0.62);
 }
 
 :root[data-theme="dark"] .secondary-button,
@@ -459,7 +513,6 @@ main {
 :root[data-theme="dark"] .article-resource-card,
 :root[data-theme="dark"] .article-faq details,
 :root[data-theme="dark"] .newsletter-section,
-:root[data-theme="dark"] .contact-form,
 :root[data-theme="dark"] .case-sidebar,
 :root[data-theme="dark"] .case-content {
   border-color: var(--line);
@@ -484,13 +537,47 @@ main {
 :root[data-theme="dark"] textarea,
 :root[data-theme="dark"] .blog-search input,
 :root[data-theme="dark"] .blog-sort select,
-:root[data-theme="dark"] .newsletter-form input,
-:root[data-theme="dark"] .contact-form input,
-:root[data-theme="dark"] .contact-form select,
-:root[data-theme="dark"] .contact-form textarea {
+:root[data-theme="dark"] .newsletter-form input {
   border-color: var(--line);
   background: rgba(255, 247, 233, 0.055);
   color: var(--foreground);
+}
+
+:root[data-theme="dark"] .contact-form-glow {
+  background:
+    radial-gradient(80% 60% at 100% 0%, rgba(215, 180, 100, 0.2), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, rgba(15, 118, 110, 0.22), transparent 65%);
+}
+
+:root[data-theme="dark"] .form-status-pill {
+  border-color: rgba(215, 180, 100, 0.22);
+  background: rgba(255, 247, 233, 0.02);
+  color: var(--gold);
+}
+
+:root[data-theme="dark"] .form-status-label {
+  color: var(--gold);
+}
+
+:root[data-theme="dark"] .form-label-text {
+  color: rgba(247, 241, 231, 0.78);
+}
+
+:root[data-theme="dark"] .contact-form input,
+:root[data-theme="dark"] .contact-form select,
+:root[data-theme="dark"] .contact-form textarea {
+  border: 1px solid rgba(255, 247, 233, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 247, 233, 0.025);
+  color: var(--foreground);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .contact-form input:hover,
+:root[data-theme="dark"] .contact-form select:hover,
+:root[data-theme="dark"] .contact-form textarea:hover {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.045);
 }
 
 :root[data-theme="dark"] input:focus,
@@ -498,12 +585,17 @@ main {
 :root[data-theme="dark"] textarea:focus,
 :root[data-theme="dark"] .blog-search input:focus,
 :root[data-theme="dark"] .blog-sort select:focus,
-:root[data-theme="dark"] .newsletter-form input:focus,
+:root[data-theme="dark"] .newsletter-form input:focus {
+  background: rgba(255, 247, 233, 0.08);
+  box-shadow: 0 0 0 4px rgba(215, 180, 100, 0.1);
+}
+
 :root[data-theme="dark"] .contact-form input:focus,
 :root[data-theme="dark"] .contact-form select:focus,
 :root[data-theme="dark"] .contact-form textarea:focus {
-  background: rgba(255, 247, 233, 0.08);
-  box-shadow: 0 0 0 4px rgba(215, 180, 100, 0.1);
+  border-color: rgba(215, 180, 100, 0.5);
+  background: rgba(255, 247, 233, 0.06);
+  box-shadow: 0 0 0 3px rgba(215, 180, 100, 0.14);
 }
 
 :root[data-theme="dark"] .comment-item--root {
@@ -670,8 +762,7 @@ main {
 :root[data-theme="dark"] .parcours-proof span,
 :root[data-theme="dark"] .stack-principles span,
 :root[data-theme="dark"] .blog-tag-row small,
-:root[data-theme="dark"] .article-summary-card small,
-:root[data-theme="dark"] .form-status {
+:root[data-theme="dark"] .article-summary-card small {
   border-color: rgba(215, 180, 100, 0.18);
   background: rgba(215, 180, 100, 0.07);
 }
@@ -6460,7 +6551,7 @@ main {
   .primary-button,
   .secondary-button,
   .newsletter-form button,
-  .contact-form button,
+  .form-cta,
   .article-back-to-top,
   .article-back-to-top-arrow {
     transition: none;
@@ -6473,7 +6564,7 @@ main {
   .primary-button:hover::before,
   .secondary-button:hover::before,
   .newsletter-form button:hover::before,
-  .contact-form button:hover::before,
+  .form-cta:hover::before,
   .case-hire-actions a:hover::before {
     animation: none;
   }
@@ -6568,7 +6659,7 @@ main {
 }
 
 .newsletter-form button:disabled,
-.contact-form button:disabled {
+.form-cta:disabled {
   cursor: wait;
   opacity: 0.72;
 }
@@ -6676,141 +6767,224 @@ main {
   background: transparent;
 }
 
+/* --- Carte form contact : dégradé enveloppant comme la carte LIBRARY --- */
 .contact-form {
-  display: grid;
-  gap: 18px;
-  padding: 30px;
-  border: 1px solid rgba(17, 17, 17, 0.1);
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 250, 241, 0.78)),
-    rgba(255, 250, 241, 0.82);
-  box-shadow: 0 24px 60px rgba(75, 61, 35, 0.1);
+  position: relative;
+  border-radius: 20px;
+  isolation: isolate;
+  overflow: hidden;
 }
 
-.form-status {
+.contact-form-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 20px;
+  background:
+    radial-gradient(80% 60% at 100% 0%, rgba(184, 132, 47, 0.18), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, rgba(15, 118, 110, 0.16), transparent 65%);
+  pointer-events: none;
+}
+
+.contact-form-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 22px;
+  padding: 32px clamp(22px, 3.6vw, 36px);
+  background: transparent;
+}
+
+.contact-form-inner::before {
+  display: none;
+}
+
+.form-status-pill {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 9px;
-  border: 1px solid rgba(15, 118, 110, 0.2);
+  gap: 10px;
+  padding: 6px 12px 6px 10px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
   border-radius: 999px;
-  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--accent-strong);
-  background: rgba(15, 118, 110, 0.06);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
-.form-status span {
+.form-status-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #34d399;
-  box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.12);
+  background: radial-gradient(circle, #34d399 35%, #0f766e 100%);
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.14);
+}
+
+.form-status-label {
+  color: var(--accent-strong);
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 14px;
 }
 
 .contact-form label {
   display: grid;
   gap: 8px;
-  color: #5e574c;
-  font-size: 13px;
-  font-weight: 800;
+  color: #2c2a25;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form-label-text {
+  color: rgba(46, 41, 32, 0.78);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .contact-form input,
 .contact-form select,
 .contact-form textarea {
   width: 100%;
-  border: 1px solid rgba(17, 17, 17, 0.12);
+  border: 1px solid rgba(17, 17, 17, 0.1);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: var(--foreground);
   font: inherit;
   font-size: 15px;
   outline: none;
-  padding: 14px 15px;
+  padding: 14px 16px;
   transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+    border-color 200ms ease,
+    box-shadow 220ms ease,
+    background-color 200ms ease;
 }
 
 .contact-form textarea {
   min-height: 156px;
   resize: vertical;
+  line-height: 1.6;
 }
 
 .contact-form select {
   color-scheme: light;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(17, 17, 17, 0.6) 50%),
+    linear-gradient(135deg, rgba(17, 17, 17, 0.6) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55));
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center, 0 0;
+  background-size: 5px 5px, 5px 5px, 100% 100%;
+  background-repeat: no-repeat;
+  padding-right: 36px;
 }
 
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
-  color: rgba(111, 106, 96, 0.58);
+  color: rgba(111, 106, 96, 0.52);
+}
+
+.contact-form input:hover,
+.contact-form select:hover,
+.contact-form textarea:hover {
+  border-color: rgba(17, 17, 17, 0.18);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .contact-form input:focus,
 .contact-form select:focus,
 .contact-form textarea:focus {
-  border-color: rgba(15, 118, 110, 0.42);
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
+  border-color: rgba(15, 118, 110, 0.5);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
-.contact-form button {
+.form-cta {
   position: relative;
   overflow: hidden;
-  min-height: 54px;
-  border: 1px solid rgba(11, 79, 73, 0.22);
-  border-radius: 12px;
-  background: linear-gradient(135deg, #0b4f49, #0f766e);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 58px;
+  margin-top: 4px;
+  border: 1px solid rgba(11, 79, 73, 0.36);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(244, 195, 107, 0.16), transparent 32%),
+    linear-gradient(135deg, #0b4f49, #0f766e 60%, #115e59);
   color: #fffaf1;
   cursor: pointer;
   font: inherit;
-  font-weight: 900;
-  box-shadow: 0 16px 34px rgba(15, 118, 110, 0.18);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 14px 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 18px 36px rgba(15, 118, 110, 0.24),
+    0 4px 10px rgba(15, 118, 110, 0.14);
   isolation: isolate;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
+    transform 180ms ease,
+    box-shadow 220ms ease;
 }
 
-.contact-form button::before {
+.form-cta::before {
   position: absolute;
   inset: auto -16% -110% -16%;
   z-index: -1;
   height: 120%;
   border-radius: 52% 48% 0 0;
   background:
-    radial-gradient(circle at 22% 28%, rgba(255, 247, 233, 0.28), transparent 20%),
-    linear-gradient(90deg, rgba(244, 195, 107, 0.9), rgba(45, 212, 191, 0.7));
+    radial-gradient(circle at 22% 28%, rgba(255, 247, 233, 0.32), transparent 22%),
+    linear-gradient(90deg, rgba(244, 195, 107, 0.92), rgba(45, 212, 191, 0.72));
   content: "";
   transform: translateY(16%);
   transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contact-form button:hover::before {
+.form-cta:hover::before {
   transform: translateY(-58%);
   animation: liquid-surface 2.8s ease-in-out infinite;
 }
 
-.contact-form button:hover {
-  box-shadow: 0 20px 42px rgba(15, 118, 110, 0.24);
+.form-cta:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 24px 48px rgba(15, 118, 110, 0.3),
+    0 6px 16px rgba(15, 118, 110, 0.18);
   transform: translateY(-1px);
+}
+
+.form-cta-arrow {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-cta:hover .form-cta-arrow {
+  transform: translateX(4px);
 }
 
 .form-note {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+.form-note a {
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 .site-footer {
@@ -9066,8 +9240,8 @@ main {
     padding-top: 72px;
   }
 
-  .contact-form {
-    padding: 22px;
+  .contact-form-inner {
+    padding: 24px 20px;
   }
 
   .form-grid {
@@ -9160,6 +9334,7 @@ main {
   .hero-visual,
   .about-panel,
   .contact-form,
+  .contact-form-inner,
   .newsletter-section,
   .blog-control-panel,
   .blog-featured,
@@ -9343,7 +9518,7 @@ main {
 
   .hero-visual,
   .about-panel,
-  .contact-form,
+  .contact-form-inner,
   .newsletter-section,
   .blog-control-panel,
   .article-summary-card,
@@ -9412,7 +9587,6 @@ main {
 :root[data-theme="dark"] .article-resource-card,
 :root[data-theme="dark"] .article-faq details,
 :root[data-theme="dark"] .newsletter-section,
-:root[data-theme="dark"] .contact-form,
 :root[data-theme="dark"] .case-sidebar,
 :root[data-theme="dark"] .case-content {
   border-color: rgba(255, 247, 233, 0.14);
