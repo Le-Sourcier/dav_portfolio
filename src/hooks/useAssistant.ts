@@ -55,7 +55,7 @@ export const useAssistant = () => {
       try {
         const [initial, actions] = await Promise.all([
           messages.length === 0 ? chatbotApi.getInitialMessage(lang) : Promise.resolve(null),
-          quickActions.length === 0 ? chatbotApi.getQuickActions() : Promise.resolve(null),
+          quickActions.length === 0 ? chatbotApi.getQuickActions(lang) : Promise.resolve(null),
         ]);
         if (cancelled) return;
         if (initial) {

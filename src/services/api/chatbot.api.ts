@@ -42,8 +42,8 @@ export const chatbotApi = {
       lang,
     }),
 
-  getQuickActions: () =>
-    apiClient.get<AssistantQuickAction[]>("/chatbot/quick-actions"),
+  getQuickActions: (lang: "fr" | "en" = "fr") =>
+    apiClient.get<AssistantQuickAction[]>(`/chatbot/quick-actions?lang=${lang}`),
 
   getInitialMessage: (lang: "fr" | "en" = "fr") =>
     apiClient.get<AssistantMessage>(`/chatbot/initial?lang=${lang}`),
