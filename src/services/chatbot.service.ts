@@ -69,20 +69,30 @@ class ChatbotService {
     return this.defaultInfo;
   }
 
-  private async getQuickActionsFromSettings(): Promise<QuickAction[]> {
+  private async getQuickActionsFromSettings(lang: 'fr' | 'en' = 'fr'): Promise<QuickAction[]> {
     try {
       const chatbot = await settingsService.getByKey('chatbot') as ChatbotSettings | null;
       if (chatbot?.quickActions?.length) return chatbot.quickActions;
     } catch { /* fallback */ }
     const firstName = config.owner.name.split(' ').pop() || config.owner.name;
-    return [
-      { id: '1', label: 'Mes Projets', prompt: 'Montre-moi tes projets' },
-      { id: '2', label: 'Rendez-vous', prompt: 'Je veux prendre rendez-vous' },
-      { id: '3', label: 'Mon Profil', prompt: `Qui est ${firstName} ?` },
-      { id: '4', label: 'Competences', prompt: 'Quelles sont tes competences ?' },
-      { id: '5', label: 'Lire le Blog', prompt: 'Montre-moi le blog' },
-      { id: '6', label: 'Contact', prompt: 'Comment te contacter ?' },
-    ];
+    const isFr = lang === 'fr';
+    return isFr
+      ? [
+          { id: '1', label: 'Mes Projets', prompt: 'Montre-moi tes projets' },
+          { id: '2', label: 'Rendez-vous', prompt: 'Je veux prendre rendez-vous' },
+          { id: '3', label: 'Mon Profil', prompt: `Qui est ${firstName} ?` },
+          { id: '4', label: 'Compétences', prompt: 'Quelles sont tes compétences ?' },
+          { id: '5', label: 'Lire le Blog', prompt: 'Montre-moi le blog' },
+          { id: '6', label: 'Contact', prompt: 'Comment te contacter ?' },
+        ]
+      : [
+          { id: '1', label: 'My Projects', prompt: 'Show me your projects' },
+          { id: '2', label: 'Appointment', prompt: 'I want to book an appointment' },
+          { id: '3', label: 'My Profile', prompt: `Who is ${firstName} ?` },
+          { id: '4', label: 'Skills', prompt: 'What are your skills ?' },
+          { id: '5', label: 'Read Blog', prompt: 'Show me the blog' },
+          { id: '6', label: 'Contact', prompt: 'How to contact you ?' },
+        ];
   }
 
   private async getWelcomeMessage(lang: 'fr' | 'en' = 'fr'): Promise<string> {
@@ -351,8 +361,8 @@ class ChatbotService {
     };
   }
 
-  async getQuickActions(): Promise<QuickAction[]> {
-    return this.getQuickActionsFromSettings();
+  async getQuickActions(lang: 'fr' | 'en' = 'fr'): Promise<QuickAction[]> {
+    return this.getQuickActionsFromSettings(lang);
   }
 }
 

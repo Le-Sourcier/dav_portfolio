@@ -21,9 +21,10 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const getQuickActions = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getQuickActions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const actions = await chatbotService.getQuickActions();
+    const lang = (req.query.lang as string) === 'en' ? 'en' : 'fr';
+    const actions = await chatbotService.getQuickActions(lang);
     sendSuccess(res, actions, 'Quick actions retrieved');
   } catch (error) {
     next(error);
