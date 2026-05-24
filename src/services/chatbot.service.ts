@@ -176,8 +176,8 @@ class ChatbotService {
     }
 
     const projectTriggers = isFr
-      ? ['projet', 'portfolio', 'realisation', 'travaux', 'creation', 'mes projets']
-      : ['project', 'portfolio', 'work', 'creation', 'my projects'];
+      ? ['projet', 'portfolio', 'realisation', 'travaux', 'creation', 'mes projets', 'montre', 'affiche', 'liste']
+      : ['project', 'portfolio', 'work', 'creation', 'my projects', 'show', 'list', 'display'];
     
     // Projects
     if (this.matchesIntent(input, projectTriggers)) {
