@@ -1,36 +1,38 @@
 "use client";
 
-/**
- * Bulle de message dans le chat assistant.
- *
- * Selon `type`, on rend des actions inline :
- *  - project_link / experience_link → CTA vers la page détail
- *  - blog_link → liste d'articles cliquables
- *  - contact_form → lien direct vers la section #contact
- *  - text → bulle simple
- */
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AssistantMarkdown } from "./AssistantMarkdown";
+import { OtpInput } from "./OtpInput";
 import type { AssistantMessage as AssistantMessageType } from "@/types/assistant.types";
 
 interface AssistantMessageProps {
   message: AssistantMessageType;
+  onOtpSubmit?: (code: string) => void;
 }
+
+const OTP_REQUIRED_RE = /\[OTP_REQUIRED:([^\]]+)\]/;
 
 const StreamingCursor = () => <span className="assistant-cursor" aria-hidden="true" />;
 
-export function AssistantMessage({ message }: AssistantMessageProps) {
+export function AssistantMessage({ message, onOtpSubmit }: AssistantMessageProps) {
   const t = useTranslations("Assistant");
   const isUser = message.role === "user";
-  const text = message.displayContent ?? message.content;
+  const raw = message.displayContent ?? message.content;
+
+  const otpMatch = !isUser ? raw.match(OTP_REQUIRED_RE) : null;
+  const otpEmail = otpMatch?.[1] || null;
+  const text = otpEmail ? raw.replace(OTP_REQUIRED_RE, "").trim() : raw;
 
   return (
     <div className={`assistant-message is-${message.role}`}>
       <div className="assistant-message-bubble">
         {isUser ? <p>{text}</p> : <AssistantMarkdown content={text} />}
         {message.isStreaming ? <StreamingCursor /> : null}
-        {!isUser && !message.isStreaming ? renderTypeActions(message, t) : null}
+        {otpEmail && !message.isStreaming && onOtpSubmit ? (
+          <OtpInput email={otpEmail} onComplete={onOtpSubmit} disabled={false} />
+        ) : null}
+        {!isUser && !message.isStreaming && !otpEmail ? renderTypeActions(message, t) : null}
       </div>
     </div>
   );

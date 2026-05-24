@@ -15,11 +15,12 @@ import type { AssistantMessage as AssistantMessageType } from "@/types/assistant
 interface AssistantMessagesProps {
   messages: AssistantMessageType[];
   isTyping: boolean;
+  onOtpSubmit: (code: string) => void;
 }
 
 const NEAR_BOTTOM_THRESHOLD_PX = 60;
 
-export function AssistantMessages({ messages, isTyping }: AssistantMessagesProps) {
+export function AssistantMessages({ messages, isTyping, onOtpSubmit }: AssistantMessagesProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showJumpButton, setShowJumpButton] = useState(false);
 
@@ -49,7 +50,7 @@ export function AssistantMessages({ messages, isTyping }: AssistantMessagesProps
   useEffect(() => {
     const lastStreamed = messages[messages.length - 1];
     if (!lastStreamed?.isStreaming) return;
-    if (isNearBottom()) scrollToBottom(false);
+    if (isNearBottom()) scrollToBottom(true);
   }, [messages]);
 
   const handleScroll = () => {
@@ -65,7 +66,7 @@ export function AssistantMessages({ messages, isTyping }: AssistantMessagesProps
         aria-live="polite"
       >
         {messages.map((message) => (
-          <AssistantMessage key={message.id} message={message} />
+          <AssistantMessage key={message.id} message={message} onOtpSubmit={onOtpSubmit} />
         ))}
         {isTyping ? <AssistantTyping /> : null}
       </div>

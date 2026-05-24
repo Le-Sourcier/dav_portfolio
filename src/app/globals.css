@@ -6932,6 +6932,60 @@ main {
   border-color: var(--asst-gold);
 }
 
+/* ─── OTP Input ──────────────────────────────────────────────────── */
+.otp-input-wrap {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--asst-surface);
+  border: 1px solid var(--asst-border);
+  border-radius: 12px;
+}
+
+.otp-input-label {
+  font-size: 11px;
+  color: var(--asst-muted);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.otp-input-digits {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.otp-input-digit {
+  width: 36px;
+  height: 40px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  border: 1.5px solid var(--asst-border);
+  border-radius: 10px;
+  background: var(--asst-bg);
+  color: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.otp-input-digit:focus {
+  border-color: var(--asst-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--asst-accent) 20%, transparent);
+}
+
+.otp-input-digit:disabled {
+  opacity: 0.5;
+}
+
+@keyframes otpFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.otp-input-wrap {
+  animation: otpFadeIn 0.2s ease-out;
+}
+
 /* ─── Typing indicator — 3 dots ────────────────────────────────────── */
 .assistant-typing {
   display: inline-flex;

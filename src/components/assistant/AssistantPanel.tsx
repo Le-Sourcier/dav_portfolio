@@ -41,7 +41,7 @@ export function AssistantPanel({
       <div className="assistant-panel-glow" aria-hidden="true" />
       <div className="assistant-panel-inner">
         <AssistantHead isOffline={isOffline} onClose={onClose} onReset={onReset} />
-        <AssistantMessages messages={messages} isTyping={isTyping} />
+        <AssistantMessages messages={messages} isTyping={isTyping} onOtpSubmit={onSend} />
         <AssistantSuggestions
           actions={quickActions}
           onSelect={onSend}
