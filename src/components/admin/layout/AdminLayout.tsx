@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { useUIStore } from '@/stores/uiStore';
@@ -41,6 +43,7 @@ export function AdminLayout() {
   const { theme, display } = useSettingsStore();
   const { data: unreadCount = 0 } = useUnreadCount();
   const [commandOpen, setCommandOpen] = useState(false);
+  const navigate = useNavigate();
 
   const ActivePage = pageComponents[activeTab] || DashboardPage;
 
@@ -56,6 +59,16 @@ export function AdminLayout() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [activeTab, setSidebarOpen]);
+
+  // Redirect to login on session expiry (401)
+  useEffect(() => {
+    const onSessionExpired = () => {
+      toast.error('Session expiree. Veuillez vous reconnecter.');
+      navigate('/admin/login', { replace: true });
+    };
+    window.addEventListener('auth:session-expired', onSessionExpired);
+    return () => window.removeEventListener('auth:session-expired', onSessionExpired);
+  }, [navigate]);
 
   // Global keyboard shortcuts
   useEffect(() => {

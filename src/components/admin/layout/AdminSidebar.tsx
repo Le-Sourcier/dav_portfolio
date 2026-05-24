@@ -74,13 +74,13 @@ export function AdminSidebar({ unreadCount = 0 }: AdminSidebarProps) {
         sidebarCollapsed ? 'justify-center px-3' : 'justify-between px-5'
       )}>
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-[0_12px_30px_rgba(15,118,110,0.18)] dark:shadow-[0_12px_30px_rgba(215,180,100,0.2)]">
-            <span className="font-black text-xs">{envConfig.appBrand.charAt(0)}</span>
-          </div>
-          {!sidebarCollapsed && (
-            <span className="text-[15px] font-semibold text-foreground tracking-tight">
-              {envConfig.appBrand.toLowerCase()}<span className="text-muted-foreground"> admin</span>
-            </span>
+          {sidebarCollapsed ? (
+            <img src="/brand/assistant-avatar-small.png" alt={envConfig.appBrand} className="w-9 h-9 rounded-xl shrink-0 shadow-[0_12px_30px_rgba(15,118,110,0.18)] dark:shadow-[0_12px_30px_rgba(215,180,100,0.2)]" />
+          ) : (
+            <>
+              <img src="/brand/logo-horizontal-clean.png" alt={envConfig.appBrand} className="h-7 block dark:hidden" />
+              <img src="/brand/logo-horizontal-clean-dark.png" alt={envConfig.appBrand} className="h-7 hidden dark:block" />
+            </>
           )}
         </div>
         {!sidebarCollapsed && (

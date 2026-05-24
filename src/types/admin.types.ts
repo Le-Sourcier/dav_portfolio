@@ -143,7 +143,7 @@ export interface Project {
   results: string[];
   metrics: ProjectMetric[];
   chartData: ChartDataPoint[];
-  technologies?: string[];
+  tech?: string[];
   url?: string;
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];

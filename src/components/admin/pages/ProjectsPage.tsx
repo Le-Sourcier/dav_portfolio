@@ -47,16 +47,16 @@ export function ProjectsPage() {
       render: (item) => <StatusBadge label={item.category} variant="info" />,
     },
     {
-      key: 'technologies',
+      key: 'tech',
       label: 'Stack',
       render: (item) => (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {(item.technologies || []).slice(0, 3).map((tech, i) => (
+          {(item.tech || []).slice(0, 3).map((tech, i) => (
             <span key={i} className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-md text-[10px] font-bold">{tech}</span>
           ))}
-          {(item.technologies || []).length > 3 && (
+          {(item.tech || []).length > 3 && (
             <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-md text-[10px] font-bold text-zinc-400">
-              +{item.technologies!.length - 3}
+              +{item.tech!.length - 3}
             </span>
           )}
         </div>

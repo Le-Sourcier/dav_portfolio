@@ -35,11 +35,19 @@ function syncAuthStore(patch: Record<string, unknown>): void {
   } catch { /* ignore */ }
 }
 
+// Fire a custom event so React components can react to session expiry
+function dispatchSessionExpired(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:session-expired'));
+  }
+}
+
 export const clearTokens = (): void => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   // Reset the Zustand auth store
   syncAuthStore({ token: null, refreshToken: null, isAuthenticated: false, user: null });
+  dispatchSessionExpired();
 };
 
 // HTTP Client

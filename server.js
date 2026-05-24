@@ -1,10 +1,11 @@
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { join, extname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const host = process.env.HOST || process.env.HOSTNAME || "127.0.0.1";
-const port = Number(process.env.PORT || 3054);
-const dist = join(import.meta.dirname, "dist");
+const host = process.env.HOST || "0.0.0.0";
+const port = Number(process.env.PORT || 3051);
+const dist = join(fileURLToPath(new URL(".", import.meta.url)), "dist");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
