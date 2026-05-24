@@ -160,7 +160,9 @@
     "seeJourney": "See journey",
     "openContact": "Open contact",
     "offlineBadge": "Offline mode",
-    "jumpToBottom": "Jump to latest message"
+    "jumpToBottom": "Jump to latest message",
+    "statusOnline": "Online",
+    "statusOffline": "Offline"
   },
   "CodeHighlighter": {
     "copyButton": "Copy",

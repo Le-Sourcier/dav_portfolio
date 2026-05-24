@@ -160,7 +160,9 @@
     "seeJourney": "Voir le parcours",
     "openContact": "Ouvrir le contact",
     "offlineBadge": "Mode hors-ligne",
-    "jumpToBottom": "Aller au dernier message"
+    "jumpToBottom": "Aller au dernier message",
+    "statusOnline": "En ligne",
+    "statusOffline": "Hors ligne"
   },
   "CodeHighlighter": {
     "copyButton": "Copier",

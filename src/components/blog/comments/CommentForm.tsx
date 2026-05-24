@@ -91,15 +91,15 @@ export function CommentForm({ postId, onPosted, allAuthors }: CommentFormProps) 
     setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
-  const feedbackTimer = useRef<ReturnType<typeof setTimeout>>();
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    return () => clearTimeout(feedbackTimer.current);
+    return () => { if (feedbackTimer.current) clearTimeout(feedbackTimer.current); };
   }, []);
 
   const showFeedback = (tone: "error" | "success", label: string) => {
     setFeedback({ tone, label });
-    clearTimeout(feedbackTimer.current);
+    if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     if (tone === "success") {
       feedbackTimer.current = setTimeout(() => setFeedback(null), 4000);
     }

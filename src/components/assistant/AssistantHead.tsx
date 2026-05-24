@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * En-tête de l'assistant — pattern Intercom Fin :
+ * avatar à gauche, nom + statut au milieu, actions à droite (toujours en ligne).
+ */
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
@@ -11,15 +15,16 @@ interface AssistantHeadProps {
 
 export function AssistantHead({ isOffline, onClose, onReset }: AssistantHeadProps) {
   const t = useTranslations("Assistant");
+  const statusLabel = isOffline ? t("statusOffline") : t("statusOnline");
 
   return (
-    <header className="assistant-head">
+    <header className={`assistant-head${isOffline ? " is-offline-ctx" : ""}`}>
       <div className="assistant-head-avatar">
         <Image
           src="/brand/assistant-avatar-small.png"
           alt=""
-          width={42}
-          height={42}
+          width={30}
+          height={30}
           aria-hidden="true"
         />
         <span
@@ -29,8 +34,8 @@ export function AssistantHead({ isOffline, onClose, onReset }: AssistantHeadProp
       </div>
 
       <div className="assistant-head-id">
-        <span className="assistant-head-kicker">{t("panelTitle")}</span>
         <strong className="assistant-head-name">{t("panelSubtitle")}</strong>
+        <span className="assistant-head-kicker">{statusLabel}</span>
       </div>
 
       <div className="assistant-head-actions">
