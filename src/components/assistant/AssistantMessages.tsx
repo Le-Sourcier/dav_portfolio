@@ -46,11 +46,13 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
     }
   }, [messages.length, isTyping]);
 
-  // Pendant le streaming, on ne montre le bouton que si l'user a remonté
+  // Pendant le streaming : instant scroll (smooth ralentit et rate le bottom
+  // car le contenu grandit entre-temps). Le premier effet (new message) utilise
+  // smooth, celui-ci utilise auto pour suivre le flux.
   useEffect(() => {
     const lastStreamed = messages[messages.length - 1];
     if (!lastStreamed?.isStreaming) return;
-    if (isNearBottom()) scrollToBottom(true);
+    if (isNearBottom()) scrollToBottom(false);
   }, [messages]);
 
   const handleScroll = () => {
