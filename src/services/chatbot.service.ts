@@ -219,8 +219,10 @@ class ChatbotService {
     }
 
     const contactTriggers = isFr
-      ? ['contact', 'email', 'telephone', 'joindre', 'linkedin', 'github', 'ecrire', 'message']
-      : ['contact', 'email', 'phone', 'reach', 'linkedin', 'github', 'write', 'message'];
+      ? ['contact', 'telephone', 'joindre', 'linkedin', 'github', 'ecrire', 'message']
+      : ['contact', 'phone', 'reach', 'linkedin', 'github', 'write', 'message'];
+    // Note: 'email' is intentionally excluded — it's too broad and conflicts
+    // with appointment booking (users naturally include their email in responses).
     
     // Contact
     if (this.matchesIntent(input, contactTriggers)) {
