@@ -3,7 +3,7 @@ const { createServer } = require("http");
 const next = require("next");
 
 const dev = false;
-const hostname = process.env.HOST || process.env.HOSTNAME || "127.0.0.1";
+const hostname = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 3000);
 
 const app = next({ dev, hostname, port });
