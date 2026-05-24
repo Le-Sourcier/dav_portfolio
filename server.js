@@ -13,6 +13,6 @@ app.prepare().then(() => {
   createServer((req, res) => {
     handle(req, res);
   }).listen(port, hostname, () => {
-    console.log(`Ready on http://${hostname}:${port}`);
+    // console.log(`Ready on http://${hostname}:${port}`);
   });
 });

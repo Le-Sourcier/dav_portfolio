@@ -56,6 +56,13 @@ function getThemePreference(): ThemePreference {
   return (document.documentElement.dataset.themePreference as ThemePreference | undefined) ?? "system";
 }
 
+function getSnapshot(): string {
+  const preference = getThemePreference();
+  if (preference !== "system") return preference;
+  const resolved = document.documentElement.dataset.theme ?? "light";
+  return `system:${resolved}`;
+}
+
 function subscribeToThemeChanges(onStoreChange: () => void) {
   const media = window.matchMedia("(prefers-color-scheme: dark)");
   const handleSystemThemeChange = () => {
@@ -76,7 +83,8 @@ function subscribeToThemeChanges(onStoreChange: () => void) {
 }
 
 export function ThemeToggle({ variant = "text" }: { variant?: ThemeToggleVariant }) {
-  const preference = useSyncExternalStore(subscribeToThemeChanges, getThemePreference, () => "system");
+  const snapshot = useSyncExternalStore(subscribeToThemeChanges, getSnapshot, () => "system:light");
+  const preference: ThemePreference = snapshot.startsWith("system:") ? "system" : snapshot as ThemePreference;
   const t = useTranslations("ThemeToggle");
 
   const themes: Array<{ value: ThemePreference; label: string; short: string }> = [

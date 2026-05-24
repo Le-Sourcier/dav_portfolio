@@ -11,7 +11,6 @@ export async function loadProjects(locale: AppLocale = defaultLocale): Promise<P
     const data = await requestApi<BackendProject[]>('/projects');
     return Array.isArray(data) ? data.map((item) => normalizeProject(item, locale)) : [];
   } catch (error) {
-    console.error(`[portfolio] Unable to load projects from API (${envConfig.apiUrl}/projects):`, error);
     return [];
   }
 }
@@ -21,7 +20,6 @@ export async function loadProjectBySlug(slug: string, locale: AppLocale = defaul
     const project = await requestApi<BackendProject>(`/projects/slug/${encodeURIComponent(slug)}`);
     return normalizeProject(project, locale);
   } catch (error) {
-    console.error(`[portfolio] Unable to load project "${slug}" from API (${envConfig.apiUrl}/projects/slug/${slug}):`, error);
     return null;
   }
 }

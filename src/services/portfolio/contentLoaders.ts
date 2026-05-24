@@ -263,7 +263,6 @@ export async function loadBlogPosts(locale: AppLocale = defaultLocale): Promise<
       ? posts.map((post, index) => normalizeBlogPost(post, locale, index === 0))
       : [];
   } catch (error) {
-    console.error(`[portfolio] Unable to load blog posts from API (${envConfig.apiUrl}/blog):`, error);
     return [];
   }
 }
@@ -276,7 +275,6 @@ export async function loadBlogPostBySlug(
     const post = await requestApi<BackendBlogPost>(`/blog/slug/${encodeURIComponent(slug)}`);
     return normalizeBlogPost(post, locale, true);
   } catch (error) {
-    console.error(`[portfolio] Unable to load blog post "${slug}" from API (${envConfig.apiUrl}/blog/slug/${slug}):`, error);
     return null;
   }
 }
@@ -290,7 +288,6 @@ export async function loadExperiences(
       ? experiences.map((item) => normalizeExperience(item, locale))
       : [];
   } catch (error) {
-    console.error(`[portfolio] Unable to load experiences from API (${envConfig.apiUrl}/experiences):`, error);
     return [];
   }
 }
@@ -305,10 +302,6 @@ export async function loadExperienceById(
     );
     return normalizeExperienceDetail(experience, locale);
   } catch (error) {
-    console.error(
-      `[portfolio] Unable to load experience "${id}" from API (${envConfig.apiUrl}/experiences/${id}):`,
-      error,
-    );
     return null;
   }
 }
@@ -322,7 +315,6 @@ export async function loadTestimonials(
       ? testimonials.map((item) => normalizeTestimonial(item, locale))
       : [];
   } catch (error) {
-    console.error(`[portfolio] Unable to load testimonials from API (${envConfig.apiUrl}/testimonials):`, error);
     return [];
   }
 }

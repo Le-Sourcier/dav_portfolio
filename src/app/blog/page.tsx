@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { BlogDirectory } from "@/components/BlogDirectory";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -57,10 +56,9 @@ export default async function BlogPage() {
     <>
       <Header showProjects={hasProjects} showBlog={hasBlog} />
       <main>
-        <Script
+        <script
           id="blog-index-jsonld"
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <section className="blog-hero section">

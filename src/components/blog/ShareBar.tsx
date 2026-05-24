@@ -35,8 +35,6 @@ export function ShareBar({ url, title, compact = false }: ShareBarProps) {
       await navigator.clipboard.writeText(url);
       setCopied(true);
     } catch (error) {
-      // Clipboard API unavailable (insecure context, permission denied) — surface a fallback.
-      console.warn("Copy to clipboard failed", error);
       window.prompt(t("copyPrompt"), url);
     }
   };
