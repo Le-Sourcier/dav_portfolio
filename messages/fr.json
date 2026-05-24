@@ -151,10 +151,16 @@
     "panelTitle": "Assistant portfolio",
     "panelSubtitle": "Parle-moi de David",
     "closeAriaLabel": "Fermer l'assistant",
+    "resetTitle": "Nouvelle conversation",
     "suggestionsAriaLabel": "Questions rapides",
     "formLabel": "Question",
     "inputPlaceholder": "Pose une question sur le profil, les projets, le blog…",
-    "submitButton": "Envoyer"
+    "submitButton": "Envoyer",
+    "seeAllProjects": "Voir tous les projets",
+    "seeJourney": "Voir le parcours",
+    "openContact": "Ouvrir le contact",
+    "offlineBadge": "Mode hors-ligne",
+    "jumpToBottom": "Aller au dernier message"
   },
   "CodeHighlighter": {
     "copyButton": "Copier",

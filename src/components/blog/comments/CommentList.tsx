@@ -1,4 +1,5 @@
 import { CommentItem } from "@/components/blog/comments/CommentItem";
+import { collectAuthors } from "@/utils/collectAuthors";
 import type { BlogComment } from "@/types/blog";
 
 interface CommentListProps {
@@ -7,18 +8,6 @@ interface CommentListProps {
   postId: string;
   emptyLabel: string;
   onReply: (reply: BlogComment) => void;
-}
-
-function collectAuthors(comments: BlogComment[]): string[] {
-  const set = new Set<string>();
-  const walk = (list: BlogComment[]) => {
-    for (const c of list) {
-      set.add(c.author);
-      if (c.replies?.length) walk(c.replies);
-    }
-  };
-  walk(comments);
-  return Array.from(set);
 }
 
 export function CommentList({ comments, language, postId, emptyLabel, onReply }: CommentListProps) {

@@ -151,10 +151,16 @@
     "panelTitle": "Portfolio assistant",
     "panelSubtitle": "Ask me about David",
     "closeAriaLabel": "Close the assistant",
+    "resetTitle": "New conversation",
     "suggestionsAriaLabel": "Quick questions",
     "formLabel": "Question",
     "inputPlaceholder": "Ask about the profile, projects, blog…",
-    "submitButton": "Send"
+    "submitButton": "Send",
+    "seeAllProjects": "See all projects",
+    "seeJourney": "See journey",
+    "openContact": "Open contact",
+    "offlineBadge": "Offline mode",
+    "jumpToBottom": "Jump to latest message"
   },
   "CodeHighlighter": {
     "copyButton": "Copy",

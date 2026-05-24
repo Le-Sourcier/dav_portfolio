@@ -1,4 +1,3 @@
-import { envConfig } from "@/config/env";
 import { defaultLocale, type AppLocale } from "@/i18n/config";
 import { localizeText } from "@/i18n/localize";
 import { requestApi } from "@/services/portfolio/apiRequest";
@@ -262,7 +261,7 @@ export async function loadBlogPosts(locale: AppLocale = defaultLocale): Promise<
     return Array.isArray(posts)
       ? posts.map((post, index) => normalizeBlogPost(post, locale, index === 0))
       : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -274,7 +273,7 @@ export async function loadBlogPostBySlug(
   try {
     const post = await requestApi<BackendBlogPost>(`/blog/slug/${encodeURIComponent(slug)}`);
     return normalizeBlogPost(post, locale, true);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -287,7 +286,7 @@ export async function loadExperiences(
     return Array.isArray(experiences)
       ? experiences.map((item) => normalizeExperience(item, locale))
       : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -301,7 +300,7 @@ export async function loadExperienceById(
       `/experiences/${encodeURIComponent(id)}`,
     );
     return normalizeExperienceDetail(experience, locale);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -314,7 +313,7 @@ export async function loadTestimonials(
     return Array.isArray(testimonials)
       ? testimonials.map((item) => normalizeTestimonial(item, locale))
       : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }

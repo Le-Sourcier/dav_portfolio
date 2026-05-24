@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { OtpInput } from "@/components/blog/comments/OtpInput";
+import { MentionPopup } from "@/components/blog/comments/MentionPopup";
 import { useAddComment } from "@/hooks/queries/useBlogQueries";
 import { useVisitorSession } from "@/hooks/useVisitorSession";
 import type { BlogComment } from "@/types/blog";
@@ -16,68 +17,6 @@ interface CommentFormProps {
 const RESEND_COOLDOWN_S = 60;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const maskEmail = (email: string) => email.replace(/(.{2})(.*)(@.*)/, "$1***$3");
-
-function MentionPopup({
-  query,
-  candidates,
-  onSelect,
-  onClose,
-}: {
-  query: string;
-  candidates: string[];
-  onSelect: (name: string) => void;
-  onClose: () => void;
-}) {
-  const [active, setActive] = useState(0);
-  const filtered = candidates.filter((n) => n.toLowerCase().includes(query.toLowerCase()));
-
-  useEffect(() => {
-    setActive(0);
-  }, [query]);
-
-  useEffect(() => {
-    if (filtered.length === 0) {
-      onClose();
-      return;
-    }
-    const handler = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActive((a) => Math.min(a + 1, filtered.length - 1));
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActive((a) => Math.max(a - 1, 0));
-      } else if (e.key === "Enter" || e.key === "Tab") {
-        e.preventDefault();
-        onSelect(filtered[active]);
-      } else if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [filtered, active, onSelect, onClose]);
-
-  if (filtered.length === 0) return null;
-
-  return (
-    <div className="mention-popup" role="listbox">
-      {filtered.slice(0, 6).map((name, i) => (
-        <button
-          key={name}
-          type="button"
-          role="option"
-          aria-selected={i === active}
-          className={i === active ? "mention-popup-item is-active" : "mention-popup-item"}
-          onMouseEnter={() => setActive(i)}
-          onClick={() => onSelect(name)}
-        >
-          <span>{name}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function CommentForm({ postId, onPosted, allAuthors }: CommentFormProps) {
   const t = useTranslations("BlogComments");
@@ -93,6 +32,13 @@ export function CommentForm({ postId, onPosted, allAuthors }: CommentFormProps) 
   const [mentionOpen, setMentionOpen] = useState(false);
   const [mentionPos, setMentionPos] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${Math.min(ta.scrollHeight, 200)}px`;
+  }, [content]);
 
   useEffect(() => {
     if (resendIn <= 0) return;
@@ -145,6 +91,20 @@ export function CommentForm({ postId, onPosted, allAuthors }: CommentFormProps) 
     setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => clearTimeout(feedbackTimer.current);
+  }, []);
+
+  const showFeedback = (tone: "error" | "success", label: string) => {
+    setFeedback({ tone, label });
+    clearTimeout(feedbackTimer.current);
+    if (tone === "success") {
+      feedbackTimer.current = setTimeout(() => setFeedback(null), 4000);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
@@ -155,10 +115,10 @@ export function CommentForm({ postId, onPosted, allAuthors }: CommentFormProps) 
       {
         onSuccess: (created) => {
           setContent("");
-          setFeedback({ tone: "success", label: t("successPosted") });
+          showFeedback("success", t("successPosted"));
           onPosted({ id: created.id, author: created.author, content: created.content, createdAt: created.createdAt });
         },
-        onError: (err) => setFeedback({ tone: "error", label: err.message }),
+        onError: (err) => showFeedback("error", err.message),
       },
     );
   };

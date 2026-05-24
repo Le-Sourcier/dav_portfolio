@@ -34,7 +34,7 @@ export function ShareBar({ url, title, compact = false }: ShareBarProps) {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-    } catch (error) {
+    } catch {
       window.prompt(t("copyPrompt"), url);
     }
   };

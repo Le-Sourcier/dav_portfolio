@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
+import { MentionPopup } from "@/components/blog/comments/MentionPopup";
 import { useAddComment } from "@/hooks/queries/useBlogQueries";
 import { useVisitorSession } from "@/hooks/useVisitorSession";
 import { formatRelativeTime } from "@/utils/relativeTime";
@@ -18,6 +19,13 @@ interface CommentItemProps {
 
 const MAX_DEPTH = 3;
 
+const AVATAR_TONES = ["a", "b", "c", "d", "e"] as const;
+const toneOf = (name: string) => {
+  let h = 0;
+  for (let i = 0; i < name.length; i += 1) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return AVATAR_TONES[Math.abs(h) % AVATAR_TONES.length];
+};
+
 const initialsOf = (name: string) =>
   name
     .trim()
@@ -25,13 +33,6 @@ const initialsOf = (name: string) =>
     .slice(0, 2)
     .map((p) => p.charAt(0).toUpperCase())
     .join("") || "?";
-
-const AVATAR_TONES = ["a", "b", "c", "d", "e"] as const;
-const toneOf = (name: string) => {
-  let h = 0;
-  for (let i = 0; i < name.length; i += 1) h = (h * 31 + name.charCodeAt(i)) | 0;
-  return AVATAR_TONES[Math.abs(h) % AVATAR_TONES.length];
-};
 
 function highlightMentions(text: string) {
   const parts: React.ReactNode[] = [];
@@ -53,93 +54,16 @@ function highlightMentions(text: string) {
   return parts.length > 0 ? parts : text;
 }
 
-function collectAuthors(comments: BlogComment[]): string[] {
-  const set = new Set<string>();
-  const walk = (list: BlogComment[]) => {
-    for (const c of list) {
-      set.add(c.author);
-      if (c.replies?.length) walk(c.replies);
-    }
-  };
-  walk(comments);
-  return Array.from(set);
-}
-
-interface MentionPopupProps {
-  query: string;
-  candidates: string[];
-  onSelect: (name: string) => void;
-  onClose: () => void;
-  anchorRef: React.RefObject<HTMLTextAreaElement | null>;
-}
-
-function MentionPopup({ query, candidates, onSelect, onClose, anchorRef }: MentionPopupProps) {
-  const [active, setActive] = useState(0);
-  const filtered = candidates.filter((n) => n.toLowerCase().includes(query.toLowerCase()));
-
-  useEffect(() => {
-    setActive(0);
-  }, [query]);
-
-  useEffect(() => {
-    if (filtered.length === 0) {
-      onClose();
-      return;
-    }
-    const handler = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActive((a) => Math.min(a + 1, filtered.length - 1));
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActive((a) => Math.max(a - 1, 0));
-      } else if (e.key === "Enter" || e.key === "Tab") {
-        e.preventDefault();
-        onSelect(filtered[active]);
-      } else if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [filtered, active, onSelect, onClose]);
-
-  if (filtered.length === 0) return null;
-
-  return (
-    <div className="mention-popup" role="listbox">
-      {filtered.slice(0, 6).map((name, i) => (
-        <button
-          key={name}
-          type="button"
-          role="option"
-          aria-selected={i === active}
-          className={i === active ? "mention-popup-item is-active" : "mention-popup-item"}
-          onMouseEnter={() => setActive(i)}
-          onClick={() => onSelect(name)}
-        >
-          <span className={`mention-popup-avatar mention-popup-avatar--${toneOf(name)}`}>
-            {initialsOf(name)}
-          </span>
-          <span>{name}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function ReplyComposer({
   parentId,
   parentAuthor,
   postId,
-  language,
   onReply,
   allAuthors,
 }: {
   parentId: string;
   parentAuthor: string;
   postId: string;
-  language?: string;
   onReply: (reply: BlogComment) => void;
   allAuthors: string[];
 }) {
@@ -151,6 +75,13 @@ function ReplyComposer({
   const [mentionOpen, setMentionOpen] = useState(false);
   const [mentionPos, setMentionPos] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${Math.min(ta.scrollHeight, 200)}px`;
+  }, [content]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -221,7 +152,6 @@ function ReplyComposer({
             candidates={allAuthors}
             onSelect={insertMention}
             onClose={() => setMentionOpen(false)}
-            anchorRef={textareaRef}
           />
         )}
       </div>
@@ -247,8 +177,16 @@ export function CommentItem({ comment, language, postId, onReply, depth = 0, all
   const session = useVisitorSession();
   const [replyOpen, setReplyOpen] = useState(false);
 
-  const canReply = depth < MAX_DEPTH && session.isVerified;
   const isRoot = depth === 0;
+
+  const handleReplyClick = () => {
+    if (!session.isVerified) {
+      document.querySelector<HTMLInputElement>(".comment-form-row input")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => document.querySelector<HTMLInputElement>(".comment-form-row input")?.focus(), 600);
+      return;
+    }
+    setReplyOpen((v) => !v);
+  };
 
   return (
     <li className={`comment-item${isRoot ? " comment-item--root" : ""}`}>
@@ -269,19 +207,18 @@ export function CommentItem({ comment, language, postId, onReply, depth = 0, all
             </time>
           </header>
           <p className="comment-text">{highlightMentions(comment.content)}</p>
-          {canReply && (
+          {depth < MAX_DEPTH && (
             <div className="comment-actions">
-              <button type="button" className="comment-reply-btn" onClick={() => setReplyOpen((v) => !v)}>
+              <button type="button" className="comment-reply-btn" onClick={handleReplyClick}>
                 {replyOpen ? t("cancel") : t("reply")}
               </button>
             </div>
           )}
-          {replyOpen && (
+          {replyOpen && session.isVerified && (
             <ReplyComposer
               parentId={comment.id}
               parentAuthor={comment.author}
               postId={postId}
-              language={language}
               onReply={(reply) => {
                 setReplyOpen(false);
                 onReply(reply);

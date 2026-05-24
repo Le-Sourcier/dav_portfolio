@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CommentForm } from "@/components/blog/comments/CommentForm";
 import { CommentList } from "@/components/blog/comments/CommentList";
 import { buildCommentTree } from "@/utils/buildCommentTree";
+import { collectAuthors } from "@/utils/collectAuthors";
 import type { BlogComment } from "@/types/blog";
 
 interface CommentsSectionProps {
@@ -20,18 +21,6 @@ function flattenComments(tree: BlogComment[]): BlogComment[] {
     if (node.replies) result.push(...flattenComments(node.replies));
   }
   return result;
-}
-
-function collectAuthors(comments: BlogComment[]): string[] {
-  const set = new Set<string>();
-  const walk = (list: BlogComment[]) => {
-    for (const c of list) {
-      set.add(c.author);
-      if (c.replies?.length) walk(c.replies);
-    }
-  };
-  walk(comments);
-  return Array.from(set);
 }
 
 export function CommentsSection({ postId, initialComments, language }: CommentsSectionProps) {
