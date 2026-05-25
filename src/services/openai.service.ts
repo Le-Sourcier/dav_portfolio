@@ -79,9 +79,9 @@ FLOW OBLIGATOIRE pour un RDV :
    - confirmed + isPast=false → informe et demande s'il veut un nouveau
 4. Appelle get_available_slots(date) pour la date souhaitée (ou demande la date)
 5. Créneaux fixes (heures pleines). Si le client dit 10h30, propose 10h00 ou 11h00
-6. Quand le client confirme le créneau → appelle book_appointment IMMÉDIATEMENT. Ne redemande PAS de confirmation.
+6. Quand le client confirme le créneau → TU DOIS appelER book_appointment via l'outil JSON. N'écris AUCUN texte tant que l'outil n'a pas répondu. Le RDV N'EST PAS RÉSERVÉ tant que l'outil n'a pas renvoyé success=true. Ne dis JAMAIS "j'ai réservé" ou "le RDV est confirmé" avant d'avoir vu le succès de l'outil.
 7. INTERDIT de réserver dans le passé. Date >= {today}
-8. Résume le RDV confirmé BRIÈVEMENT (date, heure, sujet, email)
+8. Résume le RDV confirmé BRIÈVEMENT (date, heure, sujet, email) — mais UNIQUEMENT après avoir reçu le succès de l'outil.
 
 STYLE pour les RDV :
 - Sois CONCIS. Pas de répétition du sujet complet si c'est long — résume-le en quelques mots.
@@ -90,10 +90,11 @@ STYLE pour les RDV :
 - Le sujet du RDV passé à book_appointment doit faire MAX 100 caractères. Si le client fournit un texte plus long, RÉSUME-le toi-même en une courte phrase avant d'appeler book_appointment. N'attends pas que le client résume — fais-le toi-même.
 
 APPEL D'OUTIL — RÈGLE CRITIQUE :
+Tu DOIS appeler l'outil pour exécuter une action. N'écris JAMAIS "j'ai réservé" ou "le RDV est confirmé" dans ta réponse si tu n'as pas appelé l'outil au préalable.
 Quand tu dois appeler un outil, ta réponse entière doit être UNIQUEMENT le JSON ci-dessous. AUCUN texte avant, après, ni autour. Pas d'explication, pas de phrase d'introduction. JUSTE le JSON :
 {"tool": "nom_outil", "args": {"param1": "valeur1"}}
 
-Si tu veux expliquer quelque chose au visiteur ET appeler un outil, fais d'abord l'appel d'outil (JSON seul), puis dans la réponse suivante tu expliqueras avec le résultat.
+Après avoir reçu le résultat de l'outil, écris ton message au visiteur dans le tour suivant.
 
 IMPORTANT : N'invente JAMAIS de données. Si tu n'as pas le nom, l'email ou le sujet, DEMANDE-les. Ne fais AUCUNE supposition.
 
@@ -341,10 +342,11 @@ FLOW OBLIGATOIRE pour un RDV :
    - Créneaux fixes : heures pleines (09:00, 10:00, 11:00, 14:00, 15:00, 16:00).
    - Si le client dit 10h30, propose 10h00 ou 11h00.
 
-5. CONFIRMATION :
-   - Quand le client confirme le créneau, appelle book_appointment IMMÉDIATEMENT.
+5. CONFIRMATION — CRITIQUE :
+   - Quand le client confirme, TU DOIS appelER book_appointment via l'outil JSON. N'écris AUCUN texte tant que l'outil n'a pas répondu.
+   - Le RDV N'EST PAS RÉSERVÉ tant que l'outil n'a pas renvoyé success=true. Ne dis JAMAIS "j'ai réservé" ou "le RDV est confirmé" avant d'avoir vu le succès de l'outil.
    - INTERDIT de réserver dans le passé. Vérifie que la date >= aujourd'hui.
-   - Après réservation : confirme les détails (date, heure, sujet, email) et mentionne qu'un email de confirmation a été envoyé.
+   - Après que l'outil a confirmé le succès, donne le récap (date, heure, sujet, email) et mentionne qu'un email de confirmation a été envoyé.
 
 6. POUR L'OTP (annulation/modification) :
    - Appelle request_otp(email, name) pour envoyer le code.
@@ -353,6 +355,21 @@ FLOW OBLIGATOIRE pour un RDV :
    - Quand le client saisit le code (6 chiffres), appelle verify_otp(email, code, name).
    - Si vérifié → procède à l'action (cancel ou reschedule).
    - Si échec → informe le client et propose de réessayer.
+
+FORMAT JSON OBLIGATOIRE pour appeler un outil :
+Tu ne dois JAMAIS écrire de pseudo-code ou de code. Tu dois OBLIGATOIREMENT utiliser ce format JSON EXACT :
+{"tool": "nom_outil", "args": {"param1": "valeur1"}}
+
+Exemple pour book_appointment :
+{"tool": "book_appointment", "args": {"name": "Jean Dupont", "email": "jean@email.com", "subject": "Projet web", "date": "2026-05-26", "time": "10:00"}}
+
+Exemple pour check_existing_appointments :
+{"tool": "check_existing_appointments", "args": {"email": "jean@email.com"}}
+
+Exemple pour get_available_slots :
+{"tool": "get_available_slots", "args": {"date": "2026-05-26"}}
+
+⚠️ N'écris AUCUN texte autour du JSON. Ta réponse entière doit être UNIQUEMENT le JSON. C'est le système qui se charge d'exécuter l'outil et de donner le résultat. Ensuite, dans ta réponse suivante, tu pourras t'adresser au visiteur.
 
 STYLE pour les RDV :
 - Sois CONCIS mais professionnel.
@@ -397,10 +414,11 @@ MANDATORY APPOINTMENT FLOW:
    - Fixed slots: exact hours (09:00, 10:00, 11:00, 14:00, 15:00, 16:00).
    - If the client says 10:30, offer 10:00 or 11:00.
 
-5. CONFIRMATION:
-   - When the client confirms, call book_appointment IMMEDIATELY.
-   - NEVER book in the past. Check that date >= today.
-   - After booking: confirm details (date, time, subject, email) and mention a confirmation email was sent.
+5. CONFIRMATION — CRITICAL:
+    - When the client confirms, you MUST call the book_appointment tool via JSON. Do NOT write any text until the tool returns.
+    - The booking is NOT done until the tool returns success=true. NEVER write "I've booked" or "appointment confirmed" before calling the tool.
+    - NEVER book in the past. Check that date >= today.
+    - After the tool confirms success, give the recap (date, time, subject, email) and mention a confirmation email was sent.
 
 6. FOR OTP (cancellation/modification):
    - Call request_otp(email, name) to send the code.
@@ -409,6 +427,22 @@ MANDATORY APPOINTMENT FLOW:
    - When the client enters the 6-digit code, call verify_otp(email, code, name).
    - If verified → proceed with the action (cancel or reschedule).
    - If failed → inform the client and offer to retry.
+
+MANDATORY JSON FORMAT for tool calls:
+You must NEVER write pseudo-code or any other format. You MUST use this EXACT JSON format:
+{"tool": "tool_name", "args": {"param1": "value1"}}
+
+Examples:
+book_appointment:
+{"tool": "book_appointment", "args": {"name": "John Doe", "email": "john@email.com", "subject": "Web project", "date": "2026-05-26", "time": "10:00"}}
+
+check_existing_appointments:
+{"tool": "check_existing_appointments", "args": {"email": "john@email.com"}}
+
+get_available_slots:
+{"tool": "get_available_slots", "args": {"date": "2026-05-26"}}
+
+⚠️ Do NOT write any text around the JSON. Your entire response must be ONLY the JSON. The system will execute the tool and give you the result. In your next response, you can speak to the visitor.
 
 STYLE for appointments:
 - Be CONCISE but professional.
@@ -428,15 +462,18 @@ STYLE for appointments:
 
   private parseToolCall(text: string): { toolCall: ToolCall; textBefore: string } | null {
     // Find JSON tool call anywhere in the response
-    const match = text.match(/\{"tool"\s*:\s*"[^"]+"\s*,\s*"args"\s*:\s*\{[^}]*\}\s*\}/);
-    if (!match) return null;
-    try {
-      const parsed = JSON.parse(match[0]);
-      if (parsed.tool && typeof parsed.tool === 'string') {
-        const textBefore = text.slice(0, match.index).trim();
-        return { toolCall: { tool: parsed.tool, args: parsed.args || {} }, textBefore };
-      }
-    } catch { /* not a valid tool call */ }
+    const jsonRegex = /\{"tool"\s*:\s*"[^"]+"\s*,\s*"args"\s*:\s*\{[^}]*\}\s*\}/;
+    const match = text.match(jsonRegex);
+    if (match) {
+      try {
+        const parsed = JSON.parse(match[0]);
+        if (parsed.tool && typeof parsed.tool === 'string') {
+          const textBefore = text.slice(0, match.index).trim();
+          return { toolCall: { tool: parsed.tool, args: parsed.args || {} }, textBefore };
+        }
+      } catch { /* try next approach */ }
+    }
+
     return null;
   }
 
@@ -690,6 +727,17 @@ STYLE for appointments:
 
       const parsed = this.parseToolCall(response);
       if (!parsed) {
+        // Hallucination check: AI might say "I've booked" without calling the tool
+        if (this.isBookingHallucination(response, lang)) {
+          messages.push({ role: 'assistant', content: response });
+          messages.push({
+            role: 'user',
+            content: lang === 'fr'
+              ? `⚠️ Tu n'as PAS appelé book_appointment. Tu as écrit que le RDV était réservé, mais ce n'est PAS le cas. Tu DOIS appeler l'outil book_appointment avec le JSON. Écris UNIQUEMENT le JSON maintenant.`
+              : `⚠️ You did NOT call book_appointment. You wrote that the appointment was booked, but it was NOT. You MUST call the book_appointment tool with JSON. Output ONLY JSON now.`,
+          });
+          continue;
+        }
         return response;
       }
 
@@ -704,6 +752,26 @@ STYLE for appointments:
 
     // If we exhausted rounds, do one final call without tools
     return this.llmCall(messages);
+  }
+
+  /**
+   * Detect when the AI claims to have booked an appointment
+   * without actually calling the book_appointment tool.
+   */
+  private isBookingHallucination(text: string, lang: 'fr' | 'en'): boolean {
+    const lower = text.toLowerCase();
+    const bookingWords = lang === 'fr'
+      ? ['réservé', 'rendez-vous', 'rdv', 'confirmé', 'créneau', 'booké']
+      : ['booked', 'appointment', 'confirmed', 'scheduled', 'reserved'];
+    const hasBookingLang = bookingWords.some(w => lower.includes(w));
+    if (!hasBookingLang) return false;
+
+    // Check if the text says something was done (past tense confirmation)
+    // without a tool call JSON being present in the message history context
+    const completionPhrases = lang === 'fr'
+      ? ['j\'ai réservé', 'a été réservé', 'est réservé', 'est confirmé', 'a été créé', 'rdv pris', 'rendez-vous pris']
+      : ['i\'ve booked', 'has been booked', 'is booked', 'is confirmed', 'has been created', 'appointment set'];
+    return completionPhrases.some(p => lower.includes(p));
   }
 
   isEnabled(): boolean {

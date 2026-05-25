@@ -115,9 +115,14 @@ class ChatbotService {
   ): Promise<Partial<ChatMessage>> {
     const input = content.toLowerCase().trim();
 
-    // Quick intents with rich types → always use local engine (fast + rich UI)
-    const richIntent = await this.tryRichIntent(input, lang);
-    if (richIntent) return richIntent;
+    // Rich intents ONLY on the first user message (no prior user messages).
+    // Once a conversation is ongoing, let the AI handle everything
+    // to prevent keyword conflicts (e.g. "project" in appointment flow).
+    const isFirstExchange = !history || history.length === 0 || !history.some(m => m.role === 'user');
+    if (isFirstExchange) {
+      const richIntent = await this.tryRichIntent(input, lang);
+      if (richIntent) return richIntent;
+    }
 
     // Free conversation → AI with tools, fallback to local
     if (openaiService.isEnabled()) {
