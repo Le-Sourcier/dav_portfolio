@@ -495,7 +495,7 @@ STYLE for appointments:
     return null;
   }
 
-  private async executeTool(call: ToolCall, verifiedEmails: Set<string>): Promise<string> {
+  private async executeTool(call: ToolCall, verifiedEmails: Set<string>, lang: 'fr' | 'en' = 'fr'): Promise<string> {
     logger.info('Executing tool', { tool: call.tool, args: call.args });
 
     switch (call.tool) {
@@ -550,7 +550,8 @@ STYLE for appointments:
             urgency,
             date: new Date(date),
             time,
-          });
+            lang,
+          } as any);
           return JSON.stringify({
             success: true,
             appointment: {
@@ -572,8 +573,8 @@ STYLE for appointments:
         const name = String(call.args.name || 'Visiteur');
         if (!email) return JSON.stringify({ error: 'Email requis' });
         try {
-          await visitorService.requestOtp(email, name);
-          return JSON.stringify({ success: true, message: `Code de vérification envoyé à ${email}` });
+          await visitorService.requestOtp(email, name, lang);
+          return JSON.stringify({ success: true, message: lang === 'fr' ? `Code de vérification envoyé à ${email}` : `Verification code sent to ${email}` });
         } catch (err: any) {
           return JSON.stringify({ error: err.message });
         }
@@ -765,7 +766,7 @@ STYLE for appointments:
         return response;
       }
 
-      const toolResult = await this.executeTool(parsed.toolCall, verifiedEmails);
+      const toolResult = await this.executeTool(parsed.toolCall, verifiedEmails, lang);
       logger.info('Tool executed', { tool: parsed.toolCall.tool, resultLength: toolResult.length });
 
       // Add the clean tool call (without text before) and result to messages

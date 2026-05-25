@@ -20,13 +20,7 @@ class VisitorService {
     return randomInt(100000, 1000000).toString();
   }
 
-  async requestOtp(email: string, name: string): Promise<void> {
-    // Invalidate previous OTPs for this email
-    await VisitorOtp.update(
-      { verified: true },
-      { where: { email, verified: false } }
-    );
-
+  async requestOtp(email: string, name: string, lang: 'fr' | 'en' = 'fr'): Promise<void> {
     const code = this.generateCode();
     const expiresAt = new Date(Date.now() + config.visitor.otpExpiresMinutes * 60 * 1000);
 
@@ -36,12 +30,15 @@ class VisitorService {
     try {
       await sendEmail({
         to: email,
-        subject: `${code} — Votre code de verification`,
-        html: otpTemplate({ name, code, expiresMinutes: config.visitor.otpExpiresMinutes }),
+        subject: lang === 'fr' ? `${code} — Votre code de vérification` : `${code} — Your verification code`,
+        html: otpTemplate({ name, code, expiresMinutes: config.visitor.otpExpiresMinutes, lang, baseUrl: config.frontendUrl, phone: config.owner.phone }),
       });
     } catch (error) {
       logger.error('Failed to send OTP email:', error);
-      throw new AppError('Impossible d\'envoyer le code. Reessayez.', HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR);
+      throw new AppError(
+        lang === 'fr' ? "Impossible d'envoyer le code. Réessayez." : 'Failed to send code. Try again.',
+        HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR,
+      );
     }
   }
 

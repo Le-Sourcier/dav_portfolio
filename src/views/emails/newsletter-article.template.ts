@@ -9,47 +9,48 @@ interface NewsletterArticleOptions {
   readTime: string;
   unsubscribeUrl: string;
   subscriberEmail: string;
+  lang?: 'fr' | 'en';
+  baseUrl?: string;
+  phone?: string;
 }
 
 export const newsletterArticleTemplate = ({
-  title,
-  excerpt,
-  articleUrl,
-  imageUrl,
-  category,
-  readTime,
-  unsubscribeUrl,
-  subscriberEmail,
+  title, excerpt, articleUrl, imageUrl, category, readTime, unsubscribeUrl, subscriberEmail, lang = 'fr', baseUrl, phone,
 }: NewsletterArticleOptions): string => {
+  const isFr = lang === 'fr';
+
   const content = `
     <div class="greeting">
-      Nouvel article publie !
+      ${isFr ? 'Nouvel article publié' : 'New article published'}
     </div>
-    <div class="content">
-      ${imageUrl ? `<div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden;"><img src="${imageUrl}" alt="${title}" style="width: 100%; height: auto; display: block;" /></div>` : ''}
+    <div class="content-text">
+      ${imageUrl ? `<div style="margin-bottom:20px;border-radius:10px;overflow:hidden;"><img src="${imageUrl}" alt="${title}" style="width:100%;height:auto;display:block;max-width:100%;" /></div>` : ''}
 
-      <div style="margin-bottom: 8px;">
-        <span style="display: inline-block; padding: 4px 12px; background: rgba(10, 122, 255, 0.15); color: #0a7aff; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category}</span>
-        <span style="color: #6b7c93; font-size: 12px; margin-left: 8px;">${readTime}</span>
+      <div style="margin-bottom:10px;">
+        <span class="pill">${category}</span>
+        <span style="color:#8a857b;font-size:12px;margin-left:6px;">${readTime}</span>
       </div>
 
-      <h2 style="font-size: 22px; font-weight: 800; color: #ffffff; margin-bottom: 12px; line-height: 1.3;">${title}</h2>
+      <h2 style="font-size:20px;font-weight:700;color:#111111;margin-bottom:10px;line-height:1.3;">${title}</h2>
 
-      <p style="color: #b4c6e0; line-height: 1.7; margin-bottom: 24px;">${excerpt}</p>
+      <p style="color:#3a3a3a;line-height:1.7;margin-bottom:20px;">${excerpt}</p>
 
-      <p style="text-align: center;">
-        <a href="${articleUrl}" class="button">Lire l'article</a>
-      </p>
+      <div class="button-wrap">
+        <a href="${articleUrl}" class="button button-teal">${isFr ? "Lire l'article" : 'Read article'}</a>
+      </div>
 
-      <p style="margin-top: 24px;">Bonne lecture,<br><span class="highlight">Yao David Logan</span></p>
+      <p style="margin-top:20px;">${isFr ? 'Bonne lecture,' : 'Happy reading,'}<br><strong style="color:#0f766e;">Yao David Logan</strong></p>
     </div>
   `;
 
   return baseEmailTemplate({
-    title: `Nouvel article : ${title}`,
+    title: isFr ? `Nouvel article : ${title}` : `New article: ${title}`,
     previewText: excerpt.slice(0, 100),
-    content,
+    content, lang, baseUrl,
     unsubscribeEmail: subscriberEmail,
     unsubscribeUrl,
+    phone,
   });
 };
+
+export default { newsletterArticleTemplate };

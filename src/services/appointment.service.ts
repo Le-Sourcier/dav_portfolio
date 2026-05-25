@@ -7,6 +7,7 @@ import { appointmentConfirmationTemplate } from '../views/emails/appointment.tem
 import { Op } from 'sequelize';
 import { logger } from '../utils/logger.js';
 import { todayLocal, dateToLocal } from '../utils/helpers.js';
+import { config } from '../config/index.js';
 
 // Valid status transitions (state machine)
 const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
@@ -105,16 +106,23 @@ class AppointmentService {
 
     // Send confirmation email (silent failure)
     try {
+      const lang = (data as any).lang || 'fr';
+      const baseUrl = config.frontendUrl;
+      const dateStr = new Date(data.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      });
       await sendEmail({
         to: data.email,
-        subject: 'Confirmation de votre rendez-vous',
+        subject: lang === 'fr' ? 'Confirmation de votre rendez-vous' : 'Appointment confirmation',
         html: appointmentConfirmationTemplate({
           name: data.name,
-          date: new Date(data.date).toLocaleDateString('fr-FR', {
-            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-          }),
+          date: dateStr,
           time: data.time,
           subject: data.subject,
+          urgency: (data as any).urgency || 'non-urgent',
+          lang,
+          baseUrl,
+          phone: config.owner.phone,
         }),
       });
     } catch {
@@ -198,6 +206,8 @@ class AppointmentService {
 
     // Send confirmation email
     try {
+      const lang = 'fr';
+      const baseUrl = config.frontendUrl;
       await sendEmail({
         to: appointment.email,
         subject: 'Rendez-vous reprogrammé',
@@ -208,6 +218,10 @@ class AppointmentService {
           }),
           time: newTime,
           subject: appointment.subject,
+          urgency: appointment.urgency,
+          lang,
+          baseUrl,
+          phone: config.owner.phone,
         }),
       });
     } catch { /* silent */ }

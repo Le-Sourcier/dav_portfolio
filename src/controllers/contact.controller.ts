@@ -49,7 +49,7 @@ export const deleteContact = async (req: Request, res: Response, next: NextFunct
 
 export const replyToContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const contact = await contactService.reply(req.params.id!, req.body.reply);
+    const contact = await contactService.reply(req.params.id!, req.body.reply, req.body.lang || 'fr');
     sendSuccess(res, contact, 'Reply sent successfully');
   } catch (error) {
     next(error);

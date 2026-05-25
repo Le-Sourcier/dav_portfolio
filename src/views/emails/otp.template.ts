@@ -4,33 +4,40 @@ interface OtpTemplateOptions {
   name: string;
   code: string;
   expiresMinutes: number;
+  lang?: 'fr' | 'en';
+  baseUrl?: string;
+  phone?: string;
 }
 
-export const otpTemplate = ({ name, code, expiresMinutes }: OtpTemplateOptions): string => {
+export const otpTemplate = ({ name, code, expiresMinutes, lang = 'fr', baseUrl, phone }: OtpTemplateOptions): string => {
+  const isFr = lang === 'fr';
+
   const content = `
     <div class="greeting">
-      Bonjour <span class="highlight">${name}</span>,
+      ${isFr ? 'Bonjour' : 'Hello'} <strong>${name}</strong>,
     </div>
-    <div class="content">
-      <p>Voici votre code de verification :</p>
-      <div style="text-align: center; margin: 24px 0;">
-        <span style="font-size: 32px; font-weight: 900; letter-spacing: 8px; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 16px 32px; border-radius: 12px; display: inline-block;">
-          ${code}
-        </span>
+    <div class="content-text">
+      <p>${isFr ? 'Voici votre code de vérification :' : 'Here is your verification code:'}</p>
+
+      <div class="otp-code">
+        <span>${code}</span>
       </div>
+
       <div class="info-box">
-        <ul style="margin: 0; padding-left: 18px;">
-          <li>Ce code est valable <strong>${expiresMinutes} minutes</strong></li>
-          <li>Ne partagez ce code avec personne</li>
-          <li>Si vous n'avez pas fait cette demande, ignorez cet email</li>
+        <ul>
+          <li>${isFr ? `Ce code est valable <strong>${expiresMinutes} minutes</strong>` : `This code expires in <strong>${expiresMinutes} minutes</strong>`}</li>
+          <li>${isFr ? 'Ne partagez ce code avec personne' : 'Do not share this code with anyone'}</li>
+          <li>${isFr ? "Si vous n'avez pas fait cette demande, ignorez cet email" : 'If you did not request this, ignore this email'}</li>
         </ul>
       </div>
     </div>
   `;
 
   return baseEmailTemplate({
-    title: 'Code de verification',
-    previewText: `Votre code : ${code}`,
-    content,
+    title: isFr ? 'Code de vérification' : 'Verification code',
+    previewText: isFr ? `Votre code : ${code}` : `Your code: ${code}`,
+    content, lang, baseUrl, phone,
   });
 };
+
+export default { otpTemplate };

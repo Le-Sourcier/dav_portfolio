@@ -4,48 +4,55 @@ interface PasswordResetTemplateOptions {
   name: string;
   resetLink: string;
   expiresIn: string;
+  lang?: 'fr' | 'en';
+  baseUrl?: string;
+  phone?: string;
 }
 
 export const passwordResetTemplate = ({
-  name,
-  resetLink,
-  expiresIn,
+  name, resetLink, expiresIn, lang = 'fr', baseUrl, phone,
 }: PasswordResetTemplateOptions): string => {
+  const isFr = lang === 'fr';
+
   const content = `
     <div class="greeting">
-      Bonjour <span class="highlight">${name}</span>,
+      ${isFr ? 'Bonjour' : 'Hello'} <strong>${name}</strong>,
     </div>
-    <div class="content">
-      <p>Vous avez demande la reinitialisation de votre mot de passe.</p>
+    <div class="content-text">
+      <p>${isFr
+        ? 'Vous avez demandé la réinitialisation de votre mot de passe.'
+        : 'You requested a password reset.'}</p>
 
-      <p>Cliquez sur le bouton ci-dessous pour creer un nouveau mot de passe :</p>
+      <p>${isFr
+        ? 'Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :'
+        : 'Click the button below to create a new password:'}</p>
 
-      <p style="text-align: center;">
-        <a href="${resetLink}" class="button">Reinitialiser mon mot de passe</a>
-      </p>
+      <div class="button-wrap">
+        <a href="${resetLink}" class="button">${isFr ? 'Réinitialiser mon mot de passe' : 'Reset my password'}</a>
+      </div>
 
       <div class="info-box">
-        <p><strong>Important :</strong></p>
-        <ul style="padding-left: 20px; margin: 10px 0;">
-          <li>Ce lien expire dans <strong>${expiresIn}</strong></li>
-          <li>Si vous n'avez pas fait cette demande, ignorez cet email</li>
-          <li>Ne partagez jamais ce lien avec quelqu'un d'autre</li>
+        <p style="margin-bottom:8px;"><strong>${isFr ? 'Important :' : 'Important:'}</strong></p>
+        <ul>
+          <li>${isFr ? `Ce lien expire dans <strong>${expiresIn}</strong>` : `This link expires in <strong>${expiresIn}</strong>`}</li>
+          <li>${isFr ? "Si vous n'avez pas fait cette demande, ignorez cet email" : 'If you did not request this, ignore this email'}</li>
+          <li>${isFr ? 'Ne partagez jamais ce lien' : 'Never share this link'}</li>
         </ul>
       </div>
 
-      <p style="font-size: 13px; color: #6b7c93;">
-        Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :<br>
-        <span style="word-break: break-all; color: #0a7aff;">${resetLink}</span>
+      <p style="font-size:13px;color:#6f6a60;margin-top:16px;">
+        ${isFr ? 'Si le bouton ne fonctionne pas, copiez-collez ce lien :' : 'If the button does not work, copy and paste this link:'}<br>
+        <span style="word-break:break-all;color:#0f766e;font-size:12px;">${resetLink}</span>
       </p>
 
-      <p>Cordialement,<br><span class="highlight">L'equipe technique</span></p>
+      <p style="margin-top:20px;">${isFr ? 'Cordialement,' : 'Best regards,'}<br><strong style="color:#0f766e;">Yao David Logan</strong></p>
     </div>
   `;
 
   return baseEmailTemplate({
-    title: 'Reinitialisation de votre mot de passe',
-    previewText: 'Cliquez pour reinitialiser votre mot de passe',
-    content,
+    title: isFr ? 'Réinitialisation de votre mot de passe' : 'Password reset',
+    previewText: isFr ? 'Cliquez pour réinitialiser votre mot de passe' : 'Click to reset your password',
+    content, lang, baseUrl, phone,
   });
 };
 

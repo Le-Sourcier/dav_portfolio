@@ -42,7 +42,7 @@ class NewsletterService {
       await sendEmail({
         to: email,
         subject: 'Bienvenue dans ma newsletter !',
-        html: welcomeTemplate({ email, unsubscribeUrl: buildUnsubscribeUrl(email) }),
+        html: welcomeTemplate({ email, unsubscribeUrl: buildUnsubscribeUrl(email), lang: 'fr', baseUrl: config.frontendUrl, phone: config.owner.phone }),
       });
     } catch {
       // Don't fail if email sending fails
@@ -87,6 +87,7 @@ class NewsletterService {
 
     for (const subscriber of subscribers) {
       try {
+        const lang = (subscriber as any).lang || 'fr';
         const html = newsletterArticleTemplate({
           title: article.title,
           excerpt: article.excerpt,
@@ -96,11 +97,14 @@ class NewsletterService {
           readTime: article.readTime,
           unsubscribeUrl: buildUnsubscribeUrl(subscriber.email),
           subscriberEmail: subscriber.email,
+          lang,
+          baseUrl: config.frontendUrl,
+          phone: config.owner.phone,
         });
 
         await sendEmail({
           to: subscriber.email,
-          subject: `Nouvel article : ${article.title}`,
+          subject: lang === 'fr' ? `Nouvel article : ${article.title}` : `New article: ${article.title}`,
           html,
         });
         sent++;

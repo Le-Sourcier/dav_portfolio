@@ -6,43 +6,52 @@ interface ContactReplyTemplateOptions {
   originalMessage: string;
   replyMessage: string;
   ownerName: string;
+  lang?: 'fr' | 'en';
+  baseUrl?: string;
+  phone?: string;
 }
 
 export const contactReplyTemplate = ({
-  visitorName,
-  originalSubject,
-  originalMessage,
-  replyMessage,
-  ownerName,
+  visitorName, originalSubject, originalMessage, replyMessage, ownerName, lang = 'fr', baseUrl, phone,
 }: ContactReplyTemplateOptions): string => {
+  const isFr = lang === 'fr';
+
   const content = `
     <div class="greeting">
-      Bonjour ${visitorName},
+      ${isFr ? 'Bonjour' : 'Hello'} <strong>${visitorName}</strong>,
     </div>
-    <div class="content">
-      <p>${ownerName} a repondu a votre message.</p>
+    <div class="content-text">
+      <p>${isFr
+        ? `${ownerName} a répondu à votre message.`
+        : `${ownerName} has replied to your message.`}</p>
 
-      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
-        <p style="margin-bottom: 8px; font-weight: 600; color: #10b981;">Reponse :</p>
-        <p style="white-space: pre-wrap; color: #b4c6e0;">${replyMessage}</p>
+      <div class="info-box" style="border-color:rgba(184,132,47,0.25);background:rgba(184,132,47,0.06);">
+        <p style="margin-bottom:8px;"><strong style="color:#b8842f;">${isFr ? 'Réponse :' : 'Reply:'}</strong></p>
+        <p style="white-space:pre-wrap;">${replyMessage}</p>
       </div>
 
-      <div class="info-box">
-        <p style="margin-bottom: 8px;"><strong>Votre message original :</strong></p>
-        <p style="margin-bottom: 4px; font-size: 13px; color: #6b7c93;"><strong>Sujet :</strong> ${originalSubject}</p>
-        <p style="white-space: pre-wrap; color: #6b7c93; font-size: 13px;">${originalMessage}</p>
+      <div class="divider"></div>
+
+      <p style="font-size:13px;color:#6f6a60;margin-bottom:6px;"><strong>${isFr ? 'Votre message original :' : 'Your original message:'}</strong></p>
+      <p style="font-size:13px;color:#6f6a60;margin-bottom:2px;">${isFr ? 'Sujet' : 'Subject'} : ${originalSubject}</p>
+      <div class="quote-block" style="margin-top:8px;">
+        <p style="white-space:pre-wrap;font-size:13px;color:#6f6a60;">${originalMessage}</p>
       </div>
 
-      <p style="font-size: 14px; color: #b4c6e0; margin-top: 24px;">
-        Cordialement,<br/>
-        <strong style="color: #e9f1ff;">${ownerName}</strong>
+      <p style="margin-top:20px;">
+        ${isFr ? 'Cordialement,' : 'Best regards,'}<br>
+        <strong style="color:#0f766e;">${ownerName}</strong>
       </p>
     </div>
   `;
 
   return baseEmailTemplate({
-    title: `Re: ${originalSubject}`,
-    previewText: `${ownerName} a repondu a votre message`,
-    content,
+    title: isFr ? `Re: ${originalSubject}` : `Re: ${originalSubject}`,
+    previewText: isFr
+      ? `${ownerName} a répondu à votre message`
+      : `${ownerName} replied to your message`,
+    content, lang, baseUrl, phone,
   });
 };
+
+export default { contactReplyTemplate };

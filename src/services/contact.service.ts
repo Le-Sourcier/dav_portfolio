@@ -23,19 +23,23 @@ class ContactService {
     return contact;
   }
 
-  async create(data: Omit<IContact, 'id' | 'read' | 'createdAt'>): Promise<IContact> {
-    const contact = await Contact.create(data);
+  async create(data: Omit<IContact, 'id' | 'read' | 'createdAt'> & { lang?: 'fr' | 'en' }): Promise<IContact> {
+    const { lang = 'fr', ...contactData } = data as any;
+    const contact = await Contact.create(contactData);
 
     // Send notification email to admin
     try {
       await sendEmail({
         to: config.admin.email,
-        subject: `Nouveau message de ${data.name}`,
+        subject: lang === 'fr' ? `Nouveau message de ${data.name}` : `New message from ${data.name}`,
         html: contactReceivedTemplate({
           name: data.name,
           email: data.email,
-          subject: data.subject || 'Sans sujet',
+          subject: data.subject || (lang === 'fr' ? 'Sans sujet' : 'No subject'),
           message: data.message,
+          lang,
+          baseUrl: config.frontendUrl,
+          phone: config.owner.phone,
         }),
       });
     } catch {
@@ -64,7 +68,7 @@ class ContactService {
     await contact.destroy();
   }
 
-  async reply(id: string, replyText: string): Promise<IContact> {
+  async reply(id: string, replyText: string, lang: 'fr' | 'en' = 'fr'): Promise<IContact> {
     const contact = await Contact.findByPk(id);
     if (!contact) {
       throw new AppError('Contact message not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
@@ -73,13 +77,16 @@ class ContactService {
     // Send email BEFORE updating DB — if email fails, no false trace
     await sendEmail({
       to: contact.email,
-      subject: `Re: ${contact.subject || 'Votre message'}`,
+      subject: `Re: ${contact.subject || (lang === 'fr' ? 'Votre message' : 'Your message')}`,
       html: contactReplyTemplate({
         visitorName: contact.name,
-        originalSubject: contact.subject || 'Sans sujet',
+        originalSubject: contact.subject || (lang === 'fr' ? 'Sans sujet' : 'No subject'),
         originalMessage: contact.message,
         replyMessage: replyText,
         ownerName: config.owner.name,
+        lang,
+        baseUrl: config.frontendUrl,
+        phone: config.owner.phone,
       }),
     });
 
