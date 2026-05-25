@@ -309,7 +309,7 @@ RENDEZ-VOUS :
 Tu peux aider à prendre et gérer rendez-vous. Outils disponibles :
 1. get_available_slots(date) - Vérifie les créneaux (format YYYY-MM-DD)
 2. check_existing_appointments(email) - Vérifie les RDV existants (retourne id, date, heure, sujet, statut, isPast)
-3. book_appointment(name, email, subject, date, time) - Réserve un nouveau RDV
+3. book_appointment(name, email, subject, date, time, urgency) - Réserve un nouveau RDV. urgency = "non-urgent" ou "urgent"
 4. request_otp(email, name) - Envoie un code de vérification par email
 5. verify_otp(email, code, name) - Vérifie le code OTP
 6. cancel_appointment(email) - Annule les RDV en attente (REQUIERT OTP d'abord)
@@ -318,6 +318,12 @@ Tu peux aider à prendre et gérer rendez-vous. Outils disponibles :
 SÉCURITÉ :
 - Prendre un RDV (book_appointment) est LIBRE : pas besoin d'OTP, le créneau est simplement réservé.
 - ANNULER ou MODIFIER un RDV nécessite OTP. Utilise request_otp puis verify_otp d'abord.
+
+URGENCE :
+- Si le sujet mentionne "projet", "collaboration", "mission" : demande si c'est urgent (délai, deadline) ou non.
+- Si le client mentionne explicitement une urgence ou une date limite proche → urgent.
+- Sinon → non-urgent.
+- Passe urgency="urgent" ou urgency="non-urgent" à book_appointment selon le contexte.
 
 FLOW OBLIGATOIRE pour un RDV :
 
@@ -360,8 +366,11 @@ FORMAT JSON OBLIGATOIRE pour appeler un outil :
 Tu ne dois JAMAIS écrire de pseudo-code ou de code. Tu dois OBLIGATOIREMENT utiliser ce format JSON EXACT :
 {"tool": "nom_outil", "args": {"param1": "valeur1"}}
 
-Exemple pour book_appointment :
-{"tool": "book_appointment", "args": {"name": "Jean Dupont", "email": "jean@email.com", "subject": "Projet web", "date": "2026-05-26", "time": "10:00"}}
+Exemple pour book_appointment (non urgent) :
+{"tool": "book_appointment", "args": {"name": "Jean Dupont", "email": "jean@email.com", "subject": "Projet web", "date": "2026-05-26", "time": "10:00", "urgency": "non-urgent"}}
+
+Exemple pour book_appointment (urgent) :
+{"tool": "book_appointment", "args": {"name": "Marie Martin", "email": "marie@email.com", "subject": "Bug critique site web", "date": "2026-05-26", "time": "14:00", "urgency": "urgent"}}
 
 Exemple pour check_existing_appointments :
 {"tool": "check_existing_appointments", "args": {"email": "jean@email.com"}}
@@ -374,14 +383,14 @@ Exemple pour get_available_slots :
 STYLE pour les RDV :
 - Sois CONCIS mais professionnel.
 - Résume un long sujet en max 100 caractères pour book_appointment (fais-le toi-même sans redemander au client).
-- Après réservation, donne un récap structuré en Markdown.`
+- Après réservation, donne un récap structuré en Markdown incluant l'urgence (urgent 🔴 ou non urgent 🟢).`
       : `
 
 APPOINTMENTS:
 You can help book and manage appointments. Available tools:
 1. get_available_slots(date) - Check available slots (format YYYY-MM-DD)
 2. check_existing_appointments(email) - Check existing appointments (returns id, date, time, subject, status, isPast)
-3. book_appointment(name, email, subject, date, time) - Book a new appointment
+3. book_appointment(name, email, subject, date, time, urgency) - Book a new appointment. urgency = "non-urgent" or "urgent"
 4. request_otp(email, name) - Send a verification code by email
 5. verify_otp(email, code, name) - Verify the OTP code
 6. cancel_appointment(email) - Cancel pending appointments (REQUIRES OTP first)
@@ -390,6 +399,12 @@ You can help book and manage appointments. Available tools:
 SECURITY:
 - Booking (book_appointment) is FREE: no OTP needed, the slot is simply reserved.
 - CANCEL or RESCHEDULE requires OTP. Use request_otp then verify_otp first.
+
+URGENCY:
+- If the subject mentions "project", "collaboration", "business", "mission": ask if it's urgent (deadline, timeframe).
+- If the client explicitly mentions urgency or a close deadline → urgent.
+- Otherwise → non-urgent.
+- Pass urgency="urgent" or urgency="non-urgent" to book_appointment based on context.
 
 MANDATORY APPOINTMENT FLOW:
 
@@ -433,8 +448,11 @@ You must NEVER write pseudo-code or any other format. You MUST use this EXACT JS
 {"tool": "tool_name", "args": {"param1": "value1"}}
 
 Examples:
-book_appointment:
-{"tool": "book_appointment", "args": {"name": "John Doe", "email": "john@email.com", "subject": "Web project", "date": "2026-05-26", "time": "10:00"}}
+book_appointment (non-urgent):
+{"tool": "book_appointment", "args": {"name": "John Doe", "email": "john@email.com", "subject": "Web project", "date": "2026-05-26", "time": "10:00", "urgency": "non-urgent"}}
+
+book_appointment (urgent):
+{"tool": "book_appointment", "args": {"name": "Jane Smith", "email": "jane@email.com", "subject": "Critical site bug", "date": "2026-05-26", "time": "14:00", "urgency": "urgent"}}
 
 check_existing_appointments:
 {"tool": "check_existing_appointments", "args": {"email": "john@email.com"}}
@@ -447,7 +465,7 @@ get_available_slots:
 STYLE for appointments:
 - Be CONCISE but professional.
 - Summarize a long subject to max 100 chars for book_appointment (do it yourself, don't ask the client).
-- After booking, give a structured Markdown recap.`;
+- After booking, give a structured Markdown recap including urgency (urgent 🔴 or non-urgent 🟢).`;
 
     const contextSection = isFr
       ? `\n\nCONTEXTE :\n{context}\n\nAujourd'hui : ${todayLocal()}`
@@ -513,9 +531,14 @@ STYLE for appointments:
       }
 
       case 'book_appointment': {
-        const { name, email, subject, date, time } = call.args as Record<string, string>;
+        const args = call.args as Record<string, string>;
+        const { name, email, subject, date, time } = args;
+        const urgency = (args.urgency as 'non-urgent' | 'urgent') || 'non-urgent';
         if (!name || !email || !subject || !date || !time) {
           return JSON.stringify({ error: 'Paramètres manquants : name, email, subject, date, time sont requis' });
+        }
+        if (!['non-urgent', 'urgent'].includes(urgency)) {
+          return JSON.stringify({ error: 'Urgence invalide. Utilise "non-urgent" ou "urgent".' });
         }
         // Truncate subject to 255 chars max (DB limit)
         const safeSubject = subject.length > 250 ? subject.slice(0, 247) + '...' : subject;
@@ -524,7 +547,7 @@ STYLE for appointments:
             name,
             email,
             subject: safeSubject,
-            urgency: 'non-urgent',
+            urgency,
             date: new Date(date),
             time,
           });
@@ -535,6 +558,7 @@ STYLE for appointments:
               time: appointment.time,
               subject: appointment.subject,
               status: appointment.status,
+              urgency: appointment.urgency,
             },
             message: 'Rendez-vous créé avec succès. Email de confirmation envoyé.',
           });
