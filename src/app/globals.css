@@ -6780,15 +6780,20 @@ main {
 /* ─── Messages — zone scrollable ─────────────────────────────────────── */
 .assistant-messages-wrap {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .assistant-messages {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 100%;
+  min-height: 0;
   overflow-y: auto;
+  overflow-anchor: none;
   padding: 16px 16px 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--asst-border-strong) transparent;

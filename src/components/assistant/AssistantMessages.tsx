@@ -3,11 +3,16 @@
 /**
  * Liste scrollable des messages avec auto-scroll bas + bouton remontée.
  *
- * Stratégie auto-scroll : on ne scroll auto vers le bas que si l'utilisateur
- * était déjà près du bas (tolérance 40px). Sinon on l'avertit avec un bouton
- * "nouveau message" qui force le scroll au clic.
+ * Stratégie :
+ *  - "stickToBottom" : tant que l'utilisateur reste près du bas, on suit
+ *    automatiquement chaque nouveau chunk de streaming. Dès qu'il scroll
+ *    vers le haut, on coupe le suivi et on affiche le bouton de retour.
+ *  - On capture la position *avant* le rendu via useLayoutEffect (sinon
+ *    le contenu a déjà grandi et on s'auto-disqualifie).
+ *  - On scroll *après* paint via requestAnimationFrame (sinon scrollHeight
+ *    n'a pas encore intégré le nouveau contenu).
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AssistantMessage } from "./AssistantMessage";
 import { AssistantTyping } from "./AssistantTyping";
 import type { AssistantMessage as AssistantMessageType } from "@/types/assistant.types";
@@ -18,10 +23,12 @@ interface AssistantMessagesProps {
   onOtpSubmit: (code: string) => void;
 }
 
-const NEAR_BOTTOM_THRESHOLD_PX = 60;
+const NEAR_BOTTOM_THRESHOLD_PX = 80;
 
 export function AssistantMessages({ messages, isTyping, onOtpSubmit }: AssistantMessagesProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const stickToBottomRef = useRef(true);
+  const lastMessageCountRef = useRef(messages.length);
   const [showJumpButton, setShowJumpButton] = useState(false);
 
   const isNearBottom = (): boolean => {
@@ -36,27 +43,48 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
     el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
   };
 
-  // Auto-scroll quand un nouveau message arrive si on était près du bas
-  useEffect(() => {
-    if (isNearBottom()) {
-      scrollToBottom();
-      setShowJumpButton(false);
-    } else {
-      setShowJumpButton(true);
+  // Capture l'intention de stick AVANT que le DOM ne soit muté avec le nouveau chunk.
+  // useLayoutEffect court synchroniquement après les mutations DOM mais avant le paint :
+  // c'est le bon endroit pour lire scrollHeight/scrollTop et décider, puis scroller.
+  useLayoutEffect(() => {
+    const isNewMessage = messages.length > lastMessageCountRef.current;
+    lastMessageCountRef.current = messages.length;
+
+    if (!stickToBottomRef.current && !isNewMessage) return;
+
+    // Si c'est un nouveau message (pas un chunk de streaming), on force le stick
+    // pour suivre la réponse qui arrive, sauf si l'utilisateur a scrollé loin.
+    if (isNewMessage && isNearBottom()) {
+      stickToBottomRef.current = true;
     }
-  }, [messages.length, isTyping]);
 
-  // Pendant le streaming : instant scroll (smooth ralentit et rate le bottom
-  // car le contenu grandit entre-temps). Le premier effet (new message) utilise
-  // smooth, celui-ci utilise auto pour suivre le flux.
-  useEffect(() => {
-    const lastStreamed = messages[messages.length - 1];
-    if (!lastStreamed?.isStreaming) return;
-    if (isNearBottom()) scrollToBottom(false);
-  }, [messages]);
+    if (stickToBottomRef.current) {
+      // Deux RAF : le premier laisse React commit, le second laisse le browser
+      // calculer le nouveau scrollHeight (utile quand des images/markdown sizent).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => scrollToBottom(false));
+      });
+      setShowJumpButton(false);
+    }
+  }, [messages, isTyping]);
 
+  // L'utilisateur scroll manuellement : on désactive le stick s'il s'éloigne du bas.
   const handleScroll = () => {
-    if (isNearBottom()) setShowJumpButton(false);
+    const near = isNearBottom();
+    stickToBottomRef.current = near;
+    setShowJumpButton(!near);
+  };
+
+  // Scroll initial à l'ouverture du panneau
+  useEffect(() => {
+    scrollToBottom(false);
+    stickToBottomRef.current = true;
+  }, []);
+
+  const handleJump = () => {
+    stickToBottomRef.current = true;
+    scrollToBottom(true);
+    setShowJumpButton(false);
   };
 
   return (
@@ -77,10 +105,7 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
         <button
           type="button"
           className="assistant-jump-bottom"
-          onClick={() => {
-            scrollToBottom();
-            setShowJumpButton(false);
-          }}
+          onClick={handleJump}
           aria-label="Aller au dernier message"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
