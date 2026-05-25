@@ -12340,7 +12340,20 @@ main {
   to { transform: rotate(360deg); }
 }
 
-/* --- Card flottante (rendue via drei <Html portal>) --- */
+/* --- Conteneur des cartes HTML superposé au canvas --- */
+.globe-cards-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.globe-cards-overlay .globe-card {
+  pointer-events: auto;
+}
+
+/* --- Card flottante (rendue via createPortal dans .globe-cards-overlay) --- */
 .globe-card {
   position: relative;
   display: inline-flex;

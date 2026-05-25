@@ -1,21 +1,12 @@
 "use client";
 
-import { useRef, useMemo, type RefObject } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Float, Line } from "@react-three/drei";
+import { OrbitControls, Line } from "@react-three/drei";
 import * as THREE from "three";
 import Link from "next/link";
 import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
 
-/**
- * Distribue `count` points sur une sphère, mais en limitant la latitude à
- * ±Y_RANGE pour garder toutes les cartes dans la frustum de la caméra
- * (sinon les points aux pôles sortent verticalement de l'écran et les
- * cartes correspondantes deviennent invisibles ou clippées).
- *
- * Avec Y_RANGE = 0.55, on couvre une bande équatoriale visible quel que
- * soit le nombre d'expériences, tout en gardant une vraie répartition 3D.
- */
 function fibonacciSphere(count: number, radius: number): [number, number, number][] {
   if (count === 0) return [];
   if (count === 1) return [[0, 0, radius]];
@@ -90,22 +81,18 @@ function Globe() {
 
   return (
     <group>
-      {/* Halo atmosphérique extérieur — fait briller le globe sur la page */}
       <mesh ref={glowRef}>
         <sphereGeometry args={[GLOBE_RADIUS * 1.25, 32, 32]} />
         <meshBasicMaterial color="#0f766e" transparent opacity={0.08} side={THREE.BackSide} />
       </mesh>
-      {/* Wireframe principal teal */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[GLOBE_RADIUS, 28, 28]} />
         <meshBasicMaterial color="#14b8a6" wireframe transparent opacity={0.32} />
       </mesh>
-      {/* Surface intérieure très translucide — donne du volume sans masquer ce qui est derrière */}
       <mesh>
         <sphereGeometry args={[GLOBE_RADIUS * 0.985, 24, 24]} />
         <meshBasicMaterial color="#062a28" transparent opacity={0.55} />
       </mesh>
-      {/* Lumières de surface */}
       <points ref={dotsRef} geometry={dotGeometry}>
         <pointsMaterial size={0.028} color="#5eead4" transparent opacity={0.55} sizeAttenuation />
       </points>
@@ -113,20 +100,13 @@ function Globe() {
   );
 }
 
-interface CardProps {
-  item: PortfolioExperienceItem;
-  position: [number, number, number];
-  portalRef: RefObject<HTMLElement | null>;
-}
-
-function Card({ item, position, portalRef }: CardProps) {
+function Card3D({ item, position }: { item: PortfolioExperienceItem; position: [number, number, number] }) {
   const len = Math.sqrt(position[0] ** 2 + position[1] ** 2 + position[2] ** 2);
   const d: [number, number, number] = [position[0] / len, position[1] / len, position[2] / len];
   const surfacePos: [number, number, number] = [d[0] * GLOBE_RADIUS, d[1] * GLOBE_RADIUS, d[2] * GLOBE_RADIUS];
-  const lineEnd: [number, number, number] = [d[0] * CARD_DISTANCE * 0.9, d[1] * CARD_DISTANCE * 0.9, d[2] * CARD_DISTANCE * 0.9];
-
+  const lineEnd: [number, number, number] = [d[0] * CARD_DISTANCE * 0.97, d[1] * CARD_DISTANCE * 0.97, d[2] * CARD_DISTANCE * 0.97];
   const linePoints: [number, number, number][] = useMemo(() => [
-    [surfacePos[0] * 1.1, surfacePos[1] * 1.1, surfacePos[2] * 1.1],
+    [surfacePos[0] * 1.02, surfacePos[1] * 1.02, surfacePos[2] * 1.02],
     [lineEnd[0], lineEnd[1], lineEnd[2]],
   ], []);
 
@@ -137,46 +117,75 @@ function Card({ item, position, portalRef }: CardProps) {
         <meshBasicMaterial color="#5eead4" />
       </mesh>
       <Line points={linePoints} color="#14b8a6" transparent opacity={0.18} lineWidth={1} />
-      <Float speed={1.2 + Math.random() * 0.5} rotationIntensity={0.05} floatIntensity={0.4}>
-        <Html
-          position={position}
-          center
-          distanceFactor={12}
-          occlude={false}
-          portal={portalRef as RefObject<HTMLElement>}
-          zIndexRange={[10, 0]}
-        >
-          <Link
-            href={`/experiences/${item.id}`}
-            className="globe-card"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="globe-card-dot" aria-hidden="true" />
-            <div className="globe-card-body">
-              <strong className="globe-card-company">{item.company}</strong>
-              <span className="globe-card-role">{item.role}</span>
-              <span className="globe-card-period">{item.period}</span>
-            </div>
-          </Link>
-        </Html>
-      </Float>
     </group>
   );
 }
 
+/* ── Projette les positions 3D en pixels 2D et met à jour le DOM directement ── */
+function CardUpdater({ positions }: { positions: [number, number, number][] }) {
+  const vec = useMemo(() => new THREE.Vector3(), []);
+  const camPos = useMemo(() => new THREE.Vector3(), []);
+  const els = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    els.current = positions.map((_, i) => document.querySelector(`[data-card="${i}"]`));
+  }, [positions.length]);
+
+  useFrame(({ camera, size }) => {
+    const list = els.current;
+    camPos.copy(camera.position);
+    for (let i = 0; i < positions.length; i++) {
+      const el = list[i];
+      if (!el) continue;
+      vec.set(positions[i][0], positions[i][1], positions[i][2]);
+      vec.project(camera);
+      if (vec.z > 1) {
+        el.style.display = "none";
+        continue;
+      }
+      el.style.display = "";
+      const x = (vec.x * 0.5 + 0.5) * size.width;
+      const y = (-vec.y * 0.5 + 0.5) * size.height;
+      // NOTE: distanceFactor-based scaling is intentionally disabled.
+      // Re-scaling every frame based on camera distance caused micro-jitter
+      // because the cards were continuously zooming in/out as the orbit
+      // changed each card's distance to the camera. The visual improvement
+      // from the perspective effect did not justify the loss of smoothness.
+      el.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+    }
+  });
+
+  return null;
+}
+
+/* ── Card HTML — rendue HORS du Canvas (plus de conflit R3F) ── */
+function CardHtml({ item, index }: { item: PortfolioExperienceItem; index: number }) {
+  return (
+    <div
+      data-card={index}
+      className="globe-card"
+      style={{ position: "absolute", left: 0, top: 0, transform: "translate3d(-9999px, -9999px, 0)" }}
+    >
+      <Link href={`/experiences/${item.id}`} onClick={(e) => e.stopPropagation()}>
+        <span className="globe-card-dot" aria-hidden="true" />
+        <div className="globe-card-body">
+          <strong className="globe-card-company">{item.company}</strong>
+          <span className="globe-card-role">{item.role}</span>
+          <span className="globe-card-period">{item.period}</span>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
 export function GlobeScene({ experiences }: { experiences: PortfolioExperienceItem[] }) {
-  const sectionRef = useRef<HTMLElement | null>(null);
   const positions = useMemo(
     () => fibonacciSphere(experiences.length, CARD_DISTANCE),
     [experiences.length],
   );
 
   return (
-    <section
-      ref={sectionRef}
-      className="globe-section"
-      aria-labelledby="experiences-title"
-    >
+    <section className="globe-section" aria-labelledby="experiences-title">
       <Canvas
         camera={{ position: [0, 0.4, 9], fov: 50 }}
         dpr={[1, 1.5]}
@@ -186,8 +195,9 @@ export function GlobeScene({ experiences }: { experiences: PortfolioExperienceIt
         <Stars />
         <Globe />
         {experiences.map((item, i) => (
-          <Card key={item.id} item={item} position={positions[i]} portalRef={sectionRef} />
+          <Card3D key={item.id} item={item} position={positions[i]} />
         ))}
+        <CardUpdater positions={positions} />
         <OrbitControls
           enableZoom={false}
           enablePan={false}
@@ -198,6 +208,11 @@ export function GlobeScene({ experiences }: { experiences: PortfolioExperienceIt
           maxPolarAngle={Math.PI / 2 + 0.35}
         />
       </Canvas>
+      <div className="globe-cards-overlay">
+        {experiences.map((item, i) => (
+          <CardHtml key={item.id} item={item} index={i} />
+        ))}
+      </div>
     </section>
   );
 }
