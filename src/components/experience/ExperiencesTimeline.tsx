@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
 
 type ExperiencesTimelineProps = {
@@ -8,6 +9,7 @@ type ExperiencesTimelineProps = {
 
 export function ExperiencesTimeline({ experiences }: ExperiencesTimelineProps) {
   const t = useTranslations("ExperiencesIndex");
+  const locale = useLocale();
 
   if (experiences.length === 0) {
     return (
@@ -43,7 +45,7 @@ export function ExperiencesTimeline({ experiences }: ExperiencesTimelineProps) {
                 </div>
               ) : null}
               <Link
-                href={`/experiences/${item.id}`}
+                href={localizedPath(`/experiences/${item.id}`, locale)}
                 className="text-link parcours-link"
               >
                 {t("journeyDetailLink")}

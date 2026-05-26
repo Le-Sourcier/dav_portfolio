@@ -31,12 +31,14 @@ export const useAssistant = () => {
   const {
     isOpen,
     isOffline,
+    language,
     messages,
     quickActions,
     hasHydrated,
     setOpen,
     toggleOpen,
     setOffline,
+    setLanguage,
     setMessages,
     addMessage,
     updateMessage,
@@ -53,6 +55,13 @@ export const useAssistant = () => {
   // écrasait la conversation persistée avec un fetch initial.
   useEffect(() => {
     if (!hasHydrated) return;
+    if (language !== lang) {
+      cancelStreamRef.current?.();
+      clearMessages();
+      setQuickActions([]);
+      setLanguage(lang);
+      return;
+    }
     if (messages.length > 0 && quickActions.length > 0) return;
     let cancelled = false;
 
@@ -103,7 +112,7 @@ export const useAssistant = () => {
     // On veut un init unique par langue + état hydraté ; pas de dep sur
     // messages.length sinon on relance à chaque ajout.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang, hasHydrated]);
+  }, [clearMessages, hasHydrated, lang, language, setLanguage, setQuickActions]);
 
   const sendMessage = useCallback(
     async (content: string) => {

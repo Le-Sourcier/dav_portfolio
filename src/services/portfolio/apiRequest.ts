@@ -1,10 +1,23 @@
 import { envConfig } from "@/config/env";
 import type { BackendApiResponse } from "@/types/backend.types";
 
-export async function requestApi<T>(path: string): Promise<T> {
+type RequestApiOptions = {
+  revalidate?: number;
+  tags?: string[];
+  cache?: RequestCache;
+};
+
+const DEFAULT_PUBLIC_REVALIDATE = 60;
+
+export async function requestApi<T>(
+  path: string,
+  options: RequestApiOptions = {},
+): Promise<T> {
   const url = `${envConfig.apiUrl}${path}`;
+  const cache = options.cache;
+  const revalidate = options.revalidate ?? DEFAULT_PUBLIC_REVALIDATE;
   const response = await fetch(url, {
-    cache: "no-store",
+    ...(cache ? { cache } : { next: { revalidate, tags: options.tags } }),
     headers: {
       Accept: "application/json",
     },

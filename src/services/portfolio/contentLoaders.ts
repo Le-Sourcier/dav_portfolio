@@ -257,7 +257,9 @@ function normalizeTestimonial(
 
 export async function loadBlogPosts(locale: AppLocale = defaultLocale): Promise<BlogPost[]> {
   try {
-    const posts = await requestApi<BackendBlogPost[]>("/blog");
+    const posts = await requestApi<BackendBlogPost[]>("/blog", {
+      tags: ["blog"],
+    });
     return Array.isArray(posts)
       ? posts.map((post, index) => normalizeBlogPost(post, locale, index === 0))
       : [];
@@ -271,7 +273,9 @@ export async function loadBlogPostBySlug(
   locale: AppLocale = defaultLocale,
 ): Promise<BlogPost | null> {
   try {
-    const post = await requestApi<BackendBlogPost>(`/blog/slug/${encodeURIComponent(slug)}`);
+    const post = await requestApi<BackendBlogPost>(`/blog/slug/${encodeURIComponent(slug)}`, {
+      tags: ["blog", `blog:${slug}`],
+    });
     return normalizeBlogPost(post, locale, true);
   } catch {
     return null;
@@ -282,7 +286,9 @@ export async function loadExperiences(
   locale: AppLocale = defaultLocale,
 ): Promise<PortfolioExperienceItem[]> {
   try {
-    const experiences = await requestApi<BackendExperience[]>("/experiences");
+    const experiences = await requestApi<BackendExperience[]>("/experiences", {
+      tags: ["experiences"],
+    });
     return Array.isArray(experiences)
       ? experiences.map((item) => normalizeExperience(item, locale))
       : [];
@@ -298,6 +304,7 @@ export async function loadExperienceById(
   try {
     const experience = await requestApi<BackendExperience>(
       `/experiences/${encodeURIComponent(id)}`,
+      { tags: ["experiences", `experience:${id}`] },
     );
     return normalizeExperienceDetail(experience, locale);
   } catch {
@@ -309,7 +316,9 @@ export async function loadTestimonials(
   locale: AppLocale = defaultLocale,
 ): Promise<PortfolioTestimonialItem[]> {
   try {
-    const testimonials = await requestApi<BackendTestimonial[]>("/testimonials");
+    const testimonials = await requestApi<BackendTestimonial[]>("/testimonials", {
+      tags: ["testimonials"],
+    });
     return Array.isArray(testimonials)
       ? testimonials.map((item) => normalizeTestimonial(item, locale))
       : [];

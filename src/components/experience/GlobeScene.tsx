@@ -5,6 +5,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Line } from "@react-three/drei";
 import * as THREE from "three";
 import Link from "next/link";
+import { useLocale } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
 
 function fibonacciSphere(count: number, radius: number): [number, number, number][] {
@@ -160,13 +162,15 @@ function CardUpdater({ positions }: { positions: [number, number, number][] }) {
 
 /* ── Card HTML — rendue HORS du Canvas (plus de conflit R3F) ── */
 function CardHtml({ item, index }: { item: PortfolioExperienceItem; index: number }) {
+  const locale = useLocale();
+
   return (
     <div
       data-card={index}
       className="globe-card"
       style={{ position: "absolute", left: 0, top: 0, transform: "translate3d(-9999px, -9999px, 0)" }}
     >
-      <Link href={`/experiences/${item.id}`} onClick={(e) => e.stopPropagation()}>
+      <Link href={localizedPath(`/experiences/${item.id}`, locale)} onClick={(e) => e.stopPropagation()}>
         <span className="globe-card-dot" aria-hidden="true" />
         <div className="globe-card-body">
           <strong className="globe-card-company">{item.company}</strong>

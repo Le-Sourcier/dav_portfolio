@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
-import { PortfolioAssistant } from "@/components/PortfolioAssistant";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
-import { ClientAnalytics } from "@/components/ClientAnalytics";
-import { getRequestLocale } from "@/i18n/server";
 import { site } from "@/lib/portfolio";
-import { loadBlogPosts, loadExperiences } from "@/services/portfolio/contentLoaders";
-import { loadProjects } from "@/services/portfolio/projectsLoader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -81,14 +74,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-  const requestLocale = await getRequestLocale();
-  const [assistantProjects, assistantPosts, assistantExperiences] = await Promise.all([
-    loadProjects(requestLocale),
-    loadBlogPosts(requestLocale),
-    loadExperiences(requestLocale),
-  ]);
   const themeScript = `
     (() => {
       const storageKey = "ydl-theme";
@@ -103,7 +88,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang={locale}
+      lang="fr"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -115,16 +100,8 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-            <PortfolioAssistant
-              projects={assistantProjects}
-              posts={assistantPosts}
-              experiences={assistantExperiences}
-            />
-            <ClientAnalytics />
-            <ToastProvider />
-          </NextIntlClientProvider>
+          {children}
+          <ToastProvider />
         </QueryProvider>
       </body>
     </html>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import type { Project } from "@/types/portfolio.types";
 
 type ProjectsDirectoryProps = {
@@ -210,7 +211,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
 
       {featuredProject && !hasFilters ? (
         <Link
-          href={`/projects/${featuredProject.slug}`}
+          href={localizedPath(`/projects/${featuredProject.slug}`, locale)}
           className="project-featured-case">
           <div
             className={`project-featured-media${featuredProject.image ? " has-image" : ""}`}>
@@ -257,7 +258,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
         <div className="project-index-grid">
           {visibleProjects.map((project) => (
             <Link
-              href={`/projects/${project.slug}`}
+              href={localizedPath(`/projects/${project.slug}`, locale)}
               key={project.slug}
               className="project-index-card">
               <div

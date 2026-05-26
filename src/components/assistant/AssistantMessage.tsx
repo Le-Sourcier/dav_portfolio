@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import { AssistantMarkdown } from "./AssistantMarkdown";
 import { OtpInput } from "./OtpInput";
 import type { AssistantMessage as AssistantMessageType } from "@/types/assistant.types";
@@ -22,6 +23,7 @@ export function AssistantMessage({
   onOtpSubmit,
 }: AssistantMessageProps) {
   const t = useTranslations("Assistant");
+  const locale = useLocale();
   const isUser = message.role === "user";
   const raw = message.displayContent ?? message.content;
 
@@ -42,7 +44,7 @@ export function AssistantMessage({
           />
         ) : null}
         {!isUser && !message.isStreaming && !otpEmail
-          ? renderTypeActions(message, t)
+          ? renderTypeActions(message, t, locale)
           : null}
       </div>
     </div>
@@ -52,6 +54,7 @@ export function AssistantMessage({
 function renderTypeActions(
   message: AssistantMessageType,
   t: ReturnType<typeof useTranslations>,
+  locale: string,
 ) {
   const { type, metadata } = message;
   if (!metadata) return null;
@@ -59,7 +62,7 @@ function renderTypeActions(
   if (type === "project_link" && metadata.projectId) {
     return (
       <div className="assistant-message-actions">
-        <Link href="/projects" className="assistant-action-chip">
+        <Link href={localizedPath("/projects", locale)} className="assistant-action-chip">
           {t("seeAllProjects")}
         </Link>
       </div>
@@ -69,7 +72,7 @@ function renderTypeActions(
   if (type === "experience_link" && metadata.experienceId) {
     return (
       <div className="assistant-message-actions">
-        <Link href="/experiences" className="assistant-action-chip">
+        <Link href={localizedPath("/experiences", locale)} className="assistant-action-chip">
           {t("seeJourney")}
         </Link>
       </div>
@@ -83,7 +86,7 @@ function renderTypeActions(
           post.slug ? (
             <Link
               key={post.id}
-              href={`/blog/${post.slug}`}
+              href={localizedPath(`/blog/${post.slug}`, locale)}
               className="assistant-action-chip">
               {post.title}
             </Link>
@@ -96,7 +99,7 @@ function renderTypeActions(
   if (type === "contact_form") {
     return (
       <div className="assistant-message-actions">
-        <Link href="/#contact" className="assistant-action-chip">
+        <Link href={localizedPath("/#contact", locale)} className="assistant-action-chip">
           {t("openContact")}
         </Link>
       </div>

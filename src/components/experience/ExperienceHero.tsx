@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 interface ExperienceHeroProps {
   experience: PortfolioExperienceDetail;
@@ -15,6 +16,7 @@ export async function ExperienceHero({
   contactBody,
 }: ExperienceHeroProps) {
   const t = await getTranslations("ExperienceHero");
+  const locale = await getLocale();
   const meta = Array.from(
     new Set(
       [experience.period, experience.location].filter(
@@ -29,7 +31,7 @@ export async function ExperienceHero({
 
   return (
     <section className="xp-hero" aria-label={experience.role}>
-      <Link href="/#parcours" className="xp-hero-back">
+      <Link href={localizedPath("/#parcours", locale)} className="xp-hero-back">
         {t("backLink")}
       </Link>
 

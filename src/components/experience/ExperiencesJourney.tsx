@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
 
 type ExperiencesJourneyProps = {
@@ -10,6 +11,7 @@ type ExperiencesJourneyProps = {
 
 export function ExperiencesJourney({ experiences }: ExperiencesJourneyProps) {
   const t = useTranslations("ExperiencesIndex");
+  const locale = useLocale();
 
   if (experiences.length === 0) {
     return (
@@ -35,7 +37,7 @@ export function ExperiencesJourney({ experiences }: ExperiencesJourneyProps) {
         {experiences.map((item, index) => (
           <Link
             key={`${item.company}-${item.period}`}
-            href={`/experiences/${item.id}`}
+            href={localizedPath(`/experiences/${item.id}`, locale)}
             className="xp-index-node"
           >
             <span className="xp-index-dot" />

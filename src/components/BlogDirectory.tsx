@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import type { BlogPost } from "@/types/blog";
 
 type BlogDirectoryProps = {
@@ -169,7 +170,7 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
       </div>
 
       {featured && !hasFilters ? (
-        <Link href={`/blog/${featured.slug}`} className="blog-featured" aria-label={`${t("read")} ${featured.title}`}>
+        <Link href={localizedPath(`/blog/${featured.slug}`, locale)} className="blog-featured" aria-label={`${t("read")} ${featured.title}`}>
           <img src={featured.coverImage} alt={featured.coverImageAlt ?? featured.title} />
           <div>
             <span>{t("featured")} · {featured.category}</span>
@@ -205,7 +206,7 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
       {visiblePosts.length > 0 ? (
         <div className="blog-list">
           {visiblePosts.map((post) => (
-            <Link href={`/blog/${post.slug}`} key={post.slug} className="blog-list-item">
+            <Link href={localizedPath(`/blog/${post.slug}`, locale)} key={post.slug} className="blog-list-item">
               <img src={post.coverImage} alt={post.coverImageAlt ?? post.title} />
               <div>
                 <span>{post.category}</span>

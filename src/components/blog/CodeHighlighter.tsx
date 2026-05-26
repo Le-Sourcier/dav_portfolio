@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
 type CodeHighlighterProps = {
@@ -120,15 +120,6 @@ const BUILTIN_GLOBALS = [
   "console", "document", "window", "process", "module", "require", "globalThis",
 ];
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
 function pickKeywords(lang: string): string[] {
   switch (lang) {
     case "javascript":
@@ -150,96 +141,55 @@ function pickKeywords(lang: string): string[] {
   }
 }
 
-const wrap = (color: string, italic = false) =>
-  italic
-    ? `<span style="color:${color};font-style:italic">$1</span>`
-    : `<span style="color:${color}">$1</span>`;
+const TOKEN_RE =
+  /(\/\/[^\n]*|#[^\n]*|`(?:\\.|[^`\\])*`|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b|@[A-Za-z_]\w*|\b[A-Za-z_$][\w$]*\b|[.[\]{}()<>:=+\-*/%,;|&!?]+)/g;
 
-function highlightCode(rawCode: string, lang: string): string {
-  let src = escapeHtml(rawCode);
-
-  // 1) Block comments
-  src = src.replace(/(\/\*[\s\S]*?\*\/)/g, wrap(THEME.comment, true));
-
-  // 2) Line comments
-  if (["python", "bash", "yaml"].includes(lang)) {
-    src = src.replace(/(#[^\n]*)/g, wrap(THEME.comment, true));
+function tokenColor(token: string, lang: string, nextToken?: string): { color?: string; italic?: boolean } {
+  if (token.startsWith("//") || (["python", "bash", "yaml"].includes(lang) && token.startsWith("#"))) {
+    return { color: THEME.comment, italic: true };
   }
-  src = src.replace(/(\/\/[^\n]*)/g, wrap(THEME.comment, true));
-
-  // 3) Strings (template, double, single — quotes are already HTML-escaped)
-  src = src.replace(/(`(?:\\.|[^`\\])*`)/g, wrap(THEME.string));
-  src = src.replace(/(&quot;(?:\\.|(?!&quot;).)*&quot;)/g, wrap(THEME.string));
-  src = src.replace(/(&#39;(?:\\.|(?!&#39;).)*&#39;)/g, wrap(THEME.string));
-
-  // 4) Decorators
-  src = src.replace(/@([A-Za-z_][\w]*)/g, `<span style="color:${THEME.decorator}">@$1</span>`);
-
-  // 5) Numbers
-  src = src.replace(
-    /\b(\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b/g,
-    wrap(THEME.number),
-  );
-
-  // 6) Keywords
-  const keywords = pickKeywords(lang);
-  if (keywords.length > 0) {
-    const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, "g");
-    src = src.replace(keywordRegex, wrap(THEME.keyword));
+  if (/^(`|"|')/.test(token)) return { color: THEME.string };
+  if (/^\d/.test(token)) return { color: THEME.number };
+  if (token.startsWith("@")) return { color: THEME.decorator };
+  if (pickKeywords(lang).includes(token) || (lang === "sql" && pickKeywords(lang).includes(token.toUpperCase()))) {
+    return { color: THEME.keyword };
   }
+  if (["javascript", "typescript", "tsx", "jsx"].includes(lang) && BUILTIN_TYPES.includes(token)) {
+    return { color: THEME.type };
+  }
+  if (BUILTIN_GLOBALS.includes(token)) return { color: THEME.variable };
+  if (nextToken === "(") return { color: THEME.function };
+  if (/^[.[\]{}()<>:=+\-*/%,;|&!?]+$/.test(token)) return { color: THEME.operator };
+  return {};
+}
 
-  // 7) CSS at-rules / hex colors / properties
-  if (lang === "css" || lang === "scss") {
-    const atRegex = new RegExp(`(${CSS_AT_RULES.join("|")})\\b`, "g");
-    src = src.replace(atRegex, wrap(THEME.keyword));
-    src = src.replace(/(#[0-9a-fA-F]{3,8})\b/g, wrap(THEME.number));
-    src = src.replace(
-      /^(\s*)([\w-]+)(\s*:\s*)/gm,
-      `$1<span style="color:${THEME.property}">$2</span>$3`,
+function highlightLine(line: string, lang: string): ReactNode[] {
+  const matches = Array.from(line.matchAll(TOKEN_RE));
+  if (matches.length === 0) return [line || "\u00a0"];
+
+  const nodes: ReactNode[] = [];
+  let cursor = 0;
+  matches.forEach((match, index) => {
+    const token = match[0];
+    const start = match.index ?? 0;
+    if (start > cursor) nodes.push(line.slice(cursor, start));
+
+    const nextToken = matches[index + 1]?.[0];
+    const style = tokenColor(token, lang, nextToken);
+    nodes.push(
+      style.color ? (
+        <span key={`${start}-${token}`} style={{ color: style.color, fontStyle: style.italic ? "italic" : undefined }}>
+          {token}
+        </span>
+      ) : (
+        token
+      ),
     );
-  }
+    cursor = start + token.length;
+  });
 
-  // 8) Built-in types (JS/TS family)
-  if (["javascript", "typescript", "tsx", "jsx"].includes(lang)) {
-    const typeRegex = new RegExp(`\\b(${BUILTIN_TYPES.join("|")})\\b`, "g");
-    src = src.replace(typeRegex, wrap(THEME.type));
-  }
-
-  // 9) Built-in globals / constants
-  const globalRegex = new RegExp(`\\b(${BUILTIN_GLOBALS.join("|")})\\b`, "g");
-  src = src.replace(globalRegex, wrap(THEME.variable));
-
-  // 10) Function calls
-  src = src.replace(
-    /\b([A-Za-z_$][\w$]*)\s*(?=\()/g,
-    wrap(THEME.function),
-  );
-
-  // 11) Property access
-  src = src.replace(
-    /\.([A-Za-z_$][\w$]*)/g,
-    `.<span style="color:${THEME.property}">$1</span>`,
-  );
-
-  // 12) Operators
-  src = src.replace(
-    /(=&gt;|===|!==|==|!=|&lt;=|&gt;=|&amp;&amp;|\|\||\.\.\.|\?\?|\?\.)/g,
-    wrap(THEME.operator),
-  );
-
-  // 13) HTML / JSX tags & attributes
-  if (["html", "jsx", "tsx"].includes(lang)) {
-    src = src.replace(
-      /(&lt;\/?)([A-Za-z][\w-]*)/g,
-      `$1<span style="color:${THEME.tag}">$2</span>`,
-    );
-    src = src.replace(
-      /\b([A-Za-z_][\w-]*)(=)/g,
-      `<span style="color:${THEME.attribute}">$1</span>$2`,
-    );
-  }
-
-  return src;
+  if (cursor < line.length) nodes.push(line.slice(cursor));
+  return nodes.length ? nodes : ["\u00a0"];
 }
 
 export function CodeHighlighter({ code, language = "text", filename }: CodeHighlighterProps) {
@@ -248,10 +198,7 @@ export function CodeHighlighter({ code, language = "text", filename }: CodeHighl
   const lang = normalizeLanguage(language);
   const label = languageLabels[lang] ?? languageLabels[language] ?? language.toUpperCase();
   const trimmed = useMemo(() => code.replace(/\n$/, ""), [code]);
-  const highlightedLines = useMemo(
-    () => highlightCode(trimmed, lang).split("\n"),
-    [trimmed, lang],
-  );
+  const lines = useMemo(() => trimmed.split("\n"), [trimmed]);
 
   const copyCode = useCallback(() => {
     navigator.clipboard.writeText(trimmed).then(() => {
@@ -276,10 +223,10 @@ export function CodeHighlighter({ code, language = "text", filename }: CodeHighl
       <div className="code-highlighter-body">
         <table>
           <tbody>
-            {highlightedLines.map((line, index) => (
+            {lines.map((line, index) => (
               <tr key={`${index}-${line.length}`}>
                 <td>{index + 1}</td>
-                <td dangerouslySetInnerHTML={{ __html: line || "&nbsp;" }} />
+                <td>{highlightLine(line, lang)}</td>
               </tr>
             ))}
           </tbody>

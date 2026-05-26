@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 type FooterProps = {
   showProjects?: boolean;
@@ -17,12 +18,13 @@ export async function Footer({
   showBlog = true,
 }: FooterProps) {
   const t = await getTranslations("Footer");
+  const locale = await getLocale();
 
   return (
     <footer className="site-footer">
       <div className="footer-main">
         <div>
-          <Link href="/" className="footer-brand">
+          <Link href={localizedPath("/", locale)} className="footer-brand">
             <Image
               className="brand-logo-light"
               src="/brand/logo-horizontal-clean.png"
@@ -43,11 +45,11 @@ export async function Footer({
         </div>
         <nav aria-label={t("linksAriaLabel")}>
           <span>{t("navTitle")}</span>
-          <Link href="/#expertise">{t("expertise")}</Link>
-          {showProjects ? <Link href="/projects">{t("projects")}</Link> : null}
-          {showJourney ? <Link href="/#parcours">{t("journey")}</Link> : null}
-          {showBlog ? <Link href="/blog">{t("blog")}</Link> : null}
-          <Link href="/#contact">{t("contact")}</Link>
+          <Link href={localizedPath("/#expertise", locale)}>{t("expertise")}</Link>
+          {showProjects ? <Link href={localizedPath("/projects", locale)}>{t("projects")}</Link> : null}
+          {showJourney ? <Link href={localizedPath("/#parcours", locale)}>{t("journey")}</Link> : null}
+          {showBlog ? <Link href={localizedPath("/blog", locale)}>{t("blog")}</Link> : null}
+          <Link href={localizedPath("/#contact", locale)}>{t("contact")}</Link>
         </nav>
         <nav aria-label={t("linksAriaLabel")}>
           <span>{t("linksTitle")}</span>

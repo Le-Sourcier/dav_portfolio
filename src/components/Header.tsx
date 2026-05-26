@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 
 const navItems = [
@@ -29,6 +30,7 @@ export function Header({
 }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const locale = useLocale();
   const t = useTranslations("Navigation");
   const h = useTranslations("Header");
   const visibleNavItems = navItems.filter((item) => {
@@ -61,7 +63,7 @@ export function Header({
   return (
     <header
       className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
-      <Link href="/" className="brand" aria-label={h("homeAriaLabel")}>
+      <Link href={localizedPath("/", locale)} className="brand" aria-label={h("homeAriaLabel")}>
         <Image
           className="brand-logo-light"
           src="/brand/logo-horizontal-clean.png"
@@ -81,7 +83,7 @@ export function Header({
       </Link>
       <nav className="nav-links" aria-label={h("navAriaLabel")}>
         {visibleNavItems.map((item) => (
-          <Link href={item.href} key={item.href}>
+          <Link href={localizedPath(item.href, locale)} key={item.href}>
             {t(item.key)}
           </Link>
         ))}
@@ -108,7 +110,7 @@ export function Header({
         aria-label={h("mobileNavAriaLabel")}>
         {visibleNavItems.map((item) => (
           <Link
-            href={item.href}
+            href={localizedPath(item.href, locale)}
             key={item.href}
             onClick={() => setIsMenuOpen(false)}>
             {t(item.key)}

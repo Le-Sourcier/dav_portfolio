@@ -21,6 +21,7 @@ const STORAGE_KEY = "dav.assistant";
 interface AssistantState {
   isOpen: boolean;
   isOffline: boolean;
+  language: "fr" | "en" | null;
   messages: AssistantMessage[];
   quickActions: AssistantQuickAction[];
   /** Vrai dès que Zustand a réhydraté depuis storage côté client.
@@ -33,6 +34,7 @@ interface AssistantActions {
   setOpen: (open: boolean) => void;
   toggleOpen: () => void;
   setOffline: (offline: boolean) => void;
+  setLanguage: (language: "fr" | "en") => void;
   setMessages: (messages: AssistantMessage[]) => void;
   addMessage: (message: AssistantMessage) => void;
   updateMessage: (id: string, patch: Partial<AssistantMessage>) => void;
@@ -44,6 +46,7 @@ interface AssistantActions {
 const initialState: AssistantState = {
   isOpen: false,
   isOffline: false,
+  language: null,
   messages: [],
   quickActions: [],
   hasHydrated: false,
@@ -93,6 +96,7 @@ export const useAssistantStore = create<AssistantState & AssistantActions>()(
       setOpen: (open) => set({ isOpen: open }),
       toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
       setOffline: (offline) => set({ isOffline: offline }),
+      setLanguage: (language) => set({ language }),
       setMessages: (messages) => set({ messages }),
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
@@ -110,6 +114,7 @@ export const useAssistantStore = create<AssistantState & AssistantActions>()(
       // Ne persiste que les données qui doivent survivre — pas l'état isOpen
       // (ouvrir auto le panel à chaque chargement serait intrusif)
       partialize: (state) => ({
+        language: state.language,
         messages: state.messages,
         quickActions: state.quickActions,
       }),
