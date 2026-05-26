@@ -23,6 +23,7 @@ import type {
   ProjectFormData,
   ProjectMetric,
 } from "@/types/admin.types";
+import { Toggle } from "@radix-ui/react-toggle";
 
 // ======================== CONSTANTS ========================
 
@@ -248,25 +249,35 @@ export function ProjectEditorPage({
           onChange={setLang}
           hasEnContent={!!form.title_en?.trim()}
         />
+        <div className="flex flex-row gap-5 items-center">
+          {/* Toggle switch (Published/Unpublished) */}
+          <label className="relative inline-flex h-[24px] w-[46px] cursor-pointer items-center">
+            <input type="checkbox" checked className="peer sr-only" />
 
-        <button
-          onClick={handleSave}
-          disabled={isPending}
-          className={cn(
-            "h-8 px-4 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-60",
-            saved
-              ? "bg-emerald-600 text-white"
-              : "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100",
-          )}>
-          {isPending ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : saved ? (
-            <CheckCircle2 className="w-3.5 h-3.5" />
-          ) : (
-            <Send className="w-3.5 h-3.5" />
-          )}
-          {saved ? "Enregistre" : isEditing ? "Mettre a jour" : "Creer"}
-        </button>
+            <span className="absolute inset-0 rounded-full bg-gray-300 transition duration-300 peer-checked:bg-blue-500 peer-focus:ring-2 peer-focus:ring-blue-300"></span>
+
+            <span className="absolute left-1 h-[18px] w-[18px] rounded-full bg-white transition duration-300 peer-checked:translate-x-[20px]"></span>
+          </label>
+
+          <button
+            onClick={handleSave}
+            disabled={isPending}
+            className={cn(
+              "h-8 px-4 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-60",
+              saved
+                ? "bg-emerald-600 text-white"
+                : "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100",
+            )}>
+            {isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : saved ? (
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
+            {saved ? "Enregistre" : isEditing ? "Mettre a jour" : "Creer"}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col xl:flex-row gap-5">
