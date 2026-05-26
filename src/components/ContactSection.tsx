@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { site } from "@/lib/portfolio";
 import { useContactForm } from "@/hooks/useContactForm";
 import { FloatingField } from "@/components/contact/FloatingField";
@@ -11,6 +11,7 @@ const whatsappNumber = site.phone.replace(/\D/g, "");
 
 export function ContactSection() {
   const t = useTranslations("Contact");
+  const locale = useLocale();
 
   const validationMessages = useMemo(
     () => ({
@@ -43,6 +44,7 @@ export function ContactSection() {
     successMessage: t("successFeedback"),
     cooldownMessage: t("cooldownMessage", { seconds: 30 }),
     genericErrorMessage: t("errorGeneric"),
+    locale: locale === "en" ? "en" : "fr",
   });
 
   const mailHref = useMemo(() => {

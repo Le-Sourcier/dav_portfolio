@@ -202,6 +202,7 @@ export interface ContactPayload {
   email: string;
   subject?: string;
   message: string;
+  lang?: "fr" | "en";
 }
 
 export interface BackendNewsletterSubscriber {

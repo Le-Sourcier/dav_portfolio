@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ExperienceGlobe } from "@/components/experience/ExperienceGlobe";
+import { ExperiencesJourney } from "@/components/experience/ExperiencesJourney";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
 import { site } from "@/lib/portfolio";
@@ -54,16 +54,14 @@ export default async function ExperiencesPage() {
 
   // In maintenance mode
   // Need to be desactivated in production when the page is not yet ready
-  if (process.env.NODE_ENV === "production") return <NotFound />;
+  // if (process.env.NODE_ENV === "production") return <NotFound />;
 
   return (
     <>
       <Header showBlog={hasBlog} />
       <main>
-        <Script
-          id="experiences-index-jsonld"
+        <script
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <section className="project-hero section">
@@ -90,6 +88,40 @@ export default async function ExperiencesPage() {
         </section>
 
         <ExperienceGlobe experiences={experiences} />
+
+        {hasExperiences ? (
+          <section className="section experiences-proof-section" aria-labelledby="experiences-proof-title">
+            <div className="experiences-proof-head">
+              <div>
+                <p className="section-kicker">{t("proofKicker")}</p>
+                <h2 id="experiences-proof-title">{t("proofTitle")}</h2>
+              </div>
+              <p>{t("proofDescription")}</p>
+            </div>
+
+            <ExperiencesJourney experiences={experiences} />
+
+            <dl className="experiences-proof-metrics" aria-label={t("proofStatsLabel")}>
+              <div>
+                <dt>{t("proofCompaniesLabel")}</dt>
+                <dd>{new Set(experiences.map((item) => item.company)).size}</dd>
+              </div>
+              <div>
+                <dt>{t("proofFocusLabel")}</dt>
+                <dd>{experiences.slice(0, 3).map((item) => item.focus).filter(Boolean).join(" / ")}</dd>
+              </div>
+              <div>
+                <dt>{t("proofMethodLabel")}</dt>
+                <dd>{t("proofMethodValue")}</dd>
+              </div>
+            </dl>
+          </section>
+        ) : (
+          <section className="section project-empty-state">
+            <strong>{t("emptyTitle")}</strong>
+            <p>{t("emptyText")}</p>
+          </section>
+        )}
 
         <section
           className="case-hire-cta project-hire-cta"

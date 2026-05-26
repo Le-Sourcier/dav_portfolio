@@ -13,9 +13,14 @@ interface AssistantMessageProps {
 
 const OTP_REQUIRED_RE = /\[OTP_REQUIRED:([^\]]+)\]/;
 
-const StreamingCursor = () => <span className="assistant-cursor" aria-hidden="true" />;
+const StreamingCursor = () => (
+  <span className="assistant-cursor" aria-hidden="true" />
+);
 
-export function AssistantMessage({ message, onOtpSubmit }: AssistantMessageProps) {
+export function AssistantMessage({
+  message,
+  onOtpSubmit,
+}: AssistantMessageProps) {
   const t = useTranslations("Assistant");
   const isUser = message.role === "user";
   const raw = message.displayContent ?? message.content;
@@ -30,9 +35,15 @@ export function AssistantMessage({ message, onOtpSubmit }: AssistantMessageProps
         {isUser ? <p>{text}</p> : <AssistantMarkdown content={text} />}
         {message.isStreaming ? <StreamingCursor /> : null}
         {otpEmail && !message.isStreaming && onOtpSubmit ? (
-          <OtpInput email={otpEmail} onComplete={onOtpSubmit} disabled={false} />
+          <OtpInput
+            email={otpEmail}
+            onComplete={onOtpSubmit}
+            disabled={false}
+          />
         ) : null}
-        {!isUser && !message.isStreaming && !otpEmail ? renderTypeActions(message, t) : null}
+        {!isUser && !message.isStreaming && !otpEmail
+          ? renderTypeActions(message, t)
+          : null}
       </div>
     </div>
   );
@@ -48,7 +59,7 @@ function renderTypeActions(
   if (type === "project_link" && metadata.projectId) {
     return (
       <div className="assistant-message-actions">
-        <Link href="/projets" className="assistant-action-chip">
+        <Link href="/projects" className="assistant-action-chip">
           {t("seeAllProjects")}
         </Link>
       </div>
@@ -73,8 +84,7 @@ function renderTypeActions(
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="assistant-action-chip"
-            >
+              className="assistant-action-chip">
               {post.title}
             </Link>
           ) : null,

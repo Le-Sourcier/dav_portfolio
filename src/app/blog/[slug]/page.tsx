@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -170,16 +169,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <Header showProjects={hasProjects} showBlog={hasBlog} />
       <ReadingProgress />
       <main>
-        <Script
-          id={`blog-post-jsonld-${post.slug}`}
+        <script
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Script
-          id={`blog-breadcrumb-jsonld-${post.slug}`}
+        <script
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
         <article className="article-shell article-shell--detail">

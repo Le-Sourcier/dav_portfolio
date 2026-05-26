@@ -72,7 +72,7 @@ export default async function Home() {
                   {t("heroCta")}
                 </a>
                 {hasProjects ? (
-                  <a className="secondary-button" href="#projets">
+                  <a className="secondary-button" href="#projects">
                     {t("heroSecondary")}
                   </a>
                 ) : null}
@@ -107,10 +107,30 @@ export default async function Home() {
 
               <div className="readiness-checks">
                 {[
-                  { titleKey: "readinessCheckAuth", detailKey: "readinessCheckAuthDetail", statusKey: "readinessCheckAuthStatus", maturity: "is-ready" },
-                  { titleKey: "readinessCheckBilling", detailKey: "readinessCheckBillingDetail", statusKey: "readinessCheckBillingStatus", maturity: "is-planned" },
-                  { titleKey: "readinessCheckOps", detailKey: "readinessCheckOpsDetail", statusKey: "readinessCheckOpsStatus", maturity: "is-watch" },
-                  { titleKey: "readinessCheckData", detailKey: "readinessCheckDataDetail", statusKey: "readinessCheckDataStatus", maturity: "is-ready" },
+                  {
+                    titleKey: "readinessCheckAuth",
+                    detailKey: "readinessCheckAuthDetail",
+                    statusKey: "readinessCheckAuthStatus",
+                    maturity: "is-ready",
+                  },
+                  {
+                    titleKey: "readinessCheckBilling",
+                    detailKey: "readinessCheckBillingDetail",
+                    statusKey: "readinessCheckBillingStatus",
+                    maturity: "is-planned",
+                  },
+                  {
+                    titleKey: "readinessCheckOps",
+                    detailKey: "readinessCheckOpsDetail",
+                    statusKey: "readinessCheckOpsStatus",
+                    maturity: "is-watch",
+                  },
+                  {
+                    titleKey: "readinessCheckData",
+                    detailKey: "readinessCheckDataDetail",
+                    statusKey: "readinessCheckDataStatus",
+                    maturity: "is-ready",
+                  },
                 ].map(({ titleKey, detailKey, statusKey, maturity }) => (
                   <div className="readiness-check" key={titleKey}>
                     <i aria-hidden="true" />
@@ -120,7 +140,9 @@ export default async function Home() {
                     </div>
                     <div
                       className={`readiness-maturity ${maturity}`}
-                      aria-label={t("readinessMaturityLabel", { status: t(statusKey) })}>
+                      aria-label={t("readinessMaturityLabel", {
+                        status: t(statusKey),
+                      })}>
                       <small>{t(statusKey)}</small>
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
@@ -153,6 +175,7 @@ export default async function Home() {
               <p>{stat.detail}</p>
             </article>
           ))}
+          <small className="proof-disclaimer">{t("proofDisclaimer")}</small>
         </section>
 
         <section id="apropos" className="section about-section">
@@ -183,7 +206,9 @@ export default async function Home() {
               <strong>{t("methodPanelTitle")}</strong>
             </div>
 
-            <div className="about-brief-flow" aria-label={t("methodFlowAriaLabel")}>
+            <div
+              className="about-brief-flow"
+              aria-label={t("methodFlowAriaLabel")}>
               {[
                 t("methodStep1"),
                 t("methodStep2"),
@@ -217,7 +242,7 @@ export default async function Home() {
         <ExpertiseCarousel />
 
         {hasProjects ? (
-          <section id="projets" className="section projects-section">
+          <section id="projects" className="section projects-section">
             <div className="section-heading">
               <p className="section-kicker">{t("projectsKicker")}</p>
               <h2>{t("projectsTitle")}</h2>
@@ -258,7 +283,7 @@ export default async function Home() {
                       </div>
                     ) : null}
                     <Link
-                      href={`/projets/${project.slug}`}
+                      href={`/projects/${project.slug}`}
                       className="text-link">
                       {t("projectsReadCase")}
                     </Link>
@@ -335,15 +360,14 @@ export default async function Home() {
             </div>
           </div>
           <div className="stack-brand-showcase">
-            <div
-              className="stack-marquee"
-              aria-label={t("stackAriaLabel")}>
+            <div className="stack-marquee" aria-label={t("stackAriaLabel")}>
               <div className="stack-marquee-track">
                 {[...stack, ...stack].map((item, index) => (
                   <div
                     className="stack-logo-tile"
                     key={`${item.name}-${index}`}
-                    tabIndex={0}>
+                    tabIndex={0}
+                    aria-hidden={index >= stack.length}>
                     <Image
                       src={item.icon}
                       alt={item.name}
@@ -400,7 +424,9 @@ export default async function Home() {
                     {post.author || site.name} ·{" "}
                     {dateFormatter.format(new Date(post.date))}
                   </small>
-                  <strong className="blog-card-action">{t("blogReadArticle")}</strong>
+                  <strong className="blog-card-action">
+                    {t("blogReadArticle")}
+                  </strong>
                 </Link>
               ))}
             </div>

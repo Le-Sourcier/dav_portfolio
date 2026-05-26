@@ -181,6 +181,24 @@ export const experience = [
 
 export const stack = [
   {
+    name: "Go",
+    role: "Langage backend",
+    category: "Langage",
+    icon: "/stack/go.svg",
+  },
+  {
+    name: "Rust",
+    role: "Langage système",
+    category: "Langage",
+    icon: "/stack/rust.svg",
+  },
+  {
+    name: "Python",
+    role: "Langage backend",
+    category: "Langage",
+    icon: "/stack/python.svg",
+  },
+  {
     name: "Next.js",
     role: "Framework web",
     category: "Frontend",
@@ -209,6 +227,12 @@ export const stack = [
     role: "APIs rapides",
     category: "Backend",
     icon: "/stack/fastify.svg",
+  },
+  {
+    name: ".NET",
+    role: "Framework web",
+    category: "Backend",
+    icon: "/stack/dot-net.svg",
   },
   {
     name: "PostgreSQL",

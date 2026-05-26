@@ -36,7 +36,9 @@ function metricValue(metric: ProjectMetric, value = metric.value) {
   }).format(value);
 
   if (!unit) return formatted;
-  return ["%", "x"].includes(unit) ? `${formatted}${unit}` : `${formatted} ${unit}`;
+  return ["%", "x"].includes(unit)
+    ? `${formatted}${unit}`
+    : `${formatted} ${unit}`;
 }
 
 export async function generateMetadata({
@@ -61,12 +63,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: `${site.url}/projets/${project.slug}`,
+      canonical: `${site.url}/projects/${project.slug}`,
     },
     openGraph: {
       title,
       description: project.result ?? description,
-      url: `${site.url}/projets/${project.slug}`,
+      url: `${site.url}/projects/${project.slug}`,
       type: "article",
       images: [
         {
@@ -106,12 +108,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const chartPoints = project.chartData.map((point, index) => {
     const x =
       project.chartData.length > 1
-        ? chartPlot.left +
-          (index / (project.chartData.length - 1)) * chartWidth
+        ? chartPlot.left + (index / (project.chartData.length - 1)) * chartWidth
         : chartPlot.left + chartWidth / 2;
     const y =
       chartPlot.bottom -
-      ((point.value - chartMin) / chartRange) * (chartPlot.bottom - chartPlot.top);
+      ((point.value - chartMin) / chartRange) *
+        (chartPlot.bottom - chartPlot.top);
     return { ...point, x, y };
   });
   const chartPath = chartPoints
@@ -130,18 +132,22 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const projectYear = project.createdAt
     ? new Date(project.createdAt).getFullYear()
     : null;
-  const projectScope = [project.role, project.category].filter(Boolean).join(" · ");
+  const projectScope = [project.role, project.category]
+    .filter(Boolean)
+    .join(" · ");
   const projectStackSignal = project.tech.slice(0, 3).join(" · ");
   const hasContextHeadline = Boolean(
     project.headline?.trim() &&
-      project.headline.trim() !== project.description.trim(),
+    project.headline.trim() !== project.description.trim(),
   );
   const contextFacts = [
     [t("perimeterFact"), projectScope],
     [t("stackFact"), projectStackSignal],
     [t("signalFact"), project.metric],
   ].filter(([, value]) => Boolean(value));
-  const hireSubject = encodeURIComponent(t("hireSubject", { name: project.name }));
+  const hireSubject = encodeURIComponent(
+    t("hireSubject", { name: project.name }),
+  );
   const hireBody = encodeURIComponent(t("hireBody", { name: project.name }));
 
   return (
@@ -155,7 +161,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div className="case-cover-overlay" />
           <div className="case-cover-content">
             <Link
-              href="/#projets"
+              href="/#projects"
               className="case-back-link"
               style={{ marginRight: "1rem" }}>
               {t("backLink")}
@@ -173,7 +179,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <section className="case-study-shell">
           <article className="case-story">
-            <section className="case-intro" aria-labelledby="case-context-title">
+            <section
+              className="case-intro"
+              aria-labelledby="case-context-title">
               <div className="case-intro-label">
                 <span>{t("contextLabel")}</span>
                 {projectYear ? <small>{projectYear}</small> : null}
@@ -207,9 +215,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <p>{project.problem}</p>
                   <div className="case-duo-signal">
                     <span>{t("riskLabel")}</span>
-                    <strong>
-                      {projectScope || t("riskFallback")}
-                    </strong>
+                    <strong>{projectScope || t("riskFallback")}</strong>
                   </div>
                 </article>
               ) : null}
@@ -242,7 +248,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
 
                 {hasMetrics ? (
-                  <div className="case-metrics" aria-label={t("metricsAriaLabel")}>
+                  <div
+                    className="case-metrics"
+                    aria-label={t("metricsAriaLabel")}>
                     {project.metrics.map((metric) => {
                       const delta = metricDelta(metric);
                       const metricMax = Math.max(
@@ -257,7 +265,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       const previousProgress = metric.previousValue
                         ? Math.min(
                             100,
-                            Math.max(8, (metric.previousValue / metricMax) * 100),
+                            Math.max(
+                              8,
+                              (metric.previousValue / metricMax) * 100,
+                            ),
                           )
                         : 0;
                       return (
@@ -266,12 +277,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                             <span>{metric.name}</span>
                             {delta !== null ? (
                               <small>
-                                {t("deltaLabel", { delta: delta > 0 ? `+${delta}` : String(delta) })}
+                                {t("deltaLabel", {
+                                  delta:
+                                    delta > 0 ? `+${delta}` : String(delta),
+                                })}
                               </small>
                             ) : null}
                           </div>
                           <strong>{metricValue(metric)}</strong>
-                          <div className="case-metric-compare" aria-hidden="true">
+                          <div
+                            className="case-metric-compare"
+                            aria-hidden="true">
                             {metric.previousValue ? (
                               <div>
                                 <span>{t("beforeLabel")}</span>
@@ -280,12 +296,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                                     width: `${previousProgress}%`,
                                   }}
                                 />
-                                <b>{metricValue(metric, metric.previousValue)}</b>
+                                <b>
+                                  {metricValue(metric, metric.previousValue)}
+                                </b>
                               </div>
                             ) : null}
                             <div>
                               <span>{t("afterLabel")}</span>
-                              <i className="is-after" style={{ width: `${progress}%` }} />
+                              <i
+                                className="is-after"
+                                style={{ width: `${progress}%` }}
+                              />
                               <b>{metricValue(metric)}</b>
                             </div>
                           </div>
@@ -296,7 +317,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 ) : null}
 
                 {project.chartData.length > 0 ? (
-                  <div className="case-chart" aria-label={t("evolutionAriaLabel")}>
+                  <div
+                    className="case-chart"
+                    aria-label={t("evolutionAriaLabel")}>
                     <div className="case-chart-head">
                       <span>{t("evolutionLabel")}</span>
                       <strong>{t("evolutionTitle")}</strong>
@@ -306,10 +329,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         <span style={{ top: `${(chartPlot.top / 48) * 100}%` }}>
                           {chartMax}
                         </span>
-                        <span style={{ top: `${(chartPlot.middle / 48) * 100}%` }}>
+                        <span
+                          style={{ top: `${(chartPlot.middle / 48) * 100}%` }}>
                           {chartMid}
                         </span>
-                        <span style={{ top: `${(chartPlot.bottom / 48) * 100}%` }}>
+                        <span
+                          style={{ top: `${(chartPlot.bottom / 48) * 100}%` }}>
                           {chartMin}
                         </span>
                       </div>
@@ -538,7 +563,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </dl>
           </div>
           <div className="case-hire-actions">
-            <a href={`mailto:${site.email}?subject=${hireSubject}&body=${hireBody}`}>
+            <a
+              href={`mailto:${site.email}?subject=${hireSubject}&body=${hireBody}`}>
               {t("ctaButton")}
             </a>
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>

@@ -40,7 +40,9 @@ const searchableProject = (project: Project) =>
     project.metric,
     ...project.tech,
     ...project.results,
-    ...project.metrics.map((metric) => `${metric.name} ${metric.value}${metric.unit}`),
+    ...project.metrics.map(
+      (metric) => `${metric.name} ${metric.value}${metric.unit}`,
+    ),
   ]
     .filter(Boolean)
     .join(" ")
@@ -54,7 +56,10 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
   const [sort, setSort] = useState<SortKey>("featured");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const categories = useMemo(
-    () => Array.from(new Set(projects.map((project) => project.category).filter(Boolean))),
+    () =>
+      Array.from(
+        new Set(projects.map((project) => project.category).filter(Boolean)),
+      ),
     [projects],
   );
   const featuredProject = useMemo(
@@ -62,7 +67,10 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
       [...projects].sort((a, b) => {
         const scoreDelta = projectScore(b) - projectScore(a);
         if (scoreDelta !== 0) return scoreDelta;
-        return new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime();
+        return (
+          new Date(b.createdAt ?? 0).getTime() -
+          new Date(a.createdAt ?? 0).getTime()
+        );
       })[0],
     [projects],
   );
@@ -71,14 +79,20 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
 
     return projects
       .filter((project) => {
-        const matchesCategory = activeCategory === "all" || project.category === activeCategory;
-        const matchesQuery = !normalizedQuery || searchableProject(project).includes(normalizedQuery);
+        const matchesCategory =
+          activeCategory === "all" || project.category === activeCategory;
+        const matchesQuery =
+          !normalizedQuery ||
+          searchableProject(project).includes(normalizedQuery);
         return matchesCategory && matchesQuery;
       })
       .sort((a, b) => {
         if (sort === "impact") return projectScore(b) - projectScore(a);
         if (sort === "recent") {
-          return new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime();
+          return (
+            new Date(b.createdAt ?? 0).getTime() -
+            new Date(a.createdAt ?? 0).getTime()
+          );
         }
         const featuredDelta = Number(b.featured) - Number(a.featured);
         if (featuredDelta !== 0) return featuredDelta;
@@ -88,7 +102,9 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
   const hasFilters = activeCategory !== "all" || query.trim() !== "";
   const visibleProjects =
     !hasFilters && featuredProject
-      ? filteredProjects.filter((project) => project.slug !== featuredProject.slug)
+      ? filteredProjects.filter(
+          (project) => project.slug !== featuredProject.slug,
+        )
       : filteredProjects;
   const resetFilters = () => {
     setActiveCategory("all");
@@ -106,7 +122,9 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
   }
 
   return (
-    <section className="section project-index" aria-labelledby="project-index-title">
+    <section
+      className="section project-index"
+      aria-labelledby="project-index-title">
       <div className="project-index-controls">
         <div>
           <span>{t("count", { count: projects.length })}</span>
@@ -127,8 +145,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
                 className="filter-settings-button"
                 aria-label={t("sortLabel")}
                 aria-expanded={settingsOpen}
-                onClick={() => setSettingsOpen((current) => !current)}
-              >
+                onClick={() => setSettingsOpen((current) => !current)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M4 7h10" />
                   <path d="M18 7h2" />
@@ -154,8 +171,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
                         onClick={() => {
                           setSort(value as SortKey);
                           setSettingsOpen(false);
-                        }}
-                      >
+                        }}>
                         {label}
                       </button>
                     ))}
@@ -169,8 +185,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
           <button
             type="button"
             className={activeCategory === "all" ? "is-active" : ""}
-            onClick={() => setActiveCategory("all")}
-          >
+            onClick={() => setActiveCategory("all")}>
             {t("categoryAll")}
           </button>
           {categories.map((category) => (
@@ -178,13 +193,15 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
               type="button"
               key={category}
               className={activeCategory === category ? "is-active" : ""}
-              onClick={() => setActiveCategory(category)}
-            >
+              onClick={() => setActiveCategory(category)}>
               {category}
             </button>
           ))}
           {hasFilters ? (
-            <button type="button" className="project-reset-filter" onClick={resetFilters}>
+            <button
+              type="button"
+              className="project-reset-filter"
+              onClick={resetFilters}>
               {t("resetFilters")}
             </button>
           ) : null}
@@ -192,8 +209,11 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
       </div>
 
       {featuredProject && !hasFilters ? (
-        <Link href={`/projets/${featuredProject.slug}`} className="project-featured-case">
-          <div className={`project-featured-media${featuredProject.image ? " has-image" : ""}`}>
+        <Link
+          href={`/projects/${featuredProject.slug}`}
+          className="project-featured-case">
+          <div
+            className={`project-featured-media${featuredProject.image ? " has-image" : ""}`}>
             {featuredProject.image ? (
               <img src={featuredProject.image} alt="" loading="lazy" />
             ) : null}
@@ -230,25 +250,29 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
 
       <div className="project-results-line">
         <span>{t("resultsCount", { count: filteredProjects.length })}</span>
-        <p>
-          {hasFilters
-            ? `${query || activeCategory}`
-            : t("defaultHint")}
-        </p>
+        <p>{hasFilters ? `${query || activeCategory}` : t("defaultHint")}</p>
       </div>
 
       {visibleProjects.length > 0 ? (
         <div className="project-index-grid">
           {visibleProjects.map((project) => (
-            <Link href={`/projets/${project.slug}`} key={project.slug} className="project-index-card">
-              <div className={`project-index-media${project.image ? " has-image" : ""}`}>
-                {project.image ? <img src={project.image} alt="" loading="lazy" /> : null}
+            <Link
+              href={`/projects/${project.slug}`}
+              key={project.slug}
+              className="project-index-card">
+              <div
+                className={`project-index-media${project.image ? " has-image" : ""}`}>
+                {project.image ? (
+                  <img src={project.image} alt="" loading="lazy" />
+                ) : null}
                 {project.metric ? <strong>{project.metric}</strong> : null}
               </div>
               <div className="project-index-body">
                 <div className="project-index-meta">
                   <span>{project.category}</span>
-                  {formatDate(project.createdAt, locale) ? <small>{formatDate(project.createdAt, locale)}</small> : null}
+                  {formatDate(project.createdAt, locale) ? (
+                    <small>{formatDate(project.createdAt, locale)}</small>
+                  ) : null}
                 </div>
                 <h3>{project.name}</h3>
                 <p>{project.headline || project.description}</p>

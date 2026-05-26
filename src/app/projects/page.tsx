@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ProjectsDirectory } from "@/components/ProjectsDirectory";
@@ -16,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("pageTitle"),
     description: t("metaDescription"),
     alternates: {
-      canonical: `${site.url}/projets`,
+      canonical: `${site.url}/projects`,
     },
   };
 }
@@ -32,24 +31,29 @@ export default async function ProjectsPage() {
   ]);
   const hasProjects = projects.length > 0;
   const hasBlog = blogPosts.length > 0;
-  const categories = Array.from(new Set(projects.map((project) => project.category).filter(Boolean)));
+  const categories = Array.from(
+    new Set(projects.map((project) => project.category).filter(Boolean)),
+  );
   const featuredCount = projects.filter((project) => project.featured).length;
   const stackCount = new Set(projects.flatMap((project) => project.tech)).size;
   const measurableCount = projects.filter(
-    (project) => project.metrics.length > 0 || project.metric || project.chartData.length > 0,
+    (project) =>
+      project.metrics.length > 0 ||
+      project.metric ||
+      project.chartData.length > 0,
   ).length;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Projets Yao David Logan",
+    name: "Projects Yao David Logan",
     description: t("metaDescription"),
-    url: `${site.url}/projets`,
+    url: `${site.url}/projects`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: projects.map((project, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${site.url}/projets/${project.slug}`,
+        url: `${site.url}/projects/${project.slug}`,
         name: project.name,
         description: project.headline || project.description,
       })),
@@ -60,10 +64,8 @@ export default async function ProjectsPage() {
     <>
       <Header showProjects={hasProjects} showBlog={hasBlog} />
       <main>
-        <Script
-          id="projects-index-jsonld"
+        <script
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <section className="project-hero section">
@@ -101,7 +103,9 @@ export default async function ProjectsPage() {
         </section>
 
         <ProjectsDirectory projects={projects} />
-        <section className="case-hire-cta project-hire-cta" aria-labelledby="projects-hire-title">
+        <section
+          className="case-hire-cta project-hire-cta"
+          aria-labelledby="projects-hire-title">
           <div>
             <span>{t("nextKicker")}</span>
             <h2 id="projects-hire-title">{t("nextTitle")}</h2>
@@ -120,7 +124,8 @@ export default async function ProjectsPage() {
             </dl>
           </div>
           <div className="case-hire-actions">
-            <a href={`mailto:${site.email}?subject=Mission%20SaaS%20ou%20plateforme%20web`}>
+            <a
+              href={`mailto:${site.email}?subject=Mission%20SaaS%20ou%20plateforme%20web`}>
               {t("ctaButton")}
             </a>
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>

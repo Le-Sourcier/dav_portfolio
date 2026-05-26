@@ -33,6 +33,7 @@ export const useAssistant = () => {
     isOffline,
     messages,
     quickActions,
+    hasHydrated,
     setOpen,
     toggleOpen,
     setOffline,
@@ -46,8 +47,12 @@ export const useAssistant = () => {
   const [isTyping, setIsTyping] = useState(false);
   const cancelStreamRef = useRef<(() => void) | null>(null);
 
-  // Charge message initial + quick actions si la conversation est vide
+  // Charge message initial + quick actions si la conversation est vide.
+  // CRITIQUE : on attend que Zustand ait réhydraté depuis storage. Sinon
+  // au premier rendu `messages` est vide (avant réhydratation) et on
+  // écrasait la conversation persistée avec un fetch initial.
   useEffect(() => {
+    if (!hasHydrated) return;
     if (messages.length > 0 && quickActions.length > 0) return;
     let cancelled = false;
 
@@ -95,10 +100,10 @@ export const useAssistant = () => {
     return () => {
       cancelled = true;
     };
-    // On veut un init unique par langue ; pas de dep sur messages.length
-    // sinon on relance à chaque ajout.
+    // On veut un init unique par langue + état hydraté ; pas de dep sur
+    // messages.length sinon on relance à chaque ajout.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
+  }, [lang, hasHydrated]);
 
   const sendMessage = useCallback(
     async (content: string) => {

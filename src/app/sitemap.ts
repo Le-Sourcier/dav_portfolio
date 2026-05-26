@@ -7,7 +7,10 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [projects, blogPosts] = await Promise.all([loadProjects(), loadBlogPosts()]);
+  const [projects, blogPosts] = await Promise.all([
+    loadProjects(),
+    loadBlogPosts(),
+  ]);
 
   return [
     {
@@ -23,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     ...projects.map((project) => ({
-      url: `${site.url}/projets/${project.slug}`,
+      url: `${site.url}/projects/${project.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: project.featured ? 0.8 : 0.6,

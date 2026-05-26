@@ -43,6 +43,7 @@ type UseContactFormParams = {
   successMessage: string;
   cooldownMessage: string;
   genericErrorMessage: string;
+  locale?: "fr" | "en";
 };
 
 const readDraft = (): ContactFormFields | null => {
@@ -103,6 +104,7 @@ export const useContactForm = ({
   successMessage,
   cooldownMessage,
   genericErrorMessage,
+  locale = "fr",
 }: UseContactFormParams) => {
   const [values, setValues] = useState<ContactFormFields>(EMPTY_FORM);
   const [errors, setErrors] = useState<ContactFormErrors>({});
@@ -229,6 +231,7 @@ export const useContactForm = ({
           name: values.name.trim(),
           email: values.email.trim(),
           subject: `Projet SaaS - ${values.company.trim() || values.name.trim() || "Premier échange"}`,
+          lang: locale,
           message: [
             values.company ? `Entreprise: ${values.company.trim()}` : "",
             values.budget ? `Cadre: ${values.budget}` : "",
@@ -250,7 +253,7 @@ export const useContactForm = ({
         setFeedback(error instanceof Error ? error.message : genericErrorMessage);
       }
     },
-    [values, validationMessages, successMessage, cooldownMessage, genericErrorMessage],
+    [values, validationMessages, successMessage, cooldownMessage, genericErrorMessage, locale],
   );
 
   return {

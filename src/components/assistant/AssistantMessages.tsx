@@ -29,6 +29,9 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stickToBottomRef = useRef(true);
   const lastMessageCountRef = useRef(messages.length);
+  // Flag levé pendant un scroll programmatique pour empêcher handleScroll
+  // de couper le stick (chaque scrollTo déclenche un événement scroll natif).
+  const isProgrammaticRef = useRef(false);
   const [showJumpButton, setShowJumpButton] = useState(false);
 
   const isNearBottom = (): boolean => {
@@ -40,27 +43,32 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
   const scrollToBottom = (smooth = true) => {
     const el = scrollRef.current;
     if (!el) return;
+    isProgrammaticRef.current = true;
     el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+    // Relâche le flag après que l'événement scroll programmatique ait été dispatché.
+    // 120ms couvre l'animation smooth la plus longue qu'on déclenche ici.
+    window.setTimeout(() => {
+      isProgrammaticRef.current = false;
+    }, smooth ? 120 : 0);
   };
 
-  // Capture l'intention de stick AVANT que le DOM ne soit muté avec le nouveau chunk.
-  // useLayoutEffect court synchroniquement après les mutations DOM mais avant le paint :
-  // c'est le bon endroit pour lire scrollHeight/scrollTop et décider, puis scroller.
+  // useLayoutEffect court après les mutations DOM mais avant le paint :
+  // c'est le bon moment pour mesurer scrollHeight/scrollTop puis scroller.
   useLayoutEffect(() => {
     const isNewMessage = messages.length > lastMessageCountRef.current;
     lastMessageCountRef.current = messages.length;
 
     if (!stickToBottomRef.current && !isNewMessage) return;
 
-    // Si c'est un nouveau message (pas un chunk de streaming), on force le stick
-    // pour suivre la réponse qui arrive, sauf si l'utilisateur a scrollé loin.
+    // Nouveau message : on réactive le stick si l'utilisateur n'est pas
+    // parti loin en haut.
     if (isNewMessage && isNearBottom()) {
       stickToBottomRef.current = true;
     }
 
     if (stickToBottomRef.current) {
-      // Deux RAF : le premier laisse React commit, le second laisse le browser
-      // calculer le nouveau scrollHeight (utile quand des images/markdown sizent).
+      // Double RAF : 1er laisse React commit, 2e laisse le browser layouter
+      // (le markdown peut changer la hauteur après render).
       requestAnimationFrame(() => {
         requestAnimationFrame(() => scrollToBottom(false));
       });
@@ -69,13 +77,16 @@ export function AssistantMessages({ messages, isTyping, onOtpSubmit }: Assistant
   }, [messages, isTyping]);
 
   // L'utilisateur scroll manuellement : on désactive le stick s'il s'éloigne du bas.
+  // On ignore les events déclenchés par nos propres scrollTo programmatiques.
   const handleScroll = () => {
+    if (isProgrammaticRef.current) return;
     const near = isNearBottom();
     stickToBottomRef.current = near;
     setShowJumpButton(!near);
   };
 
-  // Scroll initial à l'ouverture du panneau
+  // Scroll initial à l'ouverture du panneau (sans smooth, pour atterrir
+  // directement en bas).
   useEffect(() => {
     scrollToBottom(false);
     stickToBottomRef.current = true;

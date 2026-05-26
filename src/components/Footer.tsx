@@ -39,14 +39,12 @@ export async function Footer({
             />
           </Link>
           <h2>{site.name}</h2>
-          <p>
-            {t("description", { title: site.title })}
-          </p>
+          <p>{t("description", { title: site.title })}</p>
         </div>
         <nav aria-label={t("linksAriaLabel")}>
           <span>{t("navTitle")}</span>
           <Link href="/#expertise">{t("expertise")}</Link>
-          {showProjects ? <Link href="/projets">{t("projects")}</Link> : null}
+          {showProjects ? <Link href="/projects">{t("projects")}</Link> : null}
           {showJourney ? <Link href="/#parcours">{t("journey")}</Link> : null}
           {showBlog ? <Link href="/blog">{t("blog")}</Link> : null}
           <Link href="/#contact">{t("contact")}</Link>

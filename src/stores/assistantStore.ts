@@ -23,6 +23,10 @@ interface AssistantState {
   isOffline: boolean;
   messages: AssistantMessage[];
   quickActions: AssistantQuickAction[];
+  /** Vrai dès que Zustand a réhydraté depuis storage côté client.
+   *  Tant qu'il est faux, on ne doit PAS fetcher un message initial — sinon
+   *  on écrase la conversation persistée en cours de réhydratation. */
+  hasHydrated: boolean;
 }
 
 interface AssistantActions {
@@ -34,6 +38,7 @@ interface AssistantActions {
   updateMessage: (id: string, patch: Partial<AssistantMessage>) => void;
   clearMessages: () => void;
   setQuickActions: (actions: AssistantQuickAction[]) => void;
+  setHasHydrated: (value: boolean) => void;
 }
 
 const initialState: AssistantState = {
@@ -41,6 +46,7 @@ const initialState: AssistantState = {
   isOffline: false,
   messages: [],
   quickActions: [],
+  hasHydrated: false,
 };
 
 /**
@@ -96,6 +102,7 @@ export const useAssistantStore = create<AssistantState & AssistantActions>()(
         })),
       clearMessages: () => set({ messages: [] }),
       setQuickActions: (actions) => set({ quickActions: actions }),
+      setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {
       name: STORAGE_KEY,
@@ -106,6 +113,12 @@ export const useAssistantStore = create<AssistantState & AssistantActions>()(
         messages: state.messages,
         quickActions: state.quickActions,
       }),
+      // Marque le store comme hydraté UNE FOIS la réhydratation finie côté
+      // client. Sans ça, le hook lance un fetch initial qui écrase la
+      // conversation persistée en cours de chargement.
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

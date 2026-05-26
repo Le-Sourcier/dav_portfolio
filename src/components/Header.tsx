@@ -10,7 +10,7 @@ import { site } from "@/lib/portfolio";
 const navItems = [
   { href: "/#apropos", key: "about" },
   { href: "/#expertise", key: "expertise" },
-  { href: "/projets", key: "projects" },
+  { href: "/projects", key: "projects" },
   { href: "/#parcours", key: "journey" },
   { href: "/blog", key: "blog" },
   { href: "/#contact", key: "contact" },
@@ -22,7 +22,11 @@ interface HeaderProps {
   showBlog?: boolean;
 }
 
-export function Header({ showProjects = true, showJourney = true, showBlog = true }: HeaderProps) {
+export function Header({
+  showProjects = true,
+  showJourney = true,
+  showBlog = true,
+}: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const t = useTranslations("Navigation");
@@ -55,10 +59,25 @@ export function Header({ showProjects = true, showJourney = true, showBlog = tru
   }, [isMenuOpen]);
 
   return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
+    <header
+      className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
       <Link href="/" className="brand" aria-label={h("homeAriaLabel")}>
-        <Image className="brand-logo-light" src="/brand/logo-horizontal-clean.png" alt="" width={176} height={65} priority />
-        <Image className="brand-logo-dark" src="/brand/logo-horizontal-clean-dark.png" alt="" width={176} height={65} priority />
+        <Image
+          className="brand-logo-light"
+          src="/brand/logo-horizontal-clean.png"
+          alt=""
+          width={176}
+          height={65}
+          priority
+        />
+        <Image
+          className="brand-logo-dark"
+          src="/brand/logo-horizontal-clean-dark.png"
+          alt=""
+          width={176}
+          height={65}
+          priority
+        />
       </Link>
       <nav className="nav-links" aria-label={h("navAriaLabel")}>
         {visibleNavItems.map((item) => (
@@ -75,8 +94,7 @@ export function Header({ showProjects = true, showJourney = true, showBlog = tru
           aria-label={h(isMenuOpen ? "menuClose" : "menuOpen")}
           aria-expanded={isMenuOpen}
           aria-controls="mobile-menu"
-          onClick={() => setIsMenuOpen((current) => !current)}
-        >
+          onClick={() => setIsMenuOpen((current) => !current)}>
           <span />
           <span />
         </button>
@@ -84,9 +102,15 @@ export function Header({ showProjects = true, showJourney = true, showBlog = tru
           {t("discuss")}
         </a>
       </div>
-      <nav id="mobile-menu" className="mobile-menu" aria-label={h("mobileNavAriaLabel")}>
+      <nav
+        id="mobile-menu"
+        className="mobile-menu"
+        aria-label={h("mobileNavAriaLabel")}>
         {visibleNavItems.map((item) => (
-          <Link href={item.href} key={item.href} onClick={() => setIsMenuOpen(false)}>
+          <Link
+            href={item.href}
+            key={item.href}
+            onClick={() => setIsMenuOpen(false)}>
             {t(item.key)}
           </Link>
         ))}
