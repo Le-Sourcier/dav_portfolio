@@ -1,16 +1,16 @@
-import OpenAI from 'openai';
-import { config } from '../config/index.js';
-import projectService from './project.service.js';
-import experienceService from './experience.service.js';
-import blogService from './blog.service.js';
-import { settingsService } from './settings.service.js';
-import { appointmentService } from './appointment.service.js';
-import logger from '../utils/logger.js';
-import { todayLocal } from '../utils/helpers.js';
-import { visitorService } from './visitor.service.js';
+import OpenAI from "openai";
+import { config } from "../config/index.js";
+import projectService from "./project.service.js";
+import experienceService from "./experience.service.js";
+import blogService from "./blog.service.js";
+import { settingsService } from "./settings.service.js";
+import { appointmentService } from "./appointment.service.js";
+import logger from "../utils/logger.js";
+import { todayLocal } from "../utils/helpers.js";
+import { visitorService } from "./visitor.service.js";
 
 interface ConversationMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
@@ -128,11 +128,11 @@ class OpenAIService {
     if (!this.routerClient) {
       this.routerClient = new OpenAI({
         apiKey: config.openai.routerApiKey,
-        baseURL: 'https://openrouter.ai/api/v1',
+        baseURL: "https://openrouter.ai/api/v1",
         timeout: 30000,
         maxRetries: 1,
         defaultHeaders: {
-          'HTTP-Referer': config.frontendUrl,
+          "HTTP-Referer": config.frontendUrl,
         },
       });
     }
@@ -140,7 +140,10 @@ class OpenAIService {
   }
 
   private async buildContext(): Promise<string> {
-    if (this.cachedContext && Date.now() - this.contextCachedAt < CONTEXT_CACHE_TTL) {
+    if (
+      this.cachedContext &&
+      Date.now() - this.contextCachedAt < CONTEXT_CACHE_TTL
+    ) {
       return this.cachedContext;
     }
 
@@ -148,9 +151,9 @@ class OpenAIService {
 
     try {
       const [profile, social, skillSettings] = await Promise.all([
-        settingsService.getByKey('profile'),
-        settingsService.getByKey('socialLinks'),
-        settingsService.getByKey('skills'),
+        settingsService.getByKey("profile"),
+        settingsService.getByKey("socialLinks"),
+        settingsService.getByKey("skills"),
       ]);
       const info = {
         name: config.owner.name,
@@ -160,66 +163,93 @@ class OpenAIService {
         ...(profile || {}),
         ...(social || {}),
       };
-      const profileParts: string[] = [
-        `PROFIL: ${info.name}`,
-      ];
-      if ((info as any).title) profileParts.push(`Titre (FR): ${(info as any).title}`);
-      if ((info as any).title_en) profileParts.push(`Title (EN): ${(info as any).title_en}`);
-      if ((info as any).location) profileParts.push(`Localisation: ${(info as any).location}`);
-      if ((info as any).bio) profileParts.push(`Bio (FR): ${(info as any).bio}`);
-      if ((info as any).bio_en) profileParts.push(`Bio (EN): ${(info as any).bio_en}`);
-      if ((info as any).yearsExperience) profileParts.push(`Expérience: ${(info as any).yearsExperience}`);
+      const profileParts: string[] = [`PROFIL: ${info.name}`];
+      if ((info as any).title)
+        profileParts.push(`Titre (FR): ${(info as any).title}`);
+      if ((info as any).title_en)
+        profileParts.push(`Title (EN): ${(info as any).title_en}`);
+      if ((info as any).location)
+        profileParts.push(`Localisation: ${(info as any).location}`);
+      if ((info as any).bio)
+        profileParts.push(`Bio (FR): ${(info as any).bio}`);
+      if ((info as any).bio_en)
+        profileParts.push(`Bio (EN): ${(info as any).bio_en}`);
+      if ((info as any).yearsExperience)
+        profileParts.push(`Expérience: ${(info as any).yearsExperience}`);
       profileParts.push(`Email: ${info.email}`);
       if (info.phone) profileParts.push(`Tél: ${info.phone}`);
       const socialParts: string[] = [];
-      if ((info as any).github) socialParts.push(`GitHub: ${(info as any).github}`);
-      if ((info as any).linkedin) socialParts.push(`LinkedIn: ${(info as any).linkedin}`);
-      if ((info as any).twitter) socialParts.push(`Twitter: ${(info as any).twitter}`);
-      if ((info as any).website) socialParts.push(`Site: ${(info as any).website}`);
-      if (socialParts.length) profileParts.push(`Réseaux: ${socialParts.join(' | ')}`);
-      parts.push(profileParts.join('\n'));
+      if ((info as any).github)
+        socialParts.push(`GitHub: ${(info as any).github}`);
+      if ((info as any).linkedin)
+        socialParts.push(`LinkedIn: ${(info as any).linkedin}`);
+      if ((info as any).twitter)
+        socialParts.push(`Twitter: ${(info as any).twitter}`);
+      if ((info as any).website)
+        socialParts.push(`Site: ${(info as any).website}`);
+      if (socialParts.length)
+        profileParts.push(`Réseaux: ${socialParts.join(" | ")}`);
+      parts.push(profileParts.join("\n"));
       if (Array.isArray(skillSettings)) {
-        const skillNames = skillSettings.map((s: any) => s.name || s).join(', ');
+        const skillNames = skillSettings
+          .map((s: any) => s.name || s)
+          .join(", ");
         if (skillNames) parts.push(`COMPÉTENCES: ${skillNames}`);
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
     try {
       const projects = await projectService.findAll();
       if (projects.length > 0) {
-        const list = projects.slice(0, 8).map(p =>
-          `- ${p.title} → /projects/${p.slug} (${p.category})${p.featured ? ' [FEATURED]' : ''}: ${p.description?.slice(0, 100) || ''}${p.tech?.length ? ` [${p.tech.slice(0, 5).join(', ')}]` : ''}`
-        ).join('\n');
+        const list = projects
+          .slice(0, 8)
+          .map(
+            (p) =>
+              `- ${p.title} → /projects/${p.slug} (${p.category})${p.featured ? " [FEATURED]" : ""}: ${p.description?.slice(0, 100) || ""}${p.tech?.length ? ` [${p.tech.slice(0, 5).join(", ")}]` : ""}`,
+          )
+          .join("\n");
         parts.push(`PROJETS:\n${list}`);
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
     try {
       const experiences = await experienceService.findAll();
       if (experiences.length > 0) {
-        const list = experiences.slice(0, 6).map(e => `- ${e.company}: ${e.title} (${e.dates})`).join('\n');
+        const list = experiences
+          .slice(0, 6)
+          .map((e) => `- ${e.company}: ${e.title} (${e.dates})`)
+          .join("\n");
         parts.push(`EXPÉRIENCES:\n${list}`);
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
     try {
       const posts = await blogService.findAll(true);
       if (posts.length > 0) {
-        const list = posts.slice(0, 5).map(p =>
-          `- ${p.title} → /blog/${p.slug}`
-        ).join('\n');
+        const list = posts
+          .slice(0, 5)
+          .map((p) => `- ${p.title} → /blog/${p.slug}`)
+          .join("\n");
         parts.push(`ARTICLES DE BLOG:\n${list}`);
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
-    this.cachedContext = parts.join('\n\n');
+    this.cachedContext = parts.join("\n\n");
     this.contextCachedAt = Date.now();
     return this.cachedContext;
   }
 
-  private getInstructions(context: string, lang: 'fr' | 'en' = 'fr'): string {
-    const isFr = lang === 'fr';
-    
+  private getInstructions(context: string, lang: "fr" | "en" = "fr"): string {
+    const isFr = lang === "fr";
+
     const baseInstructions = isFr
       ? `Tu es l'assistant virtuel du portfolio de {name}. Tu réponds en FRANÇAIS.
       
@@ -478,42 +508,60 @@ STYLE for appointments:
 
   // ======================== TOOL EXECUTION ========================
 
-  private parseToolCall(text: string): { toolCall: ToolCall; textBefore: string } | null {
+  private parseToolCall(
+    text: string,
+  ): { toolCall: ToolCall; textBefore: string } | null {
     // Find JSON tool call anywhere in the response
-    const jsonRegex = /\{"tool"\s*:\s*"[^"]+"\s*,\s*"args"\s*:\s*\{[^}]*\}\s*\}/;
+    const jsonRegex =
+      /\{"tool"\s*:\s*"[^"]+"\s*,\s*"args"\s*:\s*\{[^}]*\}\s*\}/;
     const match = text.match(jsonRegex);
     if (match) {
       try {
         const parsed = JSON.parse(match[0]);
-        if (parsed.tool && typeof parsed.tool === 'string') {
+        if (parsed.tool && typeof parsed.tool === "string") {
           const textBefore = text.slice(0, match.index).trim();
-          return { toolCall: { tool: parsed.tool, args: parsed.args || {} }, textBefore };
+          return {
+            toolCall: { tool: parsed.tool, args: parsed.args || {} },
+            textBefore,
+          };
         }
-      } catch { /* try next approach */ }
+      } catch {
+        /* try next approach */
+      }
     }
 
     return null;
   }
 
-  private async executeTool(call: ToolCall, verifiedEmails: Set<string>, lang: 'fr' | 'en' = 'fr'): Promise<string> {
-    logger.info('Executing tool', { tool: call.tool, args: call.args });
+  private async executeTool(
+    call: ToolCall,
+    verifiedEmails: Set<string>,
+    lang: "fr" | "en" = "fr",
+  ): Promise<string> {
+    logger.info("Executing tool", { tool: call.tool, args: call.args });
 
     switch (call.tool) {
-      case 'get_available_slots': {
+      case "get_available_slots": {
         const dateStr = String(call.args.date || todayLocal());
-        const slots = await appointmentService.getAvailableSlots(new Date(dateStr));
+        const slots = await appointmentService.getAvailableSlots(
+          new Date(dateStr),
+        );
         if (slots.length === 0) {
-          return JSON.stringify({ date: dateStr, availableSlots: [], message: 'Aucun créneau disponible pour cette date.' });
+          return JSON.stringify({
+            date: dateStr,
+            availableSlots: [],
+            message: "Aucun créneau disponible pour cette date.",
+          });
         }
         return JSON.stringify({ date: dateStr, availableSlots: slots });
       }
 
-      case 'check_existing_appointments': {
-        const email = String(call.args.email || '');
-        if (!email) return JSON.stringify({ error: 'Email requis' });
+      case "check_existing_appointments": {
+        const email = String(call.args.email || "");
+        if (!email) return JSON.stringify({ error: "Email requis" });
         const appointments = await appointmentService.findActiveByEmail(email);
         const today = todayLocal();
-        const mapped = appointments.map(a => ({
+        const mapped = appointments.map((a) => ({
           id: a.id,
           date: a.date,
           time: a.time,
@@ -523,25 +571,38 @@ STYLE for appointments:
         }));
         return JSON.stringify({
           total: mapped.length,
-          hasFuturePending: mapped.some(a => !a.isPast && a.status === 'pending'),
-          hasFutureConfirmed: mapped.some(a => !a.isPast && a.status === 'confirmed'),
-          hasPastPending: mapped.some(a => a.isPast && a.status === 'pending'),
+          hasFuturePending: mapped.some(
+            (a) => !a.isPast && a.status === "pending",
+          ),
+          hasFutureConfirmed: mapped.some(
+            (a) => !a.isPast && a.status === "confirmed",
+          ),
+          hasPastPending: mapped.some(
+            (a) => a.isPast && a.status === "pending",
+          ),
           appointments: mapped,
         });
       }
 
-      case 'book_appointment': {
+      case "book_appointment": {
         const args = call.args as Record<string, string>;
         const { name, email, subject, date, time } = args;
-        const urgency = (args.urgency as 'non-urgent' | 'urgent') || 'non-urgent';
+        const urgency =
+          (args.urgency as "non-urgent" | "urgent") || "non-urgent";
         if (!name || !email || !subject || !date || !time) {
-          return JSON.stringify({ error: 'Paramètres manquants : name, email, subject, date, time sont requis' });
+          return JSON.stringify({
+            error:
+              "Paramètres manquants : name, email, subject, date, time sont requis",
+          });
         }
-        if (!['non-urgent', 'urgent'].includes(urgency)) {
-          return JSON.stringify({ error: 'Urgence invalide. Utilise "non-urgent" ou "urgent".' });
+        if (!["non-urgent", "urgent"].includes(urgency)) {
+          return JSON.stringify({
+            error: 'Urgence invalide. Utilise "non-urgent" ou "urgent".',
+          });
         }
         // Truncate subject to 255 chars max (DB limit)
-        const safeSubject = subject.length > 250 ? subject.slice(0, 247) + '...' : subject;
+        const safeSubject =
+          subject.length > 250 ? subject.slice(0, 247) + "..." : subject;
         try {
           const appointment = await appointmentService.create({
             name,
@@ -561,67 +622,102 @@ STYLE for appointments:
               status: appointment.status,
               urgency: appointment.urgency,
             },
-            message: 'Rendez-vous créé avec succès. Email de confirmation envoyé.',
+            message:
+              "Rendez-vous créé avec succès. Email de confirmation envoyé.",
           });
         } catch (err: any) {
-          return JSON.stringify({ error: err.message || 'Erreur lors de la création du RDV' });
+          return JSON.stringify({
+            error: err.message || "Erreur lors de la création du RDV",
+          });
         }
       }
 
-      case 'request_otp': {
-        const email = String(call.args.email || '');
-        const name = String(call.args.name || 'Visiteur');
-        if (!email) return JSON.stringify({ error: 'Email requis' });
+      case "request_otp": {
+        const email = String(call.args.email || "");
+        const name = String(call.args.name || "Visiteur");
+        if (!email) return JSON.stringify({ error: "Email requis" });
         try {
           await visitorService.requestOtp(email, name, lang);
-          return JSON.stringify({ success: true, message: lang === 'fr' ? `Code de vérification envoyé à ${email}` : `Verification code sent to ${email}` });
+          return JSON.stringify({
+            success: true,
+            message:
+              lang === "fr"
+                ? `Code de vérification envoyé à ${email}`
+                : `Verification code sent to ${email}`,
+          });
         } catch (err: any) {
           return JSON.stringify({ error: err.message });
         }
       }
 
-      case 'verify_otp': {
-        const email = String(call.args.email || '');
-        const code = String(call.args.code || '');
-        const name = String(call.args.name || 'Visiteur');
-        if (!email || !code) return JSON.stringify({ error: 'Email et code requis' });
+      case "verify_otp": {
+        const email = String(call.args.email || "");
+        const code = String(call.args.code || "");
+        const name = String(call.args.name || "Visiteur");
+        if (!email || !code)
+          return JSON.stringify({ error: "Email et code requis" });
         try {
           await visitorService.verifyOtp(email, code, name, false);
           verifiedEmails.add(email);
-          return JSON.stringify({ success: true, verified: true, message: 'Email vérifié avec succès' });
+          return JSON.stringify({
+            success: true,
+            verified: true,
+            message: "Email vérifié avec succès",
+          });
         } catch (err: any) {
-          return JSON.stringify({ success: false, verified: false, error: err.message });
+          return JSON.stringify({
+            success: false,
+            verified: false,
+            error: err.message,
+          });
         }
       }
 
-      case 'cancel_appointment': {
-        const email = String(call.args.email || '');
-        if (!email) return JSON.stringify({ error: 'Email requis' });
+      case "cancel_appointment": {
+        const email = String(call.args.email || "");
+        if (!email) return JSON.stringify({ error: "Email requis" });
         if (!verifiedEmails.has(email)) {
-          return JSON.stringify({ error: 'VERIFICATION_REQUIRED', message: 'Vérification OTP requise avant annulation. Utilisez request_otp puis verify_otp.' });
+          return JSON.stringify({
+            error: "VERIFICATION_REQUIRED",
+            message:
+              "Vérification OTP requise avant annulation. Utilisez request_otp puis verify_otp.",
+          });
         }
         try {
           const count = await appointmentService.cancelPendingByEmail(email);
           return JSON.stringify({
             success: true,
             cancelledCount: count,
-            message: count > 0 ? `${count} rendez-vous annulé(s)` : 'Aucun rendez-vous en attente à annuler',
+            message:
+              count > 0
+                ? `${count} rendez-vous annulé(s)`
+                : "Aucun rendez-vous en attente à annuler",
           });
         } catch (err: any) {
           return JSON.stringify({ error: err.message });
         }
       }
 
-      case 'reschedule_appointment': {
+      case "reschedule_appointment": {
         const { id, date, time, email } = call.args as Record<string, string>;
         if (!id || !date || !time) {
-          return JSON.stringify({ error: 'Paramètres manquants : id, date, time sont requis' });
+          return JSON.stringify({
+            error: "Paramètres manquants : id, date, time sont requis",
+          });
         }
         if (email && !verifiedEmails.has(email)) {
-          return JSON.stringify({ error: 'VERIFICATION_REQUIRED', message: 'Vérification OTP requise avant modification. Utilisez request_otp puis verify_otp.' });
+          return JSON.stringify({
+            error: "VERIFICATION_REQUIRED",
+            message:
+              "Vérification OTP requise avant modification. Utilisez request_otp puis verify_otp.",
+          });
         }
         try {
-          const appointment = await appointmentService.reschedule(id, new Date(date), time);
+          const appointment = await appointmentService.reschedule(
+            id,
+            new Date(date),
+            time,
+          );
           return JSON.stringify({
             success: true,
             appointment: {
@@ -631,7 +727,8 @@ STYLE for appointments:
               subject: appointment.subject,
               status: appointment.status,
             },
-            message: 'Rendez-vous reprogrammé avec succès. Email de confirmation envoyé.',
+            message:
+              "Rendez-vous reprogrammé avec succès. Email de confirmation envoyé.",
           });
         } catch (err: any) {
           return JSON.stringify({ error: err.message });
@@ -649,27 +746,28 @@ STYLE for appointments:
     instructions: string,
     history: ConversationMessage[],
     userMessage: string,
-  ): Array<{ role: 'system' | 'user' | 'assistant'; content: string }> {
-    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
-      { role: 'system', content: instructions },
-    ];
+  ): Array<{ role: "system" | "user" | "assistant"; content: string }> {
+    const messages: Array<{
+      role: "system" | "user" | "assistant";
+      content: string;
+    }> = [{ role: "system", content: instructions }];
     // Include last 10 messages for context
     const recent = history.slice(-10);
     for (const msg of recent) {
       messages.push({ role: msg.role, content: msg.content });
     }
-    messages.push({ role: 'user', content: userMessage });
+    messages.push({ role: "user", content: userMessage });
     return messages;
   }
 
   /** Delay helper for retry backoff */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /** Single LLM call with retry: OpenAI → OpenRouter, retry once on 429 */
   private async llmCall(
-    messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+    messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
   ): Promise<string> {
     const MAX_RETRIES = 2;
 
@@ -679,8 +777,8 @@ STYLE for appointments:
         try {
           const client = this.getOpenAIClient();
           const instructions = messages[0]!.content;
-          const input = messages.slice(1).map(m => ({
-            role: m.role as 'user' | 'assistant',
+          const input = messages.slice(1).map((m) => ({
+            role: m.role as "user" | "assistant",
             content: m.content,
           }));
           const response = await client.responses.create({
@@ -688,14 +786,16 @@ STYLE for appointments:
             instructions,
             input,
           });
-          const text = (response as any).output_text || '';
+          const text = (response as any).output_text || "";
           if (text) {
-            logger.info('OpenAI response received', { length: text.length });
+            logger.info("OpenAI response received", { length: text.length });
             return text;
           }
         } catch (error: any) {
-          logger.warn('OpenAI failed, trying OpenRouter', {
-            message: error.message, status: error.status, attempt,
+          logger.warn("OpenAI failed, trying OpenRouter", {
+            message: error.message,
+            status: error.status,
+            attempt,
           });
         }
       }
@@ -709,14 +809,18 @@ STYLE for appointments:
             messages,
             max_tokens: 600,
           });
-          const text = response.choices[0]?.message?.content || '';
+          const text = response.choices[0]?.message?.content || "";
           if (text) {
-            logger.info('OpenRouter response received', { length: text.length });
+            logger.info("OpenRouter response received", {
+              length: text.length,
+            });
             return text;
           }
         } catch (error: any) {
-          logger.warn('OpenRouter failed', {
-            message: error.message, status: error.status, attempt,
+          logger.warn("OpenRouter failed", {
+            message: error.message,
+            status: error.status,
+            attempt,
           });
         }
       }
@@ -724,12 +828,14 @@ STYLE for appointments:
       // If first attempt failed, wait before retrying (backoff: 1.5s then 3s)
       if (attempt < MAX_RETRIES - 1) {
         const backoff = (attempt + 1) * 1500;
-        logger.info(`All providers failed on attempt ${attempt + 1}, retrying in ${backoff}ms`);
+        logger.info(
+          `All providers failed on attempt ${attempt + 1}, retrying in ${backoff}ms`,
+        );
         await this.delay(backoff);
       }
     }
 
-    throw new Error('All AI providers failed after retries');
+    throw new Error("All AI providers failed after retries");
   }
 
   /**
@@ -741,10 +847,10 @@ STYLE for appointments:
     userMessage: string,
     history: ConversationMessage[] = [],
     verifiedEmails: Set<string> = new Set(),
-    lang: 'fr' | 'en' = 'fr',
+    lang: "fr" | "en" = "fr",
   ): Promise<string> {
-        const context = await this.buildContext();
-        const instructions = this.getInstructions(context, lang);
+    const context = await this.buildContext();
+    const instructions = this.getInstructions(context, lang);
     const messages = this.buildMessages(instructions, history, userMessage);
 
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
@@ -754,25 +860,45 @@ STYLE for appointments:
       if (!parsed) {
         // Hallucination check: AI might say "I've booked" without calling the tool
         if (this.isBookingHallucination(response, lang)) {
-          messages.push({ role: 'assistant', content: response });
+          messages.push({ role: "assistant", content: response });
           messages.push({
-            role: 'user',
-            content: lang === 'fr'
-              ? `⚠️ Tu n'as PAS appelé book_appointment. Tu as écrit que le RDV était réservé, mais ce n'est PAS le cas. Tu DOIS appeler l'outil book_appointment avec le JSON. Écris UNIQUEMENT le JSON maintenant.`
-              : `⚠️ You did NOT call book_appointment. You wrote that the appointment was booked, but it was NOT. You MUST call the book_appointment tool with JSON. Output ONLY JSON now.`,
+            role: "user",
+            content:
+              lang === "fr"
+                ? `⚠️ Tu n'as PAS appelé book_appointment. Tu as écrit que le RDV était réservé, mais ce n'est PAS le cas. Tu DOIS appeler l'outil book_appointment avec le JSON. Écris UNIQUEMENT le JSON maintenant.`
+                : `⚠️ You did NOT call book_appointment. You wrote that the appointment was booked, but it was NOT. You MUST call the book_appointment tool with JSON. Output ONLY JSON now.`,
           });
           continue;
         }
         return response;
       }
 
-      const toolResult = await this.executeTool(parsed.toolCall, verifiedEmails, lang);
-      logger.info('Tool executed', { tool: parsed.toolCall.tool, resultLength: toolResult.length });
+      const toolResult = await this.executeTool(
+        parsed.toolCall,
+        verifiedEmails,
+        lang,
+      );
+      logger.info("Tool executed", {
+        tool: parsed.toolCall.tool,
+        resultLength: toolResult.length,
+      });
 
       // Add the clean tool call (without text before) and result to messages
-      const toolResultPrefix = lang === 'fr' ? `[Résultat de l'outil ${parsed.toolCall.tool}]` : `[Tool ${parsed.toolCall.tool} result]`;
-      messages.push({ role: 'assistant', content: JSON.stringify({ tool: parsed.toolCall.tool, args: parsed.toolCall.args }) });
-      messages.push({ role: 'user', content: `${toolResultPrefix} : ${toolResult}` });
+      const toolResultPrefix =
+        lang === "fr"
+          ? `[Résultat de l'outil ${parsed.toolCall.tool}]`
+          : `[Tool ${parsed.toolCall.tool} result]`;
+      messages.push({
+        role: "assistant",
+        content: JSON.stringify({
+          tool: parsed.toolCall.tool,
+          args: parsed.toolCall.args,
+        }),
+      });
+      messages.push({
+        role: "user",
+        content: `${toolResultPrefix} : ${toolResult}`,
+      });
     }
 
     // If we exhausted rounds, do one final call without tools
@@ -783,20 +909,37 @@ STYLE for appointments:
    * Detect when the AI claims to have booked an appointment
    * without actually calling the book_appointment tool.
    */
-  private isBookingHallucination(text: string, lang: 'fr' | 'en'): boolean {
+  private isBookingHallucination(text: string, lang: "fr" | "en"): boolean {
     const lower = text.toLowerCase();
-    const bookingWords = lang === 'fr'
-      ? ['réservé', 'rendez-vous', 'rdv', 'confirmé', 'créneau', 'booké']
-      : ['booked', 'appointment', 'confirmed', 'scheduled', 'reserved'];
-    const hasBookingLang = bookingWords.some(w => lower.includes(w));
+    const bookingWords =
+      lang === "fr"
+        ? ["réservé", "rendez-vous", "rdv", "confirmé", "créneau", "booké"]
+        : ["booked", "appointment", "confirmed", "scheduled", "reserved"];
+    const hasBookingLang = bookingWords.some((w) => lower.includes(w));
     if (!hasBookingLang) return false;
 
     // Check if the text says something was done (past tense confirmation)
     // without a tool call JSON being present in the message history context
-    const completionPhrases = lang === 'fr'
-      ? ['j\'ai réservé', 'a été réservé', 'est réservé', 'est confirmé', 'a été créé', 'rdv pris', 'rendez-vous pris']
-      : ['i\'ve booked', 'has been booked', 'is booked', 'is confirmed', 'has been created', 'appointment set'];
-    return completionPhrases.some(p => lower.includes(p));
+    const completionPhrases =
+      lang === "fr"
+        ? [
+            "j'ai réservé",
+            "a été réservé",
+            "est réservé",
+            "est confirmé",
+            "a été créé",
+            "rdv pris",
+            "rendez-vous pris",
+          ]
+        : [
+            "i've booked",
+            "has been booked",
+            "is booked",
+            "is confirmed",
+            "has been created",
+            "appointment set",
+          ];
+    return completionPhrases.some((p) => lower.includes(p));
   }
 
   isEnabled(): boolean {

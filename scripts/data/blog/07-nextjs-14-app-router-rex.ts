@@ -54,7 +54,7 @@ export default async function DashboardPage() {
 La métadonnée par page est devenue trivial. Plus de \`next/head\` à orchestrer manuellement.
 
 \`\`\`tsx
-// app/projets/[slug]/page.tsx
+// app/projects/[slug]/page.tsx
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const project = await fetchProject(params.slug);
   return {
@@ -123,8 +123,8 @@ app/
   page.tsx                      ← page d'accueil
   @modal/
     default.tsx                 ← rien par défaut
-    (.)projets/[slug]/page.tsx  ← intercepté : ouvre une modale
-  projets/
+    (.)projects/[slug]/page.tsx  ← intercepté : ouvre une modale
+  projects/
     [slug]/page.tsx             ← navigation directe : page complète
 \`\`\`
 
@@ -417,8 +417,8 @@ app/
   page.tsx                      ← home
   @modal/
     default.tsx                 ← nothing by default
-    (.)projets/[slug]/page.tsx  ← intercepted: opens a modal
-  projets/
+    (.)projects/[slug]/page.tsx  ← intercepted: opens a modal
+  projects/
     [slug]/page.tsx             ← direct navigation: full page
 \`\`\`
 
@@ -550,8 +550,7 @@ Starting today: go App Router. Big Pages Router base: migrate section by section
 The 4–8 weeks investment in Server Components patterns pays back monthly. But you must accept the learning curve.`;
 
 export const nextjs14AppRouterRex: BlogPostSeed = {
-  title:
-    "Next.js 14 App Router en production — leçons après 6 mois sur Nexus",
+  title: "Next.js 14 App Router en production — leçons après 6 mois sur Nexus",
   title_en:
     "Next.js 14 App Router in production — lessons after 6 months on Nexus",
   slug: "nextjs-14-app-router-rex-production",

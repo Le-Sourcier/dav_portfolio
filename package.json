@@ -16,7 +16,10 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:seed:experiences": "tsx scripts/seed-experiences-only.ts",
     "db:seed:projects": "tsx scripts/seed-projects-only.ts",
-    "db:seed:blog": "tsx scripts/seed-blog-only.ts"
+    "db:seed:blog": "tsx scripts/seed-blog-only.ts",
+    "backup": "bash scripts/backup.sh",
+    "backup:verbose": "bash scripts/backup.sh --verbose",
+    "backup:test": "BACKUP_ENABLED=true bash scripts/backup.sh --verbose"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

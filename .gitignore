@@ -31,3 +31,8 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+# Backup artifacts (see scripts/backup.sh + docs/BACKUP.md)
+backups/
+*.dump
+*.sql.gz

@@ -44,7 +44,7 @@ export const config = {
 
   // Admin — no fallback password
   admin: {
-    email: process.env.ADMIN_EMAIL || "admin@logan.dev",
+    email: process.env.ADMIN_EMAIL || "admin@lesourcier.space",
     password: requireEnv("ADMIN_PASSWORD"),
   },
 
@@ -53,9 +53,15 @@ export const config = {
     host: process.env.EMAIL_HOST || "smtp.gmail.com",
     port: parseInt(process.env.EMAIL_PORT || "587", 10),
     secure: process.env.EMAIL_SECURE === "true",
-    user: process.env.EMAIL_USER || "",
-    pass: process.env.EMAIL_PASS || "",
-    from: process.env.EMAIL_FROM || "Portfolio <noreply@logan.dev>",
+    service:
+      process.env.NODE_ENV !== "production"
+        ? process.env.EMAIL_SERVICE
+        : undefined,
+    auth: {
+      user: process.env.EMAIL_USER || "support@lesourcier.space",
+      pass: process.env.EMAIL_PASS || "",
+    },
+    from: process.env.EMAIL_FROM || "Portfolio <noreply@lesourcier.space>",
   },
 
   // CORS
@@ -78,7 +84,7 @@ export const config = {
     email:
       process.env.OWNER_EMAIL ||
       process.env.ADMIN_EMAIL ||
-      "admin@portfolio.dev",
+      "admin@lesourcier.space",
     phone: process.env.OWNER_PHONE || "",
     location: process.env.OWNER_LOCATION || "",
   },

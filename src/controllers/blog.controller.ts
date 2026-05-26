@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
 import { blogService } from '../services/blog.service.js';
+import { revalidationService } from '../services/revalidation.service.js';
 import { sendSuccess, sendCreated } from '../utils/response.util.js';
 
 /**
@@ -56,6 +57,7 @@ export const getPostBySlug = async (req: Request<{ slug: string }>, res: Respons
 export const createPost = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const post = await blogService.create(req.body);
+    void revalidationService.revalidate({ tags: ['blog', `blog:${post.slug}`] });
     sendCreated(res, post, 'Blog post created successfully');
   } catch (error) {
     next(error);
@@ -64,7 +66,11 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
 export const updatePost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const previousPost = await blogService.findById(req.params.id);
     const post = await blogService.update(req.params.id, req.body);
+    void revalidationService.revalidate({
+      tags: ['blog', `blog:${previousPost.slug}`, `blog:${post.slug}`],
+    });
     sendSuccess(res, post, 'Blog post updated successfully');
   } catch (error) {
     next(error);
@@ -73,7 +79,9 @@ export const updatePost = async (req: Request<{ id: string }>, res: Response, ne
 
 export const deletePost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const post = await blogService.findById(req.params.id);
     await blogService.delete(req.params.id);
+    void revalidationService.revalidate({ tags: ['blog', `blog:${post.slug}`] });
     sendSuccess(res, null, 'Blog post deleted successfully');
   } catch (error) {
     next(error);
@@ -83,6 +91,8 @@ export const deletePost = async (req: Request<{ id: string }>, res: Response, ne
 export const addComment = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const comment = await blogService.addComment(req.params.id, req.body);
+    const post = await blogService.findById(req.params.id);
+    void revalidationService.revalidate({ tags: ['blog', `blog:${post.slug}`] });
     sendCreated(res, comment, 'Comment added successfully');
   } catch (error) {
     next(error);
@@ -118,6 +128,11 @@ export const getCommentThread = async (req: Request<{ commentId: string }>, res:
 export const replyToComment = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const comment = await blogService.addAdminReply(req.params.commentId, req.body);
+    const postId = comment.postId;
+    if (postId) {
+      const post = await blogService.findById(postId);
+      void revalidationService.revalidate({ tags: ['blog', `blog:${post.slug}`] });
+    }
     sendCreated(res, comment, 'Reply added successfully');
   } catch (error) {
     next(error);
@@ -126,7 +141,13 @@ export const replyToComment = async (req: Request<{ commentId: string }>, res: R
 
 export const deleteComment = async (req: Request<{ commentId: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const comment = await blogService.findCommentThread(req.params.commentId);
     await blogService.deleteComment(req.params.commentId);
+    const postId = comment.postId;
+    if (postId) {
+      const post = await blogService.findById(postId);
+      void revalidationService.revalidate({ tags: ['blog', `blog:${post.slug}`] });
+    }
     sendSuccess(res, null, 'Comment deleted successfully');
   } catch (error) {
     next(error);
@@ -155,6 +176,7 @@ export const getTagBySlug = async (req: Request<{ slug: string }>, res: Response
 export const createTag = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const tag = await blogService.createTag(req.body);
+    void revalidationService.revalidate({ tags: ['blog'] });
     sendCreated(res, tag, 'Blog tag created successfully');
   } catch (error) {
     next(error);
@@ -164,6 +186,7 @@ export const createTag = async (req: Request, res: Response, next: NextFunction)
 export const updateTag = async (req: Request<{ tagId: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const tag = await blogService.updateTag(req.params.tagId, req.body);
+    void revalidationService.revalidate({ tags: ['blog'] });
     sendSuccess(res, tag, 'Blog tag updated successfully');
   } catch (error) {
     next(error);
@@ -173,6 +196,7 @@ export const updateTag = async (req: Request<{ tagId: string }>, res: Response, 
 export const deleteTag = async (req: Request<{ tagId: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     await blogService.deleteTag(req.params.tagId);
+    void revalidationService.revalidate({ tags: ['blog'] });
     sendSuccess(res, null, 'Blog tag deleted successfully');
   } catch (error) {
     next(error);

@@ -18,7 +18,6 @@ import {
 } from "./middlewares/error.middleware.js";
 import { requestLogger } from "./middlewares/logger.middleware.js";
 
-
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);

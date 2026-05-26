@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { config } from '../config/index.js';
-import { logger } from '../utils/logger.js';
+import nodemailer from "nodemailer";
+import { config } from "../config/index.js";
+import { logger } from "../utils/logger.js";
 
 interface EmailOptions {
   to: string;
@@ -13,10 +13,8 @@ const transporter = nodemailer.createTransport({
   host: config.email.host,
   port: config.email.port,
   secure: config.email.secure,
-  auth: {
-    user: config.email.user,
-    pass: config.email.pass,
-  },
+  service: config.email.service,
+  auth: config.email.auth,
 });
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
@@ -32,23 +30,23 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     await transporter.sendMail(mailOptions);
     logger.info(`Email sent successfully to ${options.to}`);
   } catch (error) {
-    logger.error('Error sending email:', error);
-    throw new Error('EMAIL_SENDING_FAILED');
+    logger.error("Error sending email:", error);
+    throw new Error("EMAIL_SENDING_FAILED");
   }
 };
 
 // Verify connection on startup
 export const verifyEmailConnection = async (): Promise<boolean> => {
   try {
-    if (!config.email.user || !config.email.pass) {
-      logger.warn('Email credentials not configured - skipping verification');
+    if (!config.email.auth.user || !config.email.auth.pass) {
+      logger.warn("Email credentials not configured - skipping verification");
       return false;
     }
     await transporter.verify();
-    logger.info('Email server connection verified');
+    logger.info("Email server connection verified");
     return true;
   } catch (error) {
-    logger.warn('Email server connection failed:', error);
+    logger.warn("Email server connection failed:", error);
     return false;
   }
 };

@@ -2,7 +2,7 @@ interface BaseTemplateOptions {
   title: string;
   previewText?: string;
   content: string;
-  lang?: 'fr' | 'en';
+  lang?: "fr" | "en";
   unsubscribeEmail?: string;
   unsubscribeUrl?: string;
   baseUrl?: string;
@@ -10,8 +10,15 @@ interface BaseTemplateOptions {
 }
 
 export const baseEmailTemplate = (options: BaseTemplateOptions): string => {
-  const { title, previewText, content, lang = 'fr', baseUrl = 'https://lesourcier.space', phone } = options;
-  const isFr = lang === 'fr';
+  const {
+    title,
+    previewText,
+    content,
+    lang = "fr",
+    baseUrl = "https://lesourcier.space",
+    phone,
+  } = options;
+  const isFr = lang === "fr";
   const logoUrl = `${baseUrl}/brand/logo-horizontal-clean.png`;
 
   return `<!DOCTYPE html>
@@ -294,7 +301,7 @@ export const baseEmailTemplate = (options: BaseTemplateOptions): string => {
   </style>
 </head>
 <body>
-  ${previewText ? `<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${previewText}</div>` : ''}
+  ${previewText ? `<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${previewText}</div>` : ""}
   <div class="container">
     <div class="card">
       <div class="card-accent"></div>
@@ -306,16 +313,20 @@ export const baseEmailTemplate = (options: BaseTemplateOptions): string => {
       </div>
       <div class="footer">
         <div class="footer-links">
-          <a href="https://github.com/Le-Sourcier">🖥️ GitHub</a>
+          <a href="https://github.com/Le-Sourcier"><img src="${baseUrl}/icons/github.svg" width="25" height="25" alt="GitHub" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> GitHub</a>
           <span style="color:#b8a080;font-size:11px;">·</span>
-          <a href="https://linkedin.com/in/yao-logan"><img src="${baseUrl}/icons/linkedin.svg" width="14" height="14" alt="LinkedIn" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> LinkedIn</a>
+          <a href="https://linkedin.com/in/yao-logan"><img src="${baseUrl}/icons/linkedin.svg" width="25" height="25" alt="LinkedIn" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> LinkedIn</a>
           <span style="color:#b8a080;font-size:11px;">·</span>
-          <a href="https://lesourcier.space">🌐 Portfolio</a>
-          ${phone ? `<span style="color:#b8a080;font-size:11px;">·</span>
-          <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}"><img src="${baseUrl}/icons/whatsapp.svg" width="14" height="14" alt="WhatsApp" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> WhatsApp</a>` : ''}
+          <a href="https://lesourcier.space"><img src="${baseUrl}/brand/apple-touch-icon.png" width="25" height="25" alt="Portfolio" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> Portfolio</a>
+          ${
+            phone
+              ? `<span style="color:#b8a080;font-size:11px;">·</span>
+          <a href="https://wa.me/${phone.replace(/[^0-9]/g, "")}"><img src="${baseUrl}/icons/whatsapp.svg" width="25" height="25" alt="WhatsApp" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-right:3px;" /> WhatsApp</a>`
+              : ""
+          }
         </div>
-        <p>&copy; ${new Date().getFullYear()} Yao David Logan. ${isFr ? 'Tous droits réservés.' : 'All rights reserved.'}</p>
-        ${options.unsubscribeEmail ? `<p style="margin-top:8px;font-size:11px;color:#8a857b;">${isFr ? 'Vous recevez cet email car vous êtes inscrit à la newsletter.' : 'You\'re receiving this because you\'re subscribed to the newsletter.'}<br><a href="${options.unsubscribeUrl || '#'}" style="color:#0f766e;text-decoration:underline;">${isFr ? 'Se désabonner' : 'Unsubscribe'}</a></p>` : ''}
+        <p>&copy; ${new Date().getFullYear()} Yao David Logan. ${isFr ? "Tous droits réservés." : "All rights reserved."}</p>
+        ${options.unsubscribeEmail ? `<p style="margin-top:8px;font-size:11px;color:#8a857b;">${isFr ? "Vous recevez cet email car vous êtes inscrit à la newsletter." : "You're receiving this because you're subscribed to the newsletter."}<br><a href="${options.unsubscribeUrl || "#"}" style="color:#0f766e;text-decoration:underline;">${isFr ? "Se désabonner" : "Unsubscribe"}</a></p>` : ""}
       </div>
     </div>
   </div>
