@@ -98,7 +98,10 @@ export function ThemeToggle({ variant = "text" }: { variant?: ThemeToggleVariant
   };
 
   return (
-    <div className={`theme-toggle ${variant === "icon" ? "theme-toggle--icon" : ""}`} aria-label={t("ariaLabel")}>
+    <div
+      className={`theme-toggle ${variant === "icon" ? "theme-toggle--icon" : ""}`}
+      role="group"
+      aria-label={t("ariaLabel")}>
       {themes.map((theme) => (
         <button
           type="button"

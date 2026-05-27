@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
@@ -49,14 +50,14 @@ export async function ExperienceHero({
           <span className="xp-hero-rule" aria-hidden="true" />
 
           {experience.stack.length > 0 ? (
-            <p className="xp-hero-stack" aria-label={t("stackAriaLabel")}>
+            <div className="xp-hero-stack" role="group" aria-label={t("stackAriaLabel")}>
               {experience.stack.map((tech, index) => (
                 <span key={tech}>
                   {index > 0 ? <i aria-hidden="true">·</i> : null}
                   {tech}
                 </span>
               ))}
-            </p>
+            </div>
           ) : null}
 
           <div className="xp-hero-actions">
@@ -92,7 +93,14 @@ export async function ExperienceHero({
           <div className="xp-hero-visual-grid" />
           <div className="xp-hero-visual-frame">
             {experience.coverImage ? (
-              <img src={experience.coverImage} alt="" />
+              <Image
+                src={experience.coverImage}
+                alt=""
+                width={720}
+                height={520}
+                sizes="(max-width: 900px) 100vw, 42vw"
+                priority
+              />
             ) : (
               <div className="xp-hero-visual-fallback">
                 <span>{experience.company.charAt(0).toUpperCase()}</span>

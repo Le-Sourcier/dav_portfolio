@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { PortfolioTestimonialItem } from "@/services/portfolio/contentLoaders";
@@ -102,7 +103,7 @@ export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps
         <p className="section-kicker">{t("kicker")}</p>
         <h2>{t("title")}</h2>
         <p>{t("lead")}</p>
-        <div className="carousel-controls" aria-label={t("kicker")}>
+        <div className="carousel-controls" role="group" aria-label={t("kicker")}>
           <button
             type="button"
             onClick={() => scroll("previous")}
@@ -141,7 +142,13 @@ export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps
                   className={`testimonial-avatar${testimonial.avatar ? " has-image" : ""}`}
                   aria-hidden="true">
                   {testimonial.avatar ? (
-                    <img src={testimonial.avatar} alt="" loading="lazy" />
+                    <Image
+                      src={testimonial.avatar}
+                      alt=""
+                      width={56}
+                      height={56}
+                      sizes="56px"
+                    />
                   ) : (
                     <span>{initials}</span>
                   )}

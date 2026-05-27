@@ -14,7 +14,7 @@ export function AssistantSuggestions({ actions, onSelect, disabled }: AssistantS
   if (actions.length === 0) return null;
 
   return (
-    <div className="assistant-suggestions" aria-label={t("suggestionsAriaLabel")}>
+    <div className="assistant-suggestions" role="group" aria-label={t("suggestionsAriaLabel")}>
       {actions.map((action) => (
         <button
           key={action.id}

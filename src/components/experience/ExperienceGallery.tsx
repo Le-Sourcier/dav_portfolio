@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface ExperienceGalleryProps {
   images: string[];
 }
@@ -25,7 +27,17 @@ export function ExperienceGallery({ images }: ExperienceGalleryProps) {
     <div className={`xp-gallery xp-gallery--${pattern}`}>
       {images.map((src, index) => (
         <figure key={src} className="xp-gallery-item" data-index={index}>
-          <img src={src} alt="" loading="lazy" />
+          <Image
+            src={src}
+            alt=""
+            width={900}
+            height={620}
+            sizes={
+              index === 0
+                ? "(max-width: 900px) 100vw, 58vw"
+                : "(max-width: 900px) 50vw, 24vw"
+            }
+          />
         </figure>
       ))}
     </div>

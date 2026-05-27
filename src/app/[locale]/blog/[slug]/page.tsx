@@ -14,7 +14,7 @@ import { ShareBar } from "@/components/blog/ShareBar";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { site } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { loadBlogPostBySlug, loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 import type { BlogPost } from "@/types/blog";
@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     title: post.title,
     description: post.excerpt,
     keywords: post.tags,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      languages: localizedLanguages(`/blog/${post.slug}`),
+    },
     openGraph: {
       type: "article",
       title: post.title,
@@ -192,7 +195,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="article-layout">
             <aside className="article-sidebar">
-              <div className="article-meta-panel" aria-label={t("articleMeta")}>
+              <div className="article-meta-panel" role="group" aria-label={t("articleMeta")}>
                 {articleFacts.map((item) => (
                   <p key={item.label}>
                     <span>{item.label}</span>

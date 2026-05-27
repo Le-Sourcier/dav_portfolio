@@ -63,7 +63,7 @@ export function ExpertiseCarousel() {
         <p className="section-kicker">{t("kicker")}</p>
         <h2>{t("title")}</h2>
         <p>{t("description")}</p>
-        <div className="carousel-controls" aria-label={t("controlsAriaLabel")}>
+        <div className="carousel-controls" role="group" aria-label={t("controlsAriaLabel")}>
           <button
             type="button"
             onClick={() => scroll("previous")}

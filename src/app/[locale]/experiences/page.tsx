@@ -6,7 +6,7 @@ import { ExperienceGlobe } from "@/components/experience/ExperienceGlobe";
 import { ExperiencesJourney } from "@/components/experience/ExperiencesJourney";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadExperiences } from "@/services/portfolio/contentLoaders";
@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("metaDescription"),
     alternates: {
       canonical: `${site.url}${localizedPath("/experiences", locale)}`,
+      languages: localizedLanguages("/experiences"),
     },
   };
 }

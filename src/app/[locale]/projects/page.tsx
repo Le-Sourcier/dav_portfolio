@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { ProjectsDirectory } from "@/components/ProjectsDirectory";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
@@ -18,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("metaDescription"),
     alternates: {
       canonical: `${site.url}${localizedPath("/projects", locale)}`,
+      languages: localizedLanguages("/projects"),
     },
   };
 }

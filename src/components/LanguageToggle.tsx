@@ -21,7 +21,7 @@ export function LanguageToggle() {
   };
 
   return (
-    <div className="language-toggle" aria-label={t("label")} aria-busy={isPending}>
+    <div className="language-toggle" role="group" aria-label={t("label")} aria-busy={isPending}>
       {locales.map((item) => (
         <button
           key={item}

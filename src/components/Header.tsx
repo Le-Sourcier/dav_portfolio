@@ -70,7 +70,6 @@ export function Header({
           alt=""
           width={176}
           height={65}
-          priority
         />
         <Image
           className="brand-logo-dark"
@@ -78,7 +77,6 @@ export function Header({
           alt=""
           width={176}
           height={65}
-          priority
         />
       </Link>
       <nav className="nav-links" aria-label={h("navAriaLabel")}>
@@ -107,7 +105,8 @@ export function Header({
       <nav
         id="mobile-menu"
         className="mobile-menu"
-        aria-label={h("mobileNavAriaLabel")}>
+        aria-label={h("mobileNavAriaLabel")}
+        hidden={!isMenuOpen}>
         {visibleNavItems.map((item) => (
           <Link
             href={localizedPath(item.href, locale)}

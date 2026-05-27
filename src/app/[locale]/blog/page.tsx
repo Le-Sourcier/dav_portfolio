@@ -7,7 +7,7 @@ import { BackToTop } from "@/components/blog/BackToTop";
 import { site } from "@/lib/portfolio";
 import { getTranslations } from "next-intl/server";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("metaDescription"),
     alternates: {
       canonical: `${site.url}${localizedPath("/blog", locale)}`,
+      languages: localizedLanguages("/blog"),
     },
   };
 }

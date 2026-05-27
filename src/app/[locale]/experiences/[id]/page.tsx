@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 import { loadExperienceById } from "@/services/portfolio/contentLoaders";
 
@@ -35,6 +35,7 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical: url,
+      languages: localizedLanguages(`/experiences/${experience.id}`),
     },
     openGraph: {
       title: `${experience.role} - ${experience.company}`,

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 import { loadProjectBySlug } from "@/services/portfolio/projectsLoader";
 import type { ProjectMetric } from "@/types/portfolio.types";
@@ -66,6 +67,7 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical: url,
+      languages: localizedLanguages(`/projects/${project.slug}`),
     },
     openGraph: {
       title,
@@ -158,7 +160,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <main className="case-page">
         <section className="case-cover-hero">
           {project.image ? (
-            <img src={project.image} alt="" aria-hidden="true" />
+            <Image
+              src={project.image}
+              alt=""
+              width={1920}
+              height={1080}
+              sizes="100vw"
+              priority
+              aria-hidden="true"
+            />
           ) : null}
           <div className="case-cover-overlay" />
           <div className="case-cover-content">
@@ -171,7 +181,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <span className="case-category">{project.category}</span>
             <h1>{project.name}</h1>
             <p>{project.headline}</p>
-            <div className="case-hero-meta" aria-label={t("summaryAriaLabel")}>
+            <div className="case-hero-meta" role="group" aria-label={t("summaryAriaLabel")}>
               <span>{project.role}</span>
               {projectYear ? <span>{projectYear}</span> : null}
               {project.metric ? <span>{project.metric}</span> : null}

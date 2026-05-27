@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import type { BlogPost } from "@/types/blog";
 
@@ -38,9 +39,13 @@ export function ArticleHero({
   return (
     <section className="article-cover-hero" aria-label={post.title}>
       {post.coverImage ? (
-        <img
+        <Image
           src={post.coverImage}
           alt={post.coverImageAlt ?? post.title}
+          width={1920}
+          height={1080}
+          sizes="100vw"
+          priority
           className="article-cover-hero-img"
         />
       ) : null}

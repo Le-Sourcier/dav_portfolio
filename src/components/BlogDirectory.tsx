@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { localizedPath } from "@/lib/routing/localizedPath";
@@ -142,7 +143,7 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
               </div>
             </label>
           </div>
-          <div className="blog-category-tabs" aria-label="Catégories du blog">
+          <div className="blog-category-tabs" role="group" aria-label="Catégories du blog">
             <button
               type="button"
               className={activeCategory === "all" ? "is-active" : ""}
@@ -171,7 +172,17 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
 
       {featured && !hasFilters ? (
         <Link href={localizedPath(`/blog/${featured.slug}`, locale)} className="blog-featured" aria-label={`${t("read")} ${featured.title}`}>
-          <img src={featured.coverImage} alt={featured.coverImageAlt ?? featured.title} />
+          {featured.coverImage ? (
+            <Image
+              src={featured.coverImage}
+              alt={featured.coverImageAlt ?? featured.title}
+              width={760}
+              height={500}
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+          ) : (
+            <div className="blog-featured-placeholder" aria-hidden="true" />
+          )}
           <div>
             <span>{t("featured")} · {featured.category}</span>
             <h2>{featured.title}</h2>
@@ -207,7 +218,17 @@ export function BlogDirectory({ posts, locale = "fr" }: BlogDirectoryProps) {
         <div className="blog-list">
           {visiblePosts.map((post) => (
             <Link href={localizedPath(`/blog/${post.slug}`, locale)} key={post.slug} className="blog-list-item">
-              <img src={post.coverImage} alt={post.coverImageAlt ?? post.title} />
+              {post.coverImage ? (
+                <Image
+                  src={post.coverImage}
+                  alt={post.coverImageAlt ?? post.title}
+                  width={520}
+                  height={320}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              ) : (
+                <div className="blog-list-placeholder" aria-hidden="true" />
+              )}
               <div>
                 <span>{post.category}</span>
                 <h3>{post.title}</h3>

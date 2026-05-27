@@ -53,9 +53,6 @@ export const metadata: Metadata = {
       "Développement fullstack, architectures SaaS, automatisation et produits web/mobile orientés impact business.",
     images: ["/opengraph-image"],
   },
-  alternates: {
-    canonical: site.url,
-  },
   icons: {
     icon: [
       { url: "/brand/favicon-16x16.png", sizes: "16x16", type: "image/png" },

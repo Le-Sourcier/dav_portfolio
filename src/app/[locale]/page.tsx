@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -10,7 +11,7 @@ import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { BackToTop } from "@/components/blog/BackToTop";
 import { site, stack } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
-import { localizedPath } from "@/lib/routing/localizedPath";
+import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import {
   loadBlogPosts,
   loadExperiences,
@@ -19,6 +20,20 @@ import {
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const t = await getTranslations("HomePage");
+
+  return {
+    title: t("heroTitle"),
+    description: t("heroDescription"),
+    alternates: {
+      canonical: `${site.url}${localizedPath("/", locale)}`,
+      languages: localizedLanguages("/"),
+    },
+  };
+}
 
 export default async function Home() {
   const locale = await getRequestLocale();
@@ -79,7 +94,7 @@ export default async function Home() {
                 ) : null}
               </div>
 
-              <div className="trust-row" aria-label={t("trustAriaLabel")}>
+              <div className="trust-row" role="group" aria-label={t("trustAriaLabel")}>
                 <span>{t("trustMultiTenant")}</span>
                 <span>{t("trustRbac")}</span>
                 <span>{t("trustPayments")}</span>
@@ -257,10 +272,12 @@ export default async function Home() {
                     className={`project-preview${project.image ? " has-image" : ""}`}
                     aria-hidden="true">
                     {project.image ? (
-                      <img
+                      <Image
                         src={project.image}
                         alt=""
-                        loading="lazy"
+                        width={720}
+                        height={460}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="project-preview-image"
                       />
                     ) : null}
@@ -361,7 +378,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="stack-brand-showcase">
-            <div className="stack-marquee" aria-label={t("stackAriaLabel")}>
+            <div className="stack-marquee" role="group" aria-label={t("stackAriaLabel")}>
               <div className="stack-marquee-track">
                 {[...stack, ...stack].map((item, index) => (
                   <div
@@ -406,10 +423,12 @@ export default async function Home() {
                   className={`blog-card home-blog-card${post.coverImage ? " has-cover" : ""}`}>
                   <div className="home-blog-card-media">
                     {post.coverImage ? (
-                      <img
+                      <Image
                         src={post.coverImage}
                         alt=""
-                        loading="lazy"
+                        width={520}
+                        height={320}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="blog-card-cover"
                       />
                     ) : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { localizedPath } from "@/lib/routing/localizedPath";
@@ -182,7 +183,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
             </div>
           </label>
         </div>
-        <div className="project-category-row" aria-label="Filtres projets">
+        <div className="project-category-row" role="group" aria-label="Filtres projets">
           <button
             type="button"
             className={activeCategory === "all" ? "is-active" : ""}
@@ -216,7 +217,13 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
           <div
             className={`project-featured-media${featuredProject.image ? " has-image" : ""}`}>
             {featuredProject.image ? (
-              <img src={featuredProject.image} alt="" loading="lazy" />
+              <Image
+                src={featuredProject.image}
+                alt=""
+                width={780}
+                height={520}
+                sizes="(max-width: 768px) 100vw, 45vw"
+              />
             ) : null}
             <span>{t("leadBadge")}</span>
           </div>
@@ -264,7 +271,13 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
               <div
                 className={`project-index-media${project.image ? " has-image" : ""}`}>
                 {project.image ? (
-                  <img src={project.image} alt="" loading="lazy" />
+                  <Image
+                    src={project.image}
+                    alt=""
+                    width={520}
+                    height={340}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
                 ) : null}
                 {project.metric ? <strong>{project.metric}</strong> : null}
               </div>

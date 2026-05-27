@@ -35,7 +35,7 @@ export default async function NotFound() {
             </div>
           </div>
 
-          <div className="not-found-panel" aria-label={t("panelAriaLabel")}>
+          <div className="not-found-panel" role="group" aria-label={t("panelAriaLabel")}>
             <span>{t("panelLabel")}</span>
             <strong>{t("panelValue")}</strong>
             <div>

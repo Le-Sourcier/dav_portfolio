@@ -1,4 +1,4 @@
-import { defaultLocale, isAppLocale, type AppLocale } from "@/i18n/config";
+import { defaultLocale, isAppLocale, locales, type AppLocale } from "@/i18n/config";
 
 const normalizePath = (path = "/") => {
   if (!path || path === "/") return "";
@@ -17,4 +17,10 @@ export function switchLocalePath(pathname: string, nextLocale: AppLocale): strin
     return parts.join("/") || `/${nextLocale}`;
   }
   return localizedPath(pathname, nextLocale);
+}
+
+export function localizedLanguages(path: string): Record<AppLocale, string> {
+  return Object.fromEntries(
+    locales.map((locale) => [locale, localizedPath(path, locale)]),
+  ) as Record<AppLocale, string>;
 }

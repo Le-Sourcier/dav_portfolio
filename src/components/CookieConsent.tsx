@@ -56,6 +56,8 @@ export function CookieConsent() {
                 type="button"
                 className="cookie-consent-switch is-on is-locked"
                 disabled
+                role="switch"
+                aria-checked="true"
                 aria-label={t("essentialAriaLabel")}
               >
                 <span />
@@ -75,7 +77,8 @@ export function CookieConsent() {
                 type="button"
                 className={`cookie-consent-switch ${analyticsEnabled ? "is-on" : ""}`}
                 onClick={() => setAnalyticsEnabled((value) => !value)}
-                aria-pressed={analyticsEnabled}
+                role="switch"
+                aria-checked={analyticsEnabled}
                 aria-label={t("analyticsAriaLabel")}
               >
                 <span />

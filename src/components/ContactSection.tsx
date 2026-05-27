@@ -71,7 +71,7 @@ export function ContactSection() {
         <h2>{t("title")}</h2>
         <p>{t("description")}</p>
 
-        <div className="direct-actions" aria-label={t("directAriaLabel")}>
+        <div className="direct-actions" role="group" aria-label={t("directAriaLabel")}>
           <a href={`mailto:${site.email}`} aria-label={t("emailAriaLabel", { email: site.email })} title={t("emailTitle")}>
             <span className="contact-link-icon">
               <Image src="/icons/gmail.svg" alt="" width={24} height={24} aria-hidden="true" />
