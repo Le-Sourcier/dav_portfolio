@@ -6,7 +6,6 @@ import {
   Send,
   Plus,
   Trash2,
-  Image,
   ExternalLink,
   BarChart3,
   Trophy,
@@ -19,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "../shared/LangToggle";
 import { PublicationControl } from "../shared/PublicationControl";
+import { AssetUploadField } from "../shared/AssetUploadField";
 import type {
   ChartDataPoint,
   DiagramConnection,
@@ -145,6 +145,16 @@ export function ProjectEditorPage({
   const handleChange = useCallback((field: string, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
+
+  const handleImageChange = useCallback((url: string) => {
+    handleChange("image", url);
+    if (isEditing && initialData?.id) {
+      updateMutation.mutate({
+        id: initialData.id,
+        data: { image: url },
+      });
+    }
+  }, [handleChange, initialData?.id, isEditing, updateMutation]);
 
   const handleArrayChange = useCallback(
     (field: "results" | "results_en" | "tech", index: number, value: string) => {
@@ -364,7 +374,7 @@ export function ProjectEditorPage({
       publishedAt: form.publishedAt || null,
     };
 
-    if (form.image?.trim()) cleaned.image = form.image.trim();
+    cleaned.image = form.image?.trim() || "";
     if (form.url?.trim()) cleaned.url = form.url.trim();
 
     const results = form.results?.filter((r) => r.trim()) || [];
@@ -582,44 +592,13 @@ export function ProjectEditorPage({
           </div>
 
           {/* Cover Image */}
-          <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
-            {form.image ? (
-              <div className="relative group">
-                <img
-                  src={form.image}
-                  alt="Cover"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => {
-                      const u = prompt("URL de l'image :", form.image);
-                      if (u !== null) handleChange("image", u);
-                    }}
-                    className="px-3 py-1.5 bg-white rounded-lg text-xs font-semibold text-zinc-900">
-                    Changer
-                  </button>
-                  <button
-                    onClick={() => handleChange("image", "")}
-                    className="px-3 py-1.5 bg-red-500 rounded-lg text-xs font-semibold text-white">
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  const u = prompt("URL de l'image :");
-                  if (u) handleChange("image", u);
-                }}
-                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors">
-                <Image className="w-6 h-6" />
-                <span className="text-[12px] font-medium">
-                  {lang === "fr" ? "Ajouter une image" : "Add cover image"}
-                </span>
-              </button>
-            )}
-          </div>
+          <AssetUploadField
+            value={form.image}
+            label={lang === "fr" ? "URL de l'image :" : "Image URL:"}
+            emptyLabel={lang === "fr" ? "Ajouter une image" : "Add cover image"}
+            scope="projects"
+            onChange={handleImageChange}
+          />
 
           <div className="bg-card/60 rounded-xl border border-border/70 p-4 space-y-3">
             <label className="block text-[11px] font-medium text-zinc-400">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, Save, Loader2, CheckCircle2,
-  Image, Plus, Send, Mail,
+  Plus, Send, Mail,
 } from 'lucide-react';
 import { useBlogTags, useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
 import { LangToggle } from '@/components/admin/shared/LangToggle';
 import { PublicationControl } from '@/components/admin/shared/PublicationControl';
+import { AssetUploadField } from '@/components/admin/shared/AssetUploadField';
 import type { BlogPost, BlogPostFormData } from '@/types/admin.types';
 
 // ======================== BLOG CATEGORIES ========================
@@ -68,6 +69,16 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUrlChange = (url: string) => {
+    handleChange('imageUrl', url);
+    if (isEditing && initialData?.id) {
+      updateMutation.mutate({
+        id: initialData.id,
+        data: { imageUrl: url },
+      });
+    }
   };
 
   const toggleTag = (tagId: string) => {
@@ -230,41 +241,13 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
 
           {/* Cover image */}
-          <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
-            {formData.imageUrl ? (
-              <div className="relative group">
-                <img src={formData.imageUrl} alt="Cover" className="w-full h-48 object-cover" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => {
-                      const url = prompt('URL de l\'image de couverture :', formData.imageUrl);
-                      if (url !== null) handleChange('imageUrl', url);
-                    }}
-                    className="px-3 py-1.5 bg-white rounded-lg text-xs font-semibold text-zinc-900"
-                  >
-                    Changer
-                  </button>
-                  <button
-                    onClick={() => handleChange('imageUrl', '')}
-                    className="px-3 py-1.5 bg-red-500 rounded-lg text-xs font-semibold text-white"
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  const url = prompt('URL de l\'image de couverture :');
-                  if (url) handleChange('imageUrl', url);
-                }}
-                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors"
-              >
-                <Image className="w-6 h-6" />
-                <span className="text-[12px] font-medium">Ajouter une image de couverture</span>
-              </button>
-            )}
-          </div>
+          <AssetUploadField
+            value={formData.imageUrl}
+            label="URL de l'image de couverture :"
+            emptyLabel="Ajouter une image de couverture"
+            scope="blog"
+            onChange={handleImageUrlChange}
+          />
 
           {/* Excerpt */}
           <div className="bg-card/60 rounded-xl border border-border/70 p-4">

@@ -239,6 +239,37 @@ class ApiClient {
   async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     return this.requestWithRetry<T>('DELETE', endpoint, undefined, options);
   }
+
+  async upload<T>(endpoint: string, formData: FormData, options: RequestOptions = {}): Promise<T> {
+    const doRequest = () => {
+      const headers = this.getHeaders(options.skipAuth) as Record<string, string>;
+      delete headers['Content-Type'];
+
+      return this.fetchWithTimeout(`${this.baseUrl}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+        ...options,
+      });
+    };
+
+    try {
+      const response = await doRequest();
+      return await this.handleResponse<T>(response);
+    } catch (error: any) {
+      if (error.status === 401 && !options.skipAuth && getRefreshToken()) {
+        const refreshed = await this.tryRefreshToken();
+        if (refreshed) {
+          const retryResponse = await doRequest();
+          return this.handleResponse<T>(retryResponse);
+        }
+      }
+      if (error.status === 401) {
+        clearTokens();
+      }
+      throw error;
+    }
+  }
 }
 
 export const apiClient = new ApiClient(API_URL);

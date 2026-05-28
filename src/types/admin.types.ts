@@ -37,6 +37,16 @@ export interface ApiError {
   };
 }
 
+export interface UploadedAsset {
+  url: string;
+  filename: string;
+  path: string;
+  mimeType: string;
+  size: number;
+  width?: number;
+  height?: number;
+}
+
 export interface TrafficAnalyticsPoint {
   key: string;
   label: string;

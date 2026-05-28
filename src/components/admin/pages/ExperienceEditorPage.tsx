@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "@/components/admin/shared/LangToggle";
 import { PublicationControl } from "@/components/admin/shared/PublicationControl";
+import { AssetUploadField } from "@/components/admin/shared/AssetUploadField";
 import type {
   DiagramConnection,
   DiagramNode,
@@ -118,6 +119,16 @@ export function ExperienceEditorPage({
   const handleChange = useCallback((field: string, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
+
+  const handleCoverImageChange = useCallback((url: string) => {
+    handleChange("coverImage", url);
+    if (isEditing && initialData?.id) {
+      updateMutation.mutate({
+        id: initialData.id,
+        data: { coverImage: url },
+      });
+    }
+  }, [handleChange, initialData?.id, isEditing, updateMutation]);
 
   const handleArrayChange = useCallback(
     (
@@ -347,7 +358,7 @@ export function ExperienceEditorPage({
     cleaned.description_en = form.description_en?.trim() || "";
 
     if (form.location?.trim()) cleaned.location = form.location.trim();
-    if (form.coverImage?.trim()) cleaned.coverImage = form.coverImage.trim();
+    cleaned.coverImage = form.coverImage?.trim() || "";
 
     const details = form.details?.filter((d) => d.trim()) || [];
     if (details.length) cleaned.details = details;
@@ -540,47 +551,13 @@ export function ExperienceEditorPage({
           </div>
 
           {/* Cover Image */}
-          <div className="bg-card/60 rounded-xl border border-border/70 overflow-hidden">
-            {form.coverImage ? (
-              <div className="relative group">
-                <img
-                  src={form.coverImage}
-                  alt="Cover"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => {
-                      const url = prompt(
-                        "URL de l'image de couverture :",
-                        form.coverImage,
-                      );
-                      if (url !== null) handleChange("coverImage", url);
-                    }}
-                    className="px-3 py-1.5 bg-white rounded-lg text-xs font-semibold text-zinc-900">
-                    Changer
-                  </button>
-                  <button
-                    onClick={() => handleChange("coverImage", "")}
-                    className="px-3 py-1.5 bg-red-500 rounded-lg text-xs font-semibold text-white">
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  const url = prompt("URL de l'image de couverture :");
-                  if (url) handleChange("coverImage", url);
-                }}
-                className="w-full h-32 flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-zinc-500 hover:bg-accent/60 transition-colors">
-                <Image className="w-6 h-6" />
-                <span className="text-[12px] font-medium">
-                  Ajouter une image de couverture
-                </span>
-              </button>
-            )}
-          </div>
+          <AssetUploadField
+            value={form.coverImage}
+            label="URL de l'image de couverture :"
+            emptyLabel="Ajouter une image de couverture"
+            scope="experiences"
+            onChange={handleCoverImageChange}
+          />
 
           <DynamicListSection
             label="Images illustratives"
