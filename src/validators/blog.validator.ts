@@ -35,6 +35,11 @@ export const createBlogPostValidator = [
     .optional()
     .isBoolean()
     .withMessage('Published must be a boolean'),
+  body('publishedAt')
+    .optional({ nullable: true, values: 'falsy' })
+    .isISO8601()
+    .withMessage('Published date must be a valid date')
+    .toDate(),
   body('tags')
     .optional()
     .isArray()
@@ -73,6 +78,15 @@ export const updateBlogPostValidator = [
     .trim()
     .isURL()
     .withMessage('Invalid image URL'),
+  body('published')
+    .optional()
+    .isBoolean()
+    .withMessage('Published must be a boolean'),
+  body('publishedAt')
+    .optional({ nullable: true, values: 'falsy' })
+    .isISO8601()
+    .withMessage('Published date must be a valid date')
+    .toDate(),
   body('tags')
     .optional()
     .isArray()

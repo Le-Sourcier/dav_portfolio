@@ -1,11 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { config } from '../config/index.js';
 import { projectService } from '../services/project.service.js';
 import { revalidationService } from '../services/revalidation.service.js';
 import { sendSuccess, sendCreated } from '../utils/response.util.js';
 
-export const getAllProjects = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+function isValidAdminToken(req: Request): boolean {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) return false;
   try {
-    const projects = await projectService.findAll();
+    jwt.verify(header.slice(7), config.jwt.secret);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const getAllProjects = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const projects = await projectService.findAll(!isValidAdminToken(req));
     sendSuccess(res, projects, 'Projects retrieved successfully');
   } catch (error) {
     next(error);
@@ -14,7 +27,7 @@ export const getAllProjects = async (_req: Request, res: Response, next: NextFun
 
 export const getProjectById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const project = await projectService.findById(req.params.id!);
+    const project = await projectService.findById(req.params.id!, !isValidAdminToken(req));
     sendSuccess(res, project, 'Project retrieved successfully');
   } catch (error) {
     next(error);
@@ -23,7 +36,7 @@ export const getProjectById = async (req: Request, res: Response, next: NextFunc
 
 export const getProjectBySlug = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const project = await projectService.findBySlug(req.params.slug!);
+    const project = await projectService.findBySlug(req.params.slug!, !isValidAdminToken(req));
     sendSuccess(res, project, 'Project retrieved successfully');
   } catch (error) {
     next(error);

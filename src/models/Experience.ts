@@ -8,7 +8,7 @@ import {
   ImpactData,
 } from '../types/entities.types.js';
 
-interface ExperienceCreationAttributes extends Optional<IExperience, 'id' | 'createdAt' | 'updatedAt'> {}
+interface ExperienceCreationAttributes extends Optional<IExperience, 'id' | 'published' | 'publishedAt' | 'createdAt' | 'updatedAt'> {}
 
 class Experience extends Model<IExperience, ExperienceCreationAttributes> implements IExperience {
   declare id: string;
@@ -28,6 +28,8 @@ class Experience extends Model<IExperience, ExperienceCreationAttributes> implem
   declare impactGraph?: ImpactData[];
   declare title_en?: string;
   declare description_en?: string;
+  declare published: boolean;
+  declare publishedAt?: Date | null;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }
@@ -103,6 +105,15 @@ Experience.init(
     },
     title_en: { type: DataTypes.STRING(255), allowNull: true },
     description_en: { type: DataTypes.TEXT, allowNull: true },
+    published: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    publishedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,

@@ -12,7 +12,7 @@ import {
 
 interface ProjectCreationAttributes extends Optional<
   IProject,
-  "id" | "createdAt" | "updatedAt" | "featured" | "tech" | "links"
+  "id" | "createdAt" | "updatedAt" | "featured" | "published" | "publishedAt" | "tech" | "links"
 > {}
 
 class Project
@@ -24,6 +24,7 @@ class Project
   declare title: string;
   declare name: string;
   declare category: ProjectCategory;
+  declare category_en?: string | null;
   declare image: string;
   declare description: string;
   declare headline?: string;
@@ -35,6 +36,8 @@ class Project
   declare tech: string[];
   declare links: ProjectLink[];
   declare featured: boolean;
+  declare published: boolean;
+  declare publishedAt?: Date | null;
   declare results: string[];
   declare metrics: ProjectMetric[];
   declare chartData: ChartData[];
@@ -78,6 +81,10 @@ Project.init(
       type: DataTypes.STRING(120),
       allowNull: false,
       defaultValue: "Fullstack",
+    },
+    category_en: {
+      type: DataTypes.STRING(120),
+      allowNull: true,
     },
     image: {
       type: DataTypes.TEXT,
@@ -125,6 +132,15 @@ Project.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    published: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    publishedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     results: {
       type: DataTypes.JSONB,

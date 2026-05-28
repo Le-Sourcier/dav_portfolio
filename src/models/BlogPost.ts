@@ -78,7 +78,7 @@ Comment.init(
 // BlogPost model
 interface BlogPostCreationAttributes extends Optional<
   IBlogPost,
-  "id" | "viewCount" | "shareCount" | "createdAt" | "updatedAt" | "comments"
+  "id" | "viewCount" | "shareCount" | "publishedAt" | "newsletterSentAt" | "createdAt" | "updatedAt" | "comments"
 > {}
 
 class BlogPost
@@ -95,6 +95,8 @@ class BlogPost
   declare readTime: string;
   declare author: string;
   declare published: boolean;
+  declare publishedAt?: Date | null;
+  declare newsletterSentAt?: Date | null;
   declare viewCount: number;
   declare shareCount: number;
   declare tags?: string[];
@@ -154,6 +156,14 @@ BlogPost.init(
     published: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    publishedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    newsletterSentAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     viewCount: {
       type: DataTypes.INTEGER,
@@ -332,7 +342,7 @@ BlogView.init(
     modelName: "BlogView",
     tableName: "blog_views",
     updatedAt: false,
-    indexes: [{ fields: ["post_id", "visitor_hash"] }],
+    indexes: [{ unique: true, fields: ["post_id", "visitor_hash"] }],
   },
 );
 

@@ -3,6 +3,7 @@
 // ========================
 export interface ProjectMetric {
   name: string;
+  name_en?: string | null;
   value: number;
   previousValue: number;
   unit: string;
@@ -10,12 +11,14 @@ export interface ProjectMetric {
 
 export interface ChartData {
   name: string;
+  name_en?: string | null;
   value: number;
 }
 
 export interface DiagramNode {
   id: string;
   label: string;
+  label_en?: string | null;
   type: 'client' | 'gateway' | 'service' | 'database' | 'external' | 'ai';
 }
 
@@ -23,6 +26,7 @@ export interface DiagramConnection {
   from: string;
   to: string;
   label?: string;
+  label_en?: string | null;
 }
 
 export interface SolutionDiagram {
@@ -32,6 +36,7 @@ export interface SolutionDiagram {
 
 export interface ImpactData {
   label: string;
+  label_en?: string | null;
   value: number;
 }
 
@@ -39,6 +44,7 @@ export type ProjectCategory = string;
 
 export interface ProjectLink {
   label: string;
+  label_en?: string | null;
   href: string;
 }
 
@@ -48,6 +54,7 @@ export interface IProject {
   title: string;
   name: string;
   category: ProjectCategory;
+  category_en?: string | null;
   image: string;
   description: string;
   headline?: string;
@@ -59,6 +66,8 @@ export interface IProject {
   tech: string[];
   links: ProjectLink[];
   featured: boolean;
+  published: boolean;
+  publishedAt?: Date | null;
   results: string[];
   metrics: ProjectMetric[];
   chartData: ChartData[];
@@ -110,6 +119,8 @@ export interface IExperience {
   impactGraph?: ImpactData[];
   title_en?: string;
   description_en?: string;
+  published: boolean;
+  publishedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -140,6 +151,8 @@ export interface IBlogPost {
   readTime: string;
   author: string;
   published: boolean;
+  publishedAt?: Date | null;
+  newsletterSentAt?: Date | null;
   viewCount: number;
   shareCount: number;
   tags?: string[];
@@ -209,6 +222,7 @@ export interface IAppointment {
 export interface INewsletter {
   id: string;
   email: string;
+  locale: 'fr' | 'en';
   active: boolean;
   subscribedAt: Date;
   unsubscribedAt?: Date;

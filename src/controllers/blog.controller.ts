@@ -26,8 +26,8 @@ export const getAllPosts = async (req: Request, res: Response, next: NextFunctio
     const isAdmin = isValidAdminToken(req);
     const published = isAdmin
       ? (req.query.published === 'true' ? true : req.query.published === 'false' ? false : undefined)
-      : true; // Force published=true for unauthenticated requests
-    const posts = await blogService.findAll(published);
+      : undefined;
+    const posts = await blogService.findAll(published, !isAdmin);
     sendSuccess(res, posts, 'Blog posts retrieved successfully');
   } catch (error) {
     next(error);

@@ -4,7 +4,7 @@ import { sendSuccess, sendCreated } from '../utils/response.util.js';
 
 export const subscribe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const subscriber = await newsletterService.subscribe(req.body.email);
+    const subscriber = await newsletterService.subscribe(req.body.email, req.body.locale || req.body.lang);
     sendCreated(res, subscriber, 'Successfully subscribed to newsletter');
   } catch (error) {
     next(error);

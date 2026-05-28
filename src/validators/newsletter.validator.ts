@@ -8,6 +8,14 @@ export const subscribeValidator = [
     .isEmail()
     .withMessage('Invalid email address')
     .normalizeEmail(),
+  body('locale')
+    .optional()
+    .isIn(['fr', 'en'])
+    .withMessage('Locale must be fr or en'),
+  body('lang')
+    .optional()
+    .isIn(['fr', 'en'])
+    .withMessage('Language must be fr or en'),
 ];
 
 export const unsubscribeValidator = [

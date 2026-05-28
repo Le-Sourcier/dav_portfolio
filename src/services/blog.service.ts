@@ -3,6 +3,8 @@ import { IBlogPost, IBlogComment, IBlogTag } from '../types/entities.types.js';
 import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
 import { generateSlug, calculateReadTime } from '../utils/helpers.js';
+import { publicVisibilityWhere } from '../utils/publication.js';
+import newsletterService from './newsletter.service.js';
 import { Op } from 'sequelize';
 
 type CommentListFilters = {
@@ -43,8 +45,16 @@ class BlogService {
     ];
   }
 
-  async findAll(published?: boolean): Promise<IBlogPost[]> {
-    const where = published !== undefined ? { published } : {};
+  private visibleWhere() {
+    return publicVisibilityWhere();
+  }
+
+  async findAll(published?: boolean, publicOnly = false): Promise<IBlogPost[]> {
+    const where = publicOnly
+      ? this.visibleWhere()
+      : published !== undefined
+        ? { published }
+        : {};
     const posts = await BlogPost.findAll({
       where,
       include: this.postIncludes(),
@@ -55,7 +65,7 @@ class BlogService {
 
   async findById(id: string, publishedOnly = false): Promise<IBlogPost> {
     const where: Record<string, unknown> = { id };
-    if (publishedOnly) where.published = true;
+    if (publishedOnly) Object.assign(where, this.visibleWhere());
     const post = await BlogPost.findOne({
       where,
       include: this.postIncludes(),
@@ -68,7 +78,7 @@ class BlogService {
 
   async findBySlug(slug: string): Promise<IBlogPost> {
     const post = await BlogPost.findOne({
-      where: { slug, published: true },
+      where: { slug, ...this.visibleWhere() },
       include: this.postIncludes(),
     });
     if (!post) {
@@ -93,11 +103,12 @@ class BlogService {
       readTime,
     });
     await this.syncPostTags(post, tagIds, tags);
+    await this.sendPublicationNewsletterIfDue(post.id);
     return this.findById(post.id);
   }
 
   async update(id: string, data: Partial<IBlogPost>): Promise<IBlogPost> {
-    const post = await BlogPost.findByPk(id);
+    const post = await BlogPost.findOne({ where: { id, ...this.visibleWhere() } });
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
@@ -116,11 +127,12 @@ class BlogService {
 
     await post.update(updateData);
     await this.syncPostTags(post, tagIds, tags);
+    await this.sendPublicationNewsletterIfDue(id);
     return this.findById(id);
   }
 
   async delete(id: string): Promise<void> {
-    const post = await BlogPost.findByPk(id);
+    const post = await BlogPost.findOne({ where: { id, ...this.visibleWhere() } });
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
@@ -254,7 +266,7 @@ class BlogService {
 
   async findByCategory(category: string): Promise<IBlogPost[]> {
     const posts = await BlogPost.findAll({
-      where: { category, published: true },
+      where: { category, ...this.visibleWhere() },
       include: this.postIncludes(),
       order: [['createdAt', 'DESC']],
     });
@@ -266,7 +278,7 @@ class BlogService {
       where: includeHidden ? {} : { isVisible: true },
       order: [['name', 'ASC']],
     });
-    return Promise.all(tags.map((tag) => this.withTagStats(tag)));
+    return Promise.all(tags.map((tag) => this.withTagStats(tag, !includeHidden)));
   }
 
   async findTagBySlug(slug: string): Promise<IBlogTag & { posts: IBlogPost[] }> {
@@ -275,7 +287,7 @@ class BlogService {
       include: [{
         model: BlogPost,
         as: 'posts',
-        where: { published: true },
+        where: this.visibleWhere(),
         required: false,
         through: { attributes: [] },
         include: [{ model: BlogTag, as: 'blogTags', through: { attributes: [] } }],
@@ -284,7 +296,7 @@ class BlogService {
     if (!tag) {
       throw new AppError('Blog tag not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
-    const withStats = await this.withTagStats(tag);
+    const withStats = await this.withTagStats(tag, true);
     return { ...withStats, posts: ((tag as any).posts || []) as IBlogPost[] };
   }
 
@@ -300,7 +312,7 @@ class BlogService {
       color: data.color?.trim() || null,
       isVisible: data.isVisible ?? true,
     });
-    return this.withTagStats(tag);
+    return this.withTagStats(tag, false);
   }
 
   async updateTag(id: string, data: Partial<IBlogTag>): Promise<IBlogTag> {
@@ -315,7 +327,7 @@ class BlogService {
       ...(data.color !== undefined ? { color: data.color?.trim() || null } : {}),
       ...(data.isVisible !== undefined ? { isVisible: data.isVisible } : {}),
     });
-    return this.withTagStats(tag);
+    return this.withTagStats(tag, false);
   }
 
   async deleteTag(id: string): Promise<void> {
@@ -329,7 +341,7 @@ class BlogService {
 
   async getTagStats(): Promise<IBlogTag[]> {
     const tags = await BlogTag.findAll({ order: [['name', 'ASC']] });
-    return Promise.all(tags.map((tag) => this.withTagStats(tag)));
+    return Promise.all(tags.map((tag) => this.withTagStats(tag, false)));
   }
 
   private async syncPostTags(post: BlogPost, tagIds?: string[], tagNames?: string[]): Promise<void> {
@@ -350,8 +362,11 @@ class BlogService {
     await (post as any).setBlogTags(Array.from(ids));
   }
 
-  private async withTagStats(tag: BlogTag): Promise<IBlogTag> {
-    const posts = await (tag as any).getPosts({ joinTableAttributes: [] }) as BlogPost[];
+  private async withTagStats(tag: BlogTag, publicOnly: boolean): Promise<IBlogTag> {
+    const posts = await (tag as any).getPosts({
+      joinTableAttributes: [],
+      ...(publicOnly ? { where: this.visibleWhere() } : {}),
+    }) as BlogPost[];
     const postIds = posts.map((post) => post.id);
     const commentsCount = postIds.length ? await Comment.count({ where: { postId: postIds } }) : 0;
     return {
@@ -398,11 +413,11 @@ class BlogService {
     ]);
     const totalComments = await Comment.count();
     const totalPosts = await BlogPost.count();
-    const publishedPosts = await BlogPost.count({ where: { published: true } });
+    const publishedPosts = await BlogPost.count({ where: this.visibleWhere() });
 
     const topPosts = await BlogPost.findAll({
       attributes: ['id', 'title', 'slug', 'viewCount', 'shareCount'],
-      where: { published: true },
+      where: this.visibleWhere(),
       order: [['viewCount', 'DESC']],
       limit: 5,
       raw: true,
@@ -416,6 +431,46 @@ class BlogService {
       publishedPosts,
       topPosts: topPosts as Pick<IBlogPost, 'id' | 'title' | 'slug' | 'viewCount' | 'shareCount'>[],
     };
+  }
+
+  async sendPublicationNewsletterIfDue(id: string): Promise<{ sent: number; failed: number } | null> {
+    const post = await BlogPost.findOne({
+      where: {
+        id,
+        newsletterSentAt: null,
+        ...this.visibleWhere(),
+      },
+    });
+
+    if (!post) return null;
+
+    const result = await newsletterService.sendBlogPostToSubscribers(post);
+    if (result.sent > 0 || result.failed === 0) {
+      await post.update({ newsletterSentAt: new Date() });
+    }
+    return result;
+  }
+
+  async sendDuePublicationNewsletters(): Promise<{ posts: number; sent: number; failed: number }> {
+    const posts = await BlogPost.findAll({
+      where: {
+        newsletterSentAt: null,
+        ...this.visibleWhere(),
+      },
+      order: [['publishedAt', 'ASC'], ['createdAt', 'ASC']],
+    });
+
+    let sent = 0;
+    let failed = 0;
+    for (const post of posts) {
+      const result = await this.sendPublicationNewsletterIfDue(post.id);
+      if (result) {
+        sent += result.sent;
+        failed += result.failed;
+      }
+    }
+
+    return { posts: posts.length, sent, failed };
   }
 }
 

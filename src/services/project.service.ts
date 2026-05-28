@@ -2,25 +2,31 @@ import Project from '../models/Project.js';
 import { IProject } from '../types/entities.types.js';
 import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
+import { publicVisibilityWhere } from '../utils/publication.js';
 
 class ProjectService {
-  async findAll(): Promise<IProject[]> {
+  async findAll(publicOnly = false): Promise<IProject[]> {
     const projects = await Project.findAll({
+      where: publicOnly ? publicVisibilityWhere() : {},
       order: [['createdAt', 'DESC']],
     });
     return projects;
   }
 
-  async findById(id: string): Promise<IProject> {
-    const project = await Project.findByPk(id);
+  async findById(id: string, publicOnly = false): Promise<IProject> {
+    const project = await Project.findOne({
+      where: { id, ...(publicOnly ? publicVisibilityWhere() : {}) },
+    });
     if (!project) {
       throw new AppError('Project not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
     return project;
   }
 
-  async findBySlug(slug: string): Promise<IProject> {
-    const project = await Project.findOne({ where: { slug } });
+  async findBySlug(slug: string, publicOnly = false): Promise<IProject> {
+    const project = await Project.findOne({
+      where: { slug, ...(publicOnly ? publicVisibilityWhere() : {}) },
+    });
     if (!project) {
       throw new AppError('Project not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
@@ -51,9 +57,9 @@ class ProjectService {
     await project.destroy();
   }
 
-  async findByCategory(category: string): Promise<IProject[]> {
+  async findByCategory(category: string, publicOnly = false): Promise<IProject[]> {
     const projects = await Project.findAll({
-      where: { category },
+      where: { category, ...(publicOnly ? publicVisibilityWhere() : {}) },
       order: [['createdAt', 'DESC']],
     });
     return projects;

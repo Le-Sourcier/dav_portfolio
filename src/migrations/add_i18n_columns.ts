@@ -23,9 +23,12 @@ async function run(): Promise<void> {
   await addColumnIfMissing('blog_posts', 'title_en', 'VARCHAR(255)');
   await addColumnIfMissing('blog_posts', 'excerpt_en', 'TEXT');
   await addColumnIfMissing('blog_posts', 'content_en', 'TEXT');
+  await addColumnIfMissing('blog_posts', 'published_at', 'TIMESTAMP WITH TIME ZONE');
+  await addColumnIfMissing('blog_posts', 'newsletter_sent_at', 'TIMESTAMP WITH TIME ZONE');
 
   // projects
   await addColumnIfMissing('projects', 'title_en', 'VARCHAR(255)');
+  await addColumnIfMissing('projects', 'category_en', 'VARCHAR(120)');
   await addColumnIfMissing('projects', 'description_en', 'TEXT');
   await addColumnIfMissing('projects', 'problem_en', 'TEXT');
   await addColumnIfMissing('projects', 'solution_en', 'TEXT');
@@ -34,10 +37,17 @@ async function run(): Promise<void> {
   await addColumnIfMissing('projects', 'metric_en', 'VARCHAR(255)');
   await addColumnIfMissing('projects', 'role_en', 'VARCHAR(255)');
   await addColumnIfMissing('projects', 'results_en', 'JSONB');
+  await addColumnIfMissing('projects', 'published', 'BOOLEAN NOT NULL DEFAULT TRUE');
+  await addColumnIfMissing('projects', 'published_at', 'TIMESTAMP WITH TIME ZONE');
 
   // experiences
   await addColumnIfMissing('experiences', 'title_en', 'VARCHAR(255)');
   await addColumnIfMissing('experiences', 'description_en', 'TEXT');
+  await addColumnIfMissing('experiences', 'published', 'BOOLEAN NOT NULL DEFAULT TRUE');
+  await addColumnIfMissing('experiences', 'published_at', 'TIMESTAMP WITH TIME ZONE');
+
+  // newsletter
+  await addColumnIfMissing('newsletter_subscribers', 'locale', "VARCHAR(5) NOT NULL DEFAULT 'fr'");
 
   // testimonials
   await addColumnIfMissing('testimonials', 'content_en', 'TEXT');

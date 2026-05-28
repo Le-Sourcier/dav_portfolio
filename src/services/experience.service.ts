@@ -2,17 +2,21 @@ import Experience from '../models/Experience.js';
 import { IExperience } from '../types/entities.types.js';
 import { AppError } from '../middlewares/error.middleware.js';
 import { ErrorCode, HttpStatus } from '../types/response.types.js';
+import { publicVisibilityWhere } from '../utils/publication.js';
 
 class ExperienceService {
-  async findAll(): Promise<IExperience[]> {
+  async findAll(publicOnly = false): Promise<IExperience[]> {
     const experiences = await Experience.findAll({
+      where: publicOnly ? publicVisibilityWhere() : {},
       order: [['createdAt', 'DESC']],
     });
     return experiences;
   }
 
-  async findById(id: string): Promise<IExperience> {
-    const experience = await Experience.findByPk(id);
+  async findById(id: string, publicOnly = false): Promise<IExperience> {
+    const experience = await Experience.findOne({
+      where: { id, ...(publicOnly ? publicVisibilityWhere() : {}) },
+    });
     if (!experience) {
       throw new AppError('Experience not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }

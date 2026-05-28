@@ -1,11 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { config } from '../config/index.js';
 import { experienceService } from '../services/experience.service.js';
 import { revalidationService } from '../services/revalidation.service.js';
 import { sendSuccess, sendCreated } from '../utils/response.util.js';
 
-export const getAllExperiences = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+function isValidAdminToken(req: Request): boolean {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) return false;
   try {
-    const experiences = await experienceService.findAll();
+    jwt.verify(header.slice(7), config.jwt.secret);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const getAllExperiences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const experiences = await experienceService.findAll(!isValidAdminToken(req));
     sendSuccess(res, experiences, 'Experiences retrieved successfully');
   } catch (error) {
     next(error);
@@ -14,7 +27,7 @@ export const getAllExperiences = async (_req: Request, res: Response, next: Next
 
 export const getExperienceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const experience = await experienceService.findById(req.params.id!);
+    const experience = await experienceService.findById(req.params.id!, !isValidAdminToken(req));
     sendSuccess(res, experience, 'Experience retrieved successfully');
   } catch (error) {
     next(error);

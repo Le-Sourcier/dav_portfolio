@@ -34,6 +34,15 @@ export const createExperienceValidator = [
     .optional()
     .isArray()
     .withMessage('Challenges must be an array'),
+  body('published')
+    .optional()
+    .isBoolean()
+    .withMessage('Published must be a boolean'),
+  body('publishedAt')
+    .optional({ nullable: true, values: 'falsy' })
+    .isISO8601()
+    .withMessage('Published date must be a valid date')
+    .toDate(),
 ];
 
 export const updateExperienceValidator = [
@@ -55,6 +64,15 @@ export const updateExperienceValidator = [
     .trim()
     .isLength({ max: 255 })
     .withMessage('Location must be less than 255 characters'),
+  body('published')
+    .optional()
+    .isBoolean()
+    .withMessage('Published must be a boolean'),
+  body('publishedAt')
+    .optional({ nullable: true, values: 'falsy' })
+    .isISO8601()
+    .withMessage('Published date must be a valid date')
+    .toDate(),
 ];
 
 export const experienceIdValidator = [
