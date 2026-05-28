@@ -87,6 +87,7 @@ export interface AuthState {
 // ========================
 export interface ProjectMetric {
   name: string;
+  name_en?: string | null;
   value: number;
   previousValue: number;
   unit: string;
@@ -94,12 +95,14 @@ export interface ProjectMetric {
 
 export interface ChartDataPoint {
   name: string;
+  name_en?: string | null;
   value: number;
 }
 
 export interface DiagramNode {
   id: string;
   label: string;
+  label_en?: string | null;
   type: "client" | "gateway" | "service" | "database" | "external" | "ai";
 }
 
@@ -107,6 +110,7 @@ export interface DiagramConnection {
   from: string;
   to: string;
   label?: string;
+  label_en?: string | null;
 }
 
 export interface SolutionDiagram {
@@ -116,7 +120,14 @@ export interface SolutionDiagram {
 
 export interface ImpactData {
   label: string;
+  label_en?: string | null;
   value: number;
+}
+
+export interface ProjectLink {
+  label: string;
+  label_en?: string | null;
+  href: string;
 }
 
 export type ProjectCategory =
@@ -126,24 +137,46 @@ export type ProjectCategory =
   | "Art"
   | "Photo"
   | "Fullstack"
-  | "Software";
+  | "Software"
+  | "Frontend"
+  | "Backend"
+  | "Mobile"
+  | "DevOps"
+  | "Design"
+  | string;
 
 export interface Project {
   id: string;
+  slug?: string;
   title: string;
   title_en?: string;
+  name?: string;
   category: ProjectCategory;
+  category_en?: string | null;
   image: string;
   description: string;
   description_en?: string;
+  headline?: string;
+  headline_en?: string;
   problem: string;
   problem_en?: string;
   solution: string;
   solution_en?: string;
+  result?: string;
+  result_en?: string;
+  metric?: string;
+  metric_en?: string;
+  role?: string;
+  role_en?: string;
   results: string[];
+  results_en?: string[];
   metrics: ProjectMetric[];
   chartData: ChartDataPoint[];
   tech?: string[];
+  links?: ProjectLink[];
+  featured?: boolean;
+  published?: boolean;
+  publishedAt?: string | null;
   url?: string;
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];
@@ -185,6 +218,8 @@ export interface Experience {
   achievements?: ExperienceAchievement[];
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];
+  published?: boolean;
+  publishedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -224,6 +259,8 @@ export interface BlogPost {
   readTime: string;
   author: string;
   published: boolean;
+  publishedAt?: string | null;
+  newsletterSentAt?: string | null;
   viewCount: number;
   shareCount: number;
   tags?: string[];

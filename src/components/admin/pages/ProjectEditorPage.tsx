@@ -18,12 +18,17 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "../shared/LangToggle";
+import { PublicationControl } from "../shared/PublicationControl";
 import type {
+  ChartDataPoint,
+  DiagramConnection,
+  DiagramNode,
+  ImpactData,
   Project,
   ProjectFormData,
+  ProjectLink,
   ProjectMetric,
 } from "@/types/admin.types";
-import { Toggle } from "@radix-ui/react-toggle";
 
 // ======================== CONSTANTS ========================
 
@@ -49,16 +54,36 @@ interface ProjectEditorPageProps {
 // ======================== DEFAULTS ========================
 
 const defaultForm: ProjectFormData = {
+  slug: "",
   title: "",
+  title_en: "",
+  name: "",
   category: "Fullstack",
+  category_en: "",
   image: "",
   description: "",
+  description_en: "",
+  headline: "",
+  headline_en: "",
   problem: "",
+  problem_en: "",
   solution: "",
+  solution_en: "",
+  result: "",
+  result_en: "",
+  metric: "",
+  metric_en: "",
+  role: "",
+  role_en: "",
   results: [""],
+  results_en: [""],
   metrics: [{ name: "", value: 0, previousValue: 0, unit: "%" }],
   chartData: [],
   tech: [""],
+  links: [],
+  featured: false,
+  published: true,
+  publishedAt: null,
   url: "",
 };
 
@@ -75,32 +100,43 @@ export function ProjectEditorPage({
   const [lang, setLang] = useState<"fr" | "en">("fr");
 
   const [form, setForm] = useState<ProjectFormData>(() => {
-    if (!initialData)
-      return {
-        ...defaultForm,
-        title_en: "",
-        description_en: "",
-        problem_en: "",
-        solution_en: "",
-      };
+    if (!initialData) return defaultForm;
     return {
+      slug: initialData.slug || "",
       title: initialData.title,
       title_en: initialData.title_en || "",
+      name: initialData.name || initialData.title,
       category: initialData.category,
+      category_en: initialData.category_en || "",
       image: initialData.image || "",
       description: initialData.description || "",
       description_en: initialData.description_en || "",
+      headline: initialData.headline || "",
+      headline_en: initialData.headline_en || "",
       problem: initialData.problem || "",
       problem_en: initialData.problem_en || "",
       solution: initialData.solution || "",
       solution_en: initialData.solution_en || "",
+      result: initialData.result || "",
+      result_en: initialData.result_en || "",
+      metric: initialData.metric || "",
+      metric_en: initialData.metric_en || "",
+      role: initialData.role || "",
+      role_en: initialData.role_en || "",
       results: initialData.results?.length ? initialData.results : [""],
+      results_en: initialData.results_en?.length ? initialData.results_en : [""],
       metrics: initialData.metrics?.length
         ? initialData.metrics
         : [{ name: "", value: 0, previousValue: 0, unit: "%" }],
       chartData: initialData.chartData || [],
       tech: initialData.tech?.length ? initialData.tech : [""],
+      links: initialData.links || [],
+      featured: Boolean(initialData.featured),
+      published: initialData.published ?? true,
+      publishedAt: initialData.publishedAt || null,
       url: initialData.url || "",
+      solutionDiagram: initialData.solutionDiagram,
+      impactGraph: initialData.impactGraph || [],
     };
   });
 
@@ -111,7 +147,7 @@ export function ProjectEditorPage({
   }, []);
 
   const handleArrayChange = useCallback(
-    (field: "results" | "tech", index: number, value: string) => {
+    (field: "results" | "results_en" | "tech", index: number, value: string) => {
       setForm((prev) => {
         const arr = [...((prev as any)[field] || [])];
         arr[index] = value;
@@ -121,7 +157,7 @@ export function ProjectEditorPage({
     [],
   );
 
-  const addArrayItem = useCallback((field: "results" | "tech") => {
+  const addArrayItem = useCallback((field: "results" | "results_en" | "tech") => {
     setForm((prev) => ({
       ...prev,
       [field]: [...((prev as any)[field] || []), ""],
@@ -129,7 +165,7 @@ export function ProjectEditorPage({
   }, []);
 
   const removeArrayItem = useCallback(
-    (field: "results" | "tech", index: number) => {
+    (field: "results" | "results_en" | "tech", index: number) => {
       setForm((prev) => ({
         ...prev,
         [field]: ((prev as any)[field] || []).filter(
@@ -169,6 +205,131 @@ export function ProjectEditorPage({
     }));
   }, []);
 
+  const updateListItem = useCallback(
+    <T extends object,>(
+      field: "links" | "chartData" | "impactGraph",
+      index: number,
+      key: keyof T,
+      value: string | number,
+    ) => {
+      setForm((prev) => {
+        const items = [...(((prev as any)[field] || []) as T[])];
+        items[index] = { ...items[index], [key]: value };
+        return { ...prev, [field]: items };
+      });
+    },
+    [],
+  );
+
+  const addListItem = useCallback(
+    (field: "links" | "chartData" | "impactGraph") => {
+      const defaults = {
+        links: { label: "", label_en: "", href: "" } satisfies ProjectLink,
+        chartData: { name: "", name_en: "", value: 0 } satisfies ChartDataPoint,
+        impactGraph: { label: "", label_en: "", value: 0 } satisfies ImpactData,
+      };
+      setForm((prev) => ({
+        ...prev,
+        [field]: [...(((prev as any)[field] || []) as unknown[]), defaults[field]],
+      }));
+    },
+    [],
+  );
+
+  const removeListItem = useCallback(
+    (field: "links" | "chartData" | "impactGraph", index: number) => {
+      setForm((prev) => ({
+        ...prev,
+        [field]: (((prev as any)[field] || []) as unknown[]).filter(
+          (_, i) => i !== index,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const updateDiagramNode = useCallback(
+    (index: number, key: keyof DiagramNode, value: string) => {
+      setForm((prev) => {
+        const nodes = [...(prev.solutionDiagram?.nodes || [])];
+        nodes[index] = { ...nodes[index], [key]: value } as DiagramNode;
+        return {
+          ...prev,
+          solutionDiagram: {
+            nodes,
+            connections: prev.solutionDiagram?.connections || [],
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const addDiagramNode = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      solutionDiagram: {
+        nodes: [
+          ...(prev.solutionDiagram?.nodes || []),
+          { id: `node-${Date.now()}`, label: "", label_en: "", type: "service" },
+        ],
+        connections: prev.solutionDiagram?.connections || [],
+      },
+    }));
+  }, []);
+
+  const removeDiagramNode = useCallback((index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      solutionDiagram: {
+        nodes: (prev.solutionDiagram?.nodes || []).filter((_, i) => i !== index),
+        connections: prev.solutionDiagram?.connections || [],
+      },
+    }));
+  }, []);
+
+  const updateDiagramConnection = useCallback(
+    (index: number, key: keyof DiagramConnection, value: string) => {
+      setForm((prev) => {
+        const connections = [...(prev.solutionDiagram?.connections || [])];
+        connections[index] = { ...connections[index], [key]: value };
+        return {
+          ...prev,
+          solutionDiagram: {
+            nodes: prev.solutionDiagram?.nodes || [],
+            connections,
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const addDiagramConnection = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      solutionDiagram: {
+        nodes: prev.solutionDiagram?.nodes || [],
+        connections: [
+          ...(prev.solutionDiagram?.connections || []),
+          { from: "", to: "", label: "", label_en: "" },
+        ],
+      },
+    }));
+  }, []);
+
+  const removeDiagramConnection = useCallback((index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      solutionDiagram: {
+        nodes: prev.solutionDiagram?.nodes || [],
+        connections: (prev.solutionDiagram?.connections || []).filter(
+          (_, i) => i !== index,
+        ),
+      },
+    }));
+  }, []);
+
   // ======================== SAVE ========================
 
   const handleSave = useCallback(() => {
@@ -178,15 +339,29 @@ export function ProjectEditorPage({
     }
 
     const cleaned: Record<string, unknown> = {
+      slug: form.slug?.trim() || form.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       title: form.title.trim(),
       title_en: form.title_en?.trim() || "",
+      name: form.name?.trim() || form.title.trim(),
       category: form.category,
+      category_en: form.category_en?.trim() || "",
       description: form.description?.trim() || "",
       description_en: form.description_en?.trim() || "",
+      headline: form.headline?.trim() || "",
+      headline_en: form.headline_en?.trim() || "",
       problem: form.problem?.trim() || "",
       problem_en: form.problem_en?.trim() || "",
       solution: form.solution?.trim() || "",
       solution_en: form.solution_en?.trim() || "",
+      result: form.result?.trim() || "",
+      result_en: form.result_en?.trim() || "",
+      metric: form.metric?.trim() || "",
+      metric_en: form.metric_en?.trim() || "",
+      role: form.role?.trim() || "",
+      role_en: form.role_en?.trim() || "",
+      featured: Boolean(form.featured),
+      published: form.published ?? true,
+      publishedAt: form.publishedAt || null,
     };
 
     if (form.image?.trim()) cleaned.image = form.image.trim();
@@ -194,12 +369,32 @@ export function ProjectEditorPage({
 
     const results = form.results?.filter((r) => r.trim()) || [];
     if (results.length) cleaned.results = results;
+    const resultsEn = form.results_en?.filter((r) => r.trim()) || [];
+    if (resultsEn.length) cleaned.results_en = resultsEn;
 
     const technologies = form.tech?.filter((t) => t.trim()) || [];
     if (technologies.length) cleaned.tech = technologies;
 
     const metrics = (form.metrics || []).filter((m) => m.name.trim());
     if (metrics.length) cleaned.metrics = metrics;
+
+    const chartData = (form.chartData || []).filter((item) => item.name.trim());
+    if (chartData.length) cleaned.chartData = chartData;
+
+    const links = (form.links || []).filter((link) => link.label.trim() && link.href.trim());
+    if (links.length) cleaned.links = links;
+
+    const impactGraph = (form.impactGraph || []).filter((item) => item.label.trim());
+    if (impactGraph.length) cleaned.impactGraph = impactGraph;
+
+    const diagramNodes = form.solutionDiagram?.nodes?.filter((node) => node.id.trim() && node.label.trim()) || [];
+    const diagramConnections = form.solutionDiagram?.connections?.filter((connection) => connection.from.trim() && connection.to.trim()) || [];
+    if (diagramNodes.length || diagramConnections.length) {
+      cleaned.solutionDiagram = {
+        nodes: diagramNodes,
+        connections: diagramConnections,
+      };
+    }
 
     const options = {
       onSuccess: () => {
@@ -244,20 +439,18 @@ export function ProjectEditorPage({
           </div>
         </div>
 
-        <LangToggle
-          lang={lang}
-          onChange={setLang}
-          hasEnContent={!!form.title_en?.trim()}
-        />
-        <div className="flex flex-row gap-5 items-center">
-          {/* Toggle switch (Published/Unpublished) */}
-          <label className="relative inline-flex h-[24px] w-[46px] cursor-pointer items-center">
-            <input type="checkbox" checked className="peer sr-only" />
-
-            <span className="absolute inset-0 rounded-full bg-gray-300 transition duration-300 peer-checked:bg-blue-500 peer-focus:ring-2 peer-focus:ring-blue-300"></span>
-
-            <span className="absolute left-1 h-[18px] w-[18px] rounded-full bg-white transition duration-300 peer-checked:translate-x-[20px]"></span>
-          </label>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <LangToggle
+            lang={lang}
+            onChange={setLang}
+            hasEnContent={!!form.title_en?.trim()}
+          />
+          <PublicationControl
+            published={form.published}
+            publishedAt={form.publishedAt}
+            onPublishedChange={(value) => handleChange("published", value)}
+            onPublishedAtChange={(value) => handleChange("publishedAt", value)}
+          />
 
           <button
             onClick={handleSave}
@@ -311,6 +504,28 @@ export function ProjectEditorPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
+                  Slug
+                </label>
+                <input
+                  value={form.slug || ""}
+                  onChange={(e) => handleChange("slug", e.target.value)}
+                  placeholder="nexus-platform"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
+                  {lang === "fr" ? "Nom court" : "Short name"}
+                </label>
+                <input
+                  value={form.name || ""}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  placeholder="Nexus Platform"
+                  className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                   {lang === "fr" ? "Categorie" : "Category"}
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -329,6 +544,19 @@ export function ProjectEditorPage({
                   ))}
                 </div>
               </div>
+              {lang === "en" ? (
+                <div>
+                  <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
+                    Category label (EN)
+                  </label>
+                  <input
+                    value={form.category_en || ""}
+                    onChange={(e) => handleChange("category_en", e.target.value)}
+                    placeholder="B2B SaaS, Mobile, Backend..."
+                    className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+                  />
+                </div>
+              ) : null}
               <div>
                 <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
                   <ExternalLink className="w-3 h-3 inline mr-1" />
@@ -341,6 +569,15 @@ export function ProjectEditorPage({
                   className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
                 />
               </div>
+              <label className="flex items-center gap-2 text-[12px] text-zinc-500">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form.featured)}
+                  onChange={(e) => handleChange("featured", e.target.checked)}
+                  className="rounded border-border"
+                />
+                {lang === "fr" ? "Projet mis en avant" : "Featured project"}
+              </label>
             </div>
           </div>
 
@@ -382,6 +619,38 @@ export function ProjectEditorPage({
                 </span>
               </button>
             )}
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4 space-y-3">
+            <label className="block text-[11px] font-medium text-zinc-400">
+              {lang === "fr" ? "Signaux publics" : "Public signals"}
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                value={lang === "fr" ? form.headline || "" : form.headline_en || ""}
+                onChange={(e) => handleChange(lang === "fr" ? "headline" : "headline_en", e.target.value)}
+                placeholder={lang === "fr" ? "Headline court du projet" : "Short project headline"}
+                className="h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+              />
+              <input
+                value={lang === "fr" ? form.metric || "" : form.metric_en || ""}
+                onChange={(e) => handleChange(lang === "fr" ? "metric" : "metric_en", e.target.value)}
+                placeholder={lang === "fr" ? "Signal principal" : "Main signal"}
+                className="h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+              />
+              <input
+                value={lang === "fr" ? form.role || "" : form.role_en || ""}
+                onChange={(e) => handleChange(lang === "fr" ? "role" : "role_en", e.target.value)}
+                placeholder={lang === "fr" ? "Role sur le projet" : "Project role"}
+                className="h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+              />
+              <input
+                value={lang === "fr" ? form.result || "" : form.result_en || ""}
+                onChange={(e) => handleChange(lang === "fr" ? "result" : "result_en", e.target.value)}
+                placeholder={lang === "fr" ? "Resultat court" : "Short result"}
+                className="h-9 px-3 rounded-lg border border-border/70 bg-transparent text-sm outline-none focus:border-zinc-400 transition-colors"
+              />
+            </div>
           </div>
 
           {/* Description */}
@@ -445,15 +714,15 @@ export function ProjectEditorPage({
           <DynamicListSection
             label={lang === "fr" ? "Resultats cles" : "Key Results"}
             icon={<Trophy className="w-3 h-3" />}
-            items={form.results || [""]}
+            items={(lang === "fr" ? form.results : form.results_en) || [""]}
             placeholder={
               lang === "fr"
                 ? "Ex: +45% de performance, 10k utilisateurs..."
                 : "E.g.: +45% performance, 10k users..."
             }
-            onAdd={() => addArrayItem("results")}
-            onChange={(i, v) => handleArrayChange("results", i, v)}
-            onRemove={(i) => removeArrayItem("results", i)}
+            onAdd={() => addArrayItem(lang === "fr" ? "results" : "results_en")}
+            onChange={(i, v) => handleArrayChange(lang === "fr" ? "results" : "results_en", i, v)}
+            onRemove={(i) => removeArrayItem(lang === "fr" ? "results" : "results_en", i)}
           />
 
           {/* Metrics */}
@@ -473,11 +742,11 @@ export function ProjectEditorPage({
               {(form.metrics || []).map((metric, i) => (
                 <div key={i} className="flex gap-1.5 items-center">
                   <input
-                    value={metric.name}
+                    value={lang === "fr" ? metric.name : metric.name_en || ""}
                     onChange={(e) =>
-                      handleMetricChange(i, "name", e.target.value)
+                      handleMetricChange(i, lang === "fr" ? "name" : "name_en", e.target.value)
                     }
-                    placeholder={lang === "fr" ? "Nom" : "Name"}
+                    placeholder={lang === "fr" ? "Nom" : "Name (EN)"}
                     className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                   />
                   <input
@@ -500,6 +769,104 @@ export function ProjectEditorPage({
                   <button
                     onClick={() => removeMetric(i)}
                     className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[11px] font-medium text-zinc-400">
+                {lang === "fr" ? "Courbe d'evolution" : "Evolution chart"}
+              </label>
+              <button onClick={() => addListItem("chartData")} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.chartData || []).map((point, i) => (
+                <div key={i} className="flex gap-1.5 items-center">
+                  <input
+                    value={lang === "fr" ? point.name : point.name_en || ""}
+                    onChange={(e) => updateListItem<ChartDataPoint>("chartData", i, lang === "fr" ? "name" : "name_en", e.target.value)}
+                    placeholder={lang === "fr" ? "Label" : "Label (EN)"}
+                    className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                  />
+                  <input
+                    type="number"
+                    value={point.value}
+                    onChange={(e) => updateListItem<ChartDataPoint>("chartData", i, "value", Number(e.target.value))}
+                    placeholder="0"
+                    className="w-20 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center"
+                  />
+                  <button onClick={() => removeListItem("chartData", i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[11px] font-medium text-zinc-400">
+                {lang === "fr" ? "Ressources externes" : "External resources"}
+              </label>
+              <button onClick={() => addListItem("links")} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.links || []).map((link, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1.5fr_auto] gap-1.5 items-center">
+                  <input
+                    value={lang === "fr" ? link.label : link.label_en || ""}
+                    onChange={(e) => updateListItem<ProjectLink>("links", i, lang === "fr" ? "label" : "label_en", e.target.value)}
+                    placeholder={lang === "fr" ? "Libelle" : "Label (EN)"}
+                    className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                  />
+                  <input
+                    value={link.href}
+                    onChange={(e) => updateListItem<ProjectLink>("links", i, "href", e.target.value)}
+                    placeholder="https://..."
+                    className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                  />
+                  <button onClick={() => removeListItem("links", i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[11px] font-medium text-zinc-400">
+                {lang === "fr" ? "Impact / maturite" : "Impact / maturity"}
+              </label>
+              <button onClick={() => addListItem("impactGraph")} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.impactGraph || []).map((item, i) => (
+                <div key={i} className="flex gap-1.5 items-center">
+                  <input
+                    value={lang === "fr" ? item.label : item.label_en || ""}
+                    onChange={(e) => updateListItem<ImpactData>("impactGraph", i, lang === "fr" ? "label" : "label_en", e.target.value)}
+                    placeholder={lang === "fr" ? "Label" : "Label (EN)"}
+                    className="flex-1 h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
+                  />
+                  <input
+                    type="number"
+                    value={item.value}
+                    onChange={(e) => updateListItem<ImpactData>("impactGraph", i, "value", Number(e.target.value))}
+                    placeholder="90"
+                    className="w-20 h-8 px-2 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400 text-center"
+                  />
+                  <button onClick={() => removeListItem("impactGraph", i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -539,6 +906,85 @@ export function ProjectEditorPage({
                     className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
                     <Trash2 className="w-3 h-3" />
                   </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[11px] font-medium text-zinc-400">
+                {lang === "fr" ? "Diagramme" : "Diagram"}
+              </label>
+              <button onClick={addDiagramNode} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.solutionDiagram?.nodes || []).map((node, i) => (
+                <div key={node.id || i} className="space-y-1.5 rounded-lg border border-border/60 p-2">
+                  <input
+                    value={node.id}
+                    onChange={(e) => updateDiagramNode(i, "id", e.target.value)}
+                    placeholder="node-id"
+                    className="w-full h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                  />
+                  <div className="flex gap-1.5">
+                    <input
+                      value={lang === "fr" ? node.label : node.label_en || ""}
+                      onChange={(e) => updateDiagramNode(i, lang === "fr" ? "label" : "label_en", e.target.value)}
+                      placeholder={lang === "fr" ? "Label" : "Label (EN)"}
+                      className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={node.type}
+                      onChange={(e) => updateDiagramNode(i, "type", e.target.value)}
+                      placeholder="service"
+                      className="w-20 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                    />
+                    <button onClick={() => removeDiagramNode(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between mt-4 mb-2">
+              <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">
+                {lang === "fr" ? "Connexions" : "Connections"}
+              </span>
+              <button onClick={addDiagramConnection} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(form.solutionDiagram?.connections || []).map((connection, i) => (
+                <div key={i} className="space-y-1.5 rounded-lg border border-border/60 p-2">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <input
+                      value={connection.from}
+                      onChange={(e) => updateDiagramConnection(i, "from", e.target.value)}
+                      placeholder="from"
+                      className="h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                    />
+                    <input
+                      value={connection.to}
+                      onChange={(e) => updateDiagramConnection(i, "to", e.target.value)}
+                      placeholder="to"
+                      className="h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                    />
+                  </div>
+                  <div className="flex gap-1.5">
+                    <input
+                      value={lang === "fr" ? connection.label || "" : connection.label_en || ""}
+                      onChange={(e) => updateDiagramConnection(i, lang === "fr" ? "label" : "label_en", e.target.value)}
+                      placeholder={lang === "fr" ? "Label optionnel" : "Optional label (EN)"}
+                      className="flex-1 h-7 px-2 rounded-md border border-border/70 bg-transparent text-[11px] outline-none focus:border-zinc-400"
+                    />
+                    <button onClick={() => removeDiagramConnection(i)} className="p-1 text-zinc-400 hover:text-red-500 transition-colors">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

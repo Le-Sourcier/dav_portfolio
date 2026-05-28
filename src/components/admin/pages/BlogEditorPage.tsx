@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
 import { LangToggle } from '@/components/admin/shared/LangToggle';
+import { PublicationControl } from '@/components/admin/shared/PublicationControl';
 import type { BlogPost, BlogPostFormData } from '@/types/admin.types';
 
 // ======================== BLOG CATEGORIES ========================
@@ -44,6 +45,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         tags: initialData.tags?.length ? initialData.tags : [],
         tagIds: initialData.blogTags?.map((tag) => tag.id) || initialData.tagIds || [],
         published: initialData.published,
+        publishedAt: initialData.publishedAt || null,
+        newsletterSentAt: initialData.newsletterSentAt || null,
       };
     }
     return {
@@ -59,6 +62,7 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       tags: [],
       tagIds: [],
       published: false,
+      publishedAt: null,
     };
   });
 
@@ -98,7 +102,8 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
       category: formData.category,
       imageUrl: formData.imageUrl?.trim() || '',
       author: formData.author || '',
-      published: publish ? true : formData.published,
+      published: publish ? true : false,
+      publishedAt: publish ? formData.publishedAt || null : null,
       tags: availableTags.filter((tag) => formData.tagIds?.includes(tag.id)).map((tag) => tag.name),
       tagIds: formData.tagIds || [],
     };
@@ -144,9 +149,15 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
           </div>
         </div>
 
-        <LangToggle lang={lang} onChange={setLang} hasEnContent={!!(formData.title_en?.trim())} />
-
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <LangToggle lang={lang} onChange={setLang} hasEnContent={!!(formData.title_en?.trim())} />
+          <PublicationControl
+            published={formData.published}
+            publishedAt={formData.publishedAt}
+            newsletterSentAt={formData.newsletterSentAt}
+            onPublishedChange={(value) => handleChange('published', value)}
+            onPublishedAtChange={(value) => handleChange('publishedAt', value || '')}
+          />
           <button
             onClick={() => handleSave(false)}
             disabled={isPending}

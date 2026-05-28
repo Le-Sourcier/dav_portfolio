@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "@/components/admin/shared/LangToggle";
+import { PublicationControl } from "@/components/admin/shared/PublicationControl";
 import type {
   DiagramConnection,
   DiagramNode,
@@ -58,6 +59,8 @@ const defaultForm: ExperienceFormData = {
   links: [{ label: "", url: "" }],
   solutionDiagram: { nodes: [], connections: [] },
   impactGraph: [{ label: "", value: 0 }],
+  published: true,
+  publishedAt: null,
 };
 
 // ======================== COMPONENT ========================
@@ -105,6 +108,8 @@ export function ExperienceEditorPage({
       impactGraph: initialData.impactGraph?.length
         ? initialData.impactGraph
         : [{ label: "", value: 0 }],
+      published: initialData.published ?? true,
+      publishedAt: initialData.publishedAt || null,
     };
   });
 
@@ -334,6 +339,8 @@ export function ExperienceEditorPage({
       company: form.company.trim(),
       dates: form.dates.trim(),
       description: form.description?.trim() || "",
+      published: form.published ?? true,
+      publishedAt: form.publishedAt || null,
     };
 
     cleaned.title_en = form.title_en?.trim() || "";
@@ -431,13 +438,18 @@ export function ExperienceEditorPage({
           </div>
         </div>
 
-        <LangToggle
-          lang={lang}
-          onChange={setLang}
-          hasEnContent={!!form.title_en?.trim()}
-        />
-
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <LangToggle
+            lang={lang}
+            onChange={setLang}
+            hasEnContent={!!form.title_en?.trim()}
+          />
+          <PublicationControl
+            published={form.published}
+            publishedAt={form.publishedAt}
+            onPublishedChange={(value) => handleChange("published", value)}
+            onPublishedAtChange={(value) => handleChange("publishedAt", value)}
+          />
           <button
             onClick={handleSave}
             disabled={isPending}
