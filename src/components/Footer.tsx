@@ -4,21 +4,23 @@ import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { defaultLocale, type AppLocale } from "@/i18n/config";
 
 type FooterProps = {
   showProjects?: boolean;
   showJourney?: boolean;
   showBlog?: boolean;
+  locale?: AppLocale;
 };
 
 export async function Footer({
   showProjects = true,
   showJourney = true,
   showBlog = true,
+  locale = defaultLocale,
 }: FooterProps) {
-  const t = await getTranslations("Footer");
-  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "Footer" });
 
   return (
     <footer className="site-footer">

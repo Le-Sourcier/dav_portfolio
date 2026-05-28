@@ -135,6 +135,19 @@ function wordCount(value: string): number {
   return words?.length ?? 0;
 }
 
+function normalizeReadTime(value: string | undefined | null, locale: AppLocale): string {
+  if (!value?.trim()) return locale === "en" ? "4 min read" : "4 min de lecture";
+  const normalized = value.trim();
+  if (locale === "en") {
+    return normalized
+      .replace(/minutes?\s+de\s+lecture/i, "min read")
+      .replace(/min\s+de\s+lecture/i, "min read");
+  }
+  return normalized
+    .replace(/minutes?\s+read/i, "min de lecture")
+    .replace(/min\s+read/i, "min de lecture");
+}
+
 function normalizeBlogPost(
   post: BackendBlogPost,
   locale: AppLocale,
@@ -161,7 +174,7 @@ function normalizeBlogPost(
     category: post.category,
     date: post.createdAt ?? new Date().toISOString(),
     updatedAt: post.updatedAt,
-    readTime: post.readTime || (locale === "en" ? "4 min read" : "4 min de lecture"),
+    readTime: normalizeReadTime(post.readTime, locale),
     author: post.author,
     wordCount: wordCount(content),
     viewCount: Number(post.viewCount ?? 0),

@@ -1,12 +1,14 @@
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
+import type { AppLocale } from "@/i18n/config";
 import { getTranslations } from "next-intl/server";
 
 interface ExperienceSignalProps {
   experience: PortfolioExperienceDetail;
+  locale: AppLocale;
 }
 
-export async function ExperienceSignal({ experience }: ExperienceSignalProps) {
-  const t = await getTranslations("ExperienceSignal");
+export async function ExperienceSignal({ experience, locale }: ExperienceSignalProps) {
+  const t = await getTranslations({ locale, namespace: "ExperienceSignal" });
   const facts: { label: string; value: string }[] = [];
 
   if (experience.period) {
@@ -18,7 +20,7 @@ export async function ExperienceSignal({ experience }: ExperienceSignalProps) {
   if (experience.stack.length > 0) {
     facts.push({
       label: t("stackLabel"),
-      value: `${experience.stack.length} techno${experience.stack.length > 1 ? "s" : ""}`,
+      value: t("stackCount", { count: experience.stack.length }),
     });
   }
   if (experience.achievements.length > 0) {
@@ -30,7 +32,7 @@ export async function ExperienceSignal({ experience }: ExperienceSignalProps) {
   if (experience.impactGraph.length > 0) {
     facts.push({
       label: t("indicatorsLabel"),
-      value: `${experience.impactGraph.length} axe${experience.impactGraph.length > 1 ? "s" : ""}`,
+      value: t("axisCount", { count: experience.impactGraph.length }),
     });
   }
 

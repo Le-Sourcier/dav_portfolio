@@ -231,6 +231,7 @@
     "sortFeatured": "Mis en avant",
     "sortRecent": "Plus récents",
     "sortImpact": "Impact mesurable",
+    "categoryAriaLabel": "Filtres projets",
     "categoryAll": "Tous",
     "resetFilters": "Réinitialiser",
     "leadBadge": "Cas de référence",
@@ -381,7 +382,9 @@
     "locationLabel": "Lieu",
     "stackLabel": "Stack",
     "achievementsLabel": "Réalisations",
-    "indicatorsLabel": "Indicateurs"
+    "indicatorsLabel": "Indicateurs",
+    "stackCount": "{count, plural, one {# techno} other {# technos}}",
+    "axisCount": "{count, plural, one {# axe} other {# axes}}"
   },
   "ExperienceDiagram": {
     "columnClient": "Clients",
@@ -412,6 +415,7 @@
   "HomePage": {
     "heroAvailability": "Disponible pour CDI, freelance et missions longues",
     "heroPromise": "Je conçois des plateformes SaaS rapides, sécurisées et prêtes à scaler pour des équipes qui veulent livrer sans dette technique.",
+    "heroDescription": "Plateformes SaaS rapides, sécurisées et prêtes à scaler pour des équipes qui veulent livrer sans dette technique.",
     "heroTitle": "Des plateformes SaaS plus rapides, plus fiables, plus simples à vendre.",
     "heroCta": "Me confier un projet",
     "heroSecondary": "Voir les cas concrets",

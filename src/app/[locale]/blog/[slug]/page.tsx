@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { ArticleHero } from "@/components/blog/ArticleHero";
 import { BackToTop } from "@/components/blog/BackToTop";
+import { BlogEngagementTracker } from "@/components/blog/BlogEngagementTracker";
 import { CommentsSection } from "@/components/blog/comments/CommentsSection";
 import { MarkdownContent } from "@/components/blog/MarkdownContent";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
@@ -21,14 +22,14 @@ import type { BlogPost } from "@/types/blog";
 import { sectionId } from "@/utils/sectionId";
 
 type BlogPostPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const locale = await getRequestLocale();
+  const { locale: routeLocale, slug } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const post = await loadBlogPostBySlug(slug, locale);
 
   if (!post) {
@@ -134,9 +135,9 @@ const formatCount = (value: number, locale = "fr") =>
   }).format(value);
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params;
-  const locale = await getRequestLocale();
-  const t = await getTranslations("BlogArticle");
+  const { locale: routeLocale, slug } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "BlogArticle" });
   const post = await loadBlogPostBySlug(slug, locale);
 
   if (!post) {
@@ -174,6 +175,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <>
       <Header showProjects={hasProjects} showBlog={hasBlog} />
       <ReadingProgress />
+      <BlogEngagementTracker postId={post.id} />
       <main>
         <script
           type="application/ld+json"
@@ -190,7 +192,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             authorName={post.author || site.name}
             backHref={localizedPath("/blog", locale)}
             backLabel={t("back")}
-            actions={<ShareBar url={articleUrl} title={post.title} compact />}
+            actions={<ShareBar url={articleUrl} title={post.title} postId={post.id} compact />}
           />
 
           <div className="article-layout">
@@ -273,7 +275,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </article>
 
         <Newsletter compact />
-        <Footer showProjects={hasProjects} showBlog={hasBlog} />
+        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
       </main>
       <BackToTop />
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { newsletterApi } from "@/services/api/newsletter.api";
 
@@ -10,6 +11,7 @@ type NewsletterProps = {
 
 export function Newsletter({ compact = false }: NewsletterProps) {
   const t = useTranslations("Newsletter");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -20,7 +22,7 @@ export function Newsletter({ compact = false }: NewsletterProps) {
     setMessage("");
 
     try {
-      await newsletterApi.subscribe(email);
+      await newsletterApi.subscribe(email, locale === "en" ? "en" : "fr");
       setStatus("success");
       setMessage(t("successFeedback"));
       setEmail("");

@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { normalizeLocale } from "@/i18n/config";
+import { localizeText } from "@/i18n/localize";
 import { services } from "@/lib/portfolio";
 
 export function ExpertiseCarousel() {
   const t = useTranslations("ExpertiseSection");
+  const locale = normalizeLocale(useLocale());
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideStep, setSlideStep] = useState(530);
@@ -88,19 +91,24 @@ export function ExpertiseCarousel() {
         ref={trackRef}
         style={{ transform: `translate3d(${-currentTranslate}px, 0, 0)` }}
       >
-        {services.map((service) => (
+        {services.map((service) => {
+          const title = localizeText(locale, service.title, service.title_en);
+          const points = locale === "en" && service.points_en ? service.points_en : service.points;
+
+          return (
           <article className="expertise-slide" key={service.title}>
-            <span>{service.eyebrow}</span>
-            <h3>{service.title}</h3>
-            <h4>{service.headline}</h4>
-            <p>{service.description}</p>
+            <span>{localizeText(locale, service.eyebrow, service.eyebrow_en)}</span>
+            <h3>{title}</h3>
+            <h4>{localizeText(locale, service.headline, service.headline_en)}</h4>
+            <p>{localizeText(locale, service.description, service.description_en)}</p>
             <div>
-              {service.points.map((point) => (
+              {points.map((point) => (
                 <small key={point}>{point}</small>
               ))}
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

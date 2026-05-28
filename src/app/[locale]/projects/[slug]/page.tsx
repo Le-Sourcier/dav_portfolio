@@ -16,7 +16,7 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 type ProjectPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 function metricDelta(metric: ProjectMetric) {
@@ -31,9 +31,9 @@ function metricUnit(metric: ProjectMetric) {
   return unit.toLowerCase() === "n" ? "" : unit;
 }
 
-function metricValue(metric: ProjectMetric, value = metric.value) {
+function metricValue(metric: ProjectMetric, locale = "fr", value = metric.value) {
   const unit = metricUnit(metric);
-  const formatted = new Intl.NumberFormat("fr-FR", {
+  const formatted = new Intl.NumberFormat(locale === "en" ? "en-US" : "fr-FR", {
     maximumFractionDigits: 1,
   }).format(value);
 
@@ -46,15 +46,15 @@ function metricValue(metric: ProjectMetric, value = metric.value) {
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const locale = await getRequestLocale();
+  const { locale: routeLocale, slug } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const project = await loadProjectBySlug(slug, locale);
 
   if (!project) {
     return {};
   }
 
-  const t = await getTranslations("ProjectDetail");
+  const t = await getTranslations({ locale, namespace: "ProjectDetail" });
   const description = [project.headline, project.result]
     .filter(Boolean)
     .join(" ")
@@ -93,15 +93,15 @@ export async function generateMetadata({
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { slug } = await params;
-  const locale = await getRequestLocale();
+  const { locale: routeLocale, slug } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const project = await loadProjectBySlug(slug, locale);
 
   if (!project) {
     notFound();
   }
 
-  const t = await getTranslations("ProjectDetail");
+  const t = await getTranslations({ locale, namespace: "ProjectDetail" });
 
   const chartMax = Math.max(...project.chartData.map((item) => item.value), 1);
   const chartMin = Math.min(...project.chartData.map((item) => item.value), 0);
@@ -296,7 +296,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                               </small>
                             ) : null}
                           </div>
-                          <strong>{metricValue(metric)}</strong>
+                          <strong>{metricValue(metric, locale)}</strong>
                           <div
                             className="case-metric-compare"
                             aria-hidden="true">
@@ -309,7 +309,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                                   }}
                                 />
                                 <b>
-                                  {metricValue(metric, metric.previousValue)}
+                                  {metricValue(metric, locale, metric.previousValue)}
                                 </b>
                               </div>
                             ) : null}
@@ -319,7 +319,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                                 className="is-after"
                                 style={{ width: `${progress}%` }}
                               />
-                              <b>{metricValue(metric)}</b>
+                              <b>{metricValue(metric, locale)}</b>
                             </div>
                           </div>
                         </article>
@@ -583,7 +583,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
         </section>
       </main>
-      <Footer showProjects />
+      <Footer showProjects locale={locale} />
       <BackToTop />
     </>
   );

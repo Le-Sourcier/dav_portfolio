@@ -1,6 +1,7 @@
 import { ExperienceToc } from "@/components/experience/ExperienceToc";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { site } from "@/lib/portfolio";
+import type { AppLocale } from "@/i18n/config";
 import { getTranslations } from "next-intl/server";
 
 interface ExperienceAsideProps {
@@ -8,6 +9,7 @@ interface ExperienceAsideProps {
   toc: { id: string; label: string }[];
   contactSubject: string;
   contactBody: string;
+  locale: AppLocale;
 }
 
 export async function ExperienceAside({
@@ -15,8 +17,9 @@ export async function ExperienceAside({
   toc,
   contactSubject,
   contactBody,
+  locale,
 }: ExperienceAsideProps) {
-  const t = await getTranslations("ExperienceAside");
+  const t = await getTranslations({ locale, namespace: "ExperienceAside" });
   return (
     <aside className="xp-rail" aria-label={t("asideAriaLabel")}>
       <div className="xp-rail-inner">

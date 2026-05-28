@@ -10,9 +10,14 @@ import { site } from "@/lib/portfolio";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("ProjectsIndex");
-  const locale = await getRequestLocale();
+type LocalePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: LocalePageProps): Promise<Metadata> {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "ProjectsIndex" });
   return {
     title: t("pageTitle"),
     description: t("metaDescription"),
@@ -25,9 +30,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 60;
 
-export default async function ProjectsPage() {
-  const t = await getTranslations("ProjectsIndex");
-  const locale = await getRequestLocale();
+export default async function ProjectsPage({ params }: LocalePageProps) {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "ProjectsIndex" });
   const [projects, blogPosts] = await Promise.all([
     loadProjects(locale),
     loadBlogPosts(locale),
@@ -134,7 +140,7 @@ export default async function ProjectsPage() {
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
-        <Footer showProjects={hasProjects} showBlog={hasBlog} />
+        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
       </main>
       <BackToTop />
     </>

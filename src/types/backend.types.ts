@@ -44,6 +44,7 @@ export type LocalizedTextField<T extends string> = Partial<Record<`${T}_en`, str
 
 export interface ProjectMetric {
   name: string;
+  name_en?: string | null;
   value: number;
   previousValue: number;
   unit: string;
@@ -51,12 +52,14 @@ export interface ProjectMetric {
 
 export interface ChartDataPoint {
   name: string;
+  name_en?: string | null;
   value: number;
 }
 
 export interface DiagramNode {
   id: string;
   label: string;
+  label_en?: string | null;
   type: "client" | "gateway" | "service" | "database" | "external" | "ai" | string;
 }
 
@@ -64,6 +67,7 @@ export interface DiagramConnection {
   from: string;
   to: string;
   label?: string;
+  label_en?: string | null;
 }
 
 export interface SolutionDiagram {
@@ -73,11 +77,13 @@ export interface SolutionDiagram {
 
 export interface ImpactData {
   label: string;
+  label_en?: string | null;
   value: number;
 }
 
 export interface ProjectLink {
   label: string;
+  label_en?: string | null;
   href: string;
 }
 
@@ -88,6 +94,7 @@ export interface BackendProject
   title: string;
   name: string;
   category: string;
+  category_en?: string | null;
   image: string;
   imageUrl?: string | null;
   description: string;
@@ -208,6 +215,7 @@ export interface ContactPayload {
 export interface BackendNewsletterSubscriber {
   id: string;
   email: string;
+  locale?: "fr" | "en";
   active: boolean;
   subscribedAt: string;
   unsubscribedAt?: string | null;

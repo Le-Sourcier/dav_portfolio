@@ -231,6 +231,7 @@
     "sortFeatured": "Featured",
     "sortRecent": "Most recent",
     "sortImpact": "Measured impact",
+    "categoryAriaLabel": "Project filters",
     "categoryAll": "All",
     "resetFilters": "Reset",
     "leadBadge": "Reference case",
@@ -381,7 +382,9 @@
     "locationLabel": "Location",
     "stackLabel": "Stack",
     "achievementsLabel": "Achievements",
-    "indicatorsLabel": "Indicators"
+    "indicatorsLabel": "Indicators",
+    "stackCount": "{count, plural, one {# technology} other {# technologies}}",
+    "axisCount": "{count, plural, one {# axis} other {# axes}}"
   },
   "ExperienceDiagram": {
     "columnClient": "Clients",
@@ -412,6 +415,7 @@
   "HomePage": {
     "heroAvailability": "Available for full-time, freelance and long-term missions",
     "heroPromise": "I design fast, secure, production-ready SaaS platforms for teams that want to ship without technical debt.",
+    "heroDescription": "Fast, secure, production-ready SaaS platforms for teams that want to ship without technical debt.",
     "heroTitle": "Faster, more reliable, easier-to-sell SaaS platforms.",
     "heroCta": "Assign me a project",
     "heroSecondary": "See case studies",

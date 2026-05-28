@@ -3,21 +3,23 @@ import Image from "next/image";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { getLocale, getTranslations } from "next-intl/server";
+import type { AppLocale } from "@/i18n/config";
+import { getTranslations } from "next-intl/server";
 
 interface ExperienceHeroProps {
   experience: PortfolioExperienceDetail;
   contactSubject: string;
   contactBody: string;
+  locale: AppLocale;
 }
 
 export async function ExperienceHero({
   experience,
   contactSubject,
   contactBody,
+  locale,
 }: ExperienceHeroProps) {
-  const t = await getTranslations("ExperienceHero");
-  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "ExperienceHero" });
   const meta = Array.from(
     new Set(
       [experience.period, experience.location].filter(

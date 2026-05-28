@@ -21,9 +21,14 @@ import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 export const revalidate = 60;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
-  const t = await getTranslations("HomePage");
+type LocalePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: LocalePageProps): Promise<Metadata> {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "HomePage" });
 
   return {
     title: t("heroTitle"),
@@ -35,8 +40,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Home() {
-  const locale = await getRequestLocale();
+export default async function Home({ params }: LocalePageProps) {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const [projects, blogPosts, experience, testimonials] = await Promise.all([
     loadProjects(locale),
     loadBlogPosts(locale),
@@ -50,7 +56,7 @@ export default async function Home() {
   const hasJourney = experience.length > 0;
   const hasBlog = blogPosts.length > 0;
   const hasTestimonials = testimonials.length > 0;
-  const t = await getTranslations("HomePage");
+  const t = await getTranslations({ locale, namespace: "HomePage" });
   const proofStats = [1, 2, 3, 4].map((i) => ({
     value: t(`proofStat${i}Value`),
     label: t(`proofStat${i}Label`),
@@ -461,6 +467,7 @@ export default async function Home() {
           showProjects={hasProjects}
           showJourney={hasJourney}
           showBlog={hasBlog}
+          locale={locale}
         />
       </main>
       <BackToTop />

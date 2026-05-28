@@ -13,14 +13,14 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 type ExperiencePageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 };
 
 export async function generateMetadata({
   params,
 }: ExperiencePageProps): Promise<Metadata> {
-  const { id } = await params;
-  const locale = await getRequestLocale();
+  const { locale: routeLocale, id } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const experience = await loadExperienceById(id, locale);
 
   if (!experience) {
@@ -61,8 +61,8 @@ export async function generateMetadata({
 }
 
 export default async function ExperiencePage({ params }: ExperiencePageProps) {
-  const { id } = await params;
-  const locale = await getRequestLocale();
+  const { locale: routeLocale, id } = await params;
+  const locale = await getRequestLocale(routeLocale);
   const experience = await loadExperienceById(id, locale);
 
   if (!experience) {
@@ -72,8 +72,8 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
   return (
     <>
       <Header />
-      <ExperienceDetail experience={experience} />
-      <Footer />
+      <ExperienceDetail experience={experience} locale={locale} />
+      <Footer locale={locale} />
       <BackToTop />
     </>
   );

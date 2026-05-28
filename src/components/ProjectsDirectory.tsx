@@ -183,7 +183,7 @@ export function ProjectsDirectory({ projects }: ProjectsDirectoryProps) {
             </div>
           </label>
         </div>
-        <div className="project-category-row" role="group" aria-label="Filtres projets">
+        <div className="project-category-row" role="group" aria-label={t("categoryAriaLabel")}>
           <button
             type="button"
             className={activeCategory === "all" ? "is-active" : ""}

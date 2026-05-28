@@ -11,9 +11,14 @@ import { site } from "@/lib/portfolio";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadExperiences } from "@/services/portfolio/contentLoaders";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("ExperiencesIndex");
-  const locale = await getRequestLocale();
+type LocalePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: LocalePageProps): Promise<Metadata> {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "ExperiencesIndex" });
   return {
     title: t("pageTitle"),
     description: t("metaDescription"),
@@ -26,9 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 60;
 
-export default async function ExperiencesPage() {
-  const t = await getTranslations("ExperiencesIndex");
-  const locale = await getRequestLocale();
+export default async function ExperiencesPage({ params }: LocalePageProps) {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "ExperiencesIndex" });
   const [experiences, blogPosts] = await Promise.all([
     loadExperiences(locale),
     loadBlogPosts(locale),
@@ -39,7 +45,7 @@ export default async function ExperiencesPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Parcours Yao David Logan",
+    name: t("pageTitle"),
     description: t("metaDescription"),
     url: `${site.url}${localizedPath("/experiences", locale)}`,
     mainEntity: {
@@ -153,7 +159,7 @@ export default async function ExperiencesPage() {
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
-        <Footer showBlog={hasBlog} />
+        <Footer showBlog={hasBlog} locale={locale} />
       </main>
       <BackToTop />
     </>

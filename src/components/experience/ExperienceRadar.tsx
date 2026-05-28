@@ -1,3 +1,4 @@
+import type { AppLocale } from "@/i18n/config";
 import { getTranslations } from "next-intl/server";
 
 interface RadarPoint {
@@ -7,6 +8,7 @@ interface RadarPoint {
 
 interface ExperienceRadarProps {
   points: RadarPoint[];
+  locale: AppLocale;
 }
 
 const SIZE = 360;
@@ -24,8 +26,8 @@ function polarToCartesian(angle: number, radius: number) {
  * Diagramme de Kiviat (radar chart) — affiche plusieurs axes d'impact
  * sur un polygone radial. Rendu SVG pur, sans dépendance.
  */
-export async function ExperienceRadar({ points }: ExperienceRadarProps) {
-  const t = await getTranslations("ExperienceRadar");
+export async function ExperienceRadar({ points, locale }: ExperienceRadarProps) {
+  const t = await getTranslations({ locale, namespace: "ExperienceRadar" });
   if (points.length < 3) {
     return (
       <div className="experience-radar-fallback">

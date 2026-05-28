@@ -40,37 +40,61 @@ export const services = [
   {
     eyebrow: "Produit",
     title: "Architecture SaaS",
+    title_en: "SaaS architecture",
     headline:
       "Structurer une plateforme claire avant qu'elle ne devienne difficile à maintenir.",
+    headline_en:
+      "Structure a clear platform before it becomes hard to maintain.",
     description:
       "Backends Node.js/TypeScript, RBAC, paiements, files d'attente, dashboards et APIs maintenables.",
+    description_en:
+      "Node.js/TypeScript backends, RBAC, payments, queues, dashboards and maintainable APIs.",
     points: ["Découpage métier", "Contrats API", "Parcours critiques"],
+    points_en: ["Business domain split", "API contracts", "Critical journeys"],
   },
   {
     eyebrow: "Interface",
     title: "Produit web & mobile",
+    title_en: "Web & mobile product",
     headline:
       "Construire des interfaces rapides, lisibles et pensées pour l'usage réel.",
+    headline_en:
+      "Build fast, readable interfaces designed for real usage.",
     description:
       "Interfaces React, Next.js et React Native avec hiérarchie claire, performance et finition produit.",
+    description_en:
+      "React, Next.js and React Native interfaces with clear hierarchy, performance and product polish.",
     points: ["Next.js", "React Native", "Design systems"],
+    points_en: ["Next.js", "React Native", "Design systems"],
   },
   {
     eyebrow: "Ops",
     title: "Automatisation métier",
+    title_en: "Business automation",
     headline:
       "Réduire les tâches répétitives sans créer de dépendance fragile.",
+    headline_en:
+      "Reduce repetitive tasks without creating fragile dependencies.",
     description:
       "Workflows n8n/Make, enrichissement de données, batchs et outils internes pour réduire les opérations manuelles.",
+    description_en:
+      "n8n/Make workflows, data enrichment, batches and internal tools to reduce manual operations.",
     points: ["n8n", "Batchs", "Data enrichment"],
+    points_en: ["n8n", "Batches", "Data enrichment"],
   },
   {
     eyebrow: "Qualité",
+    eyebrow_en: "Quality",
     title: "Performance & sécurité",
+    title_en: "Performance & security",
     headline: "Stabiliser les temps de réponse et protéger les flux sensibles.",
+    headline_en: "Stabilize response times and protect sensitive flows.",
     description:
       "Optimisation API, cache, permissions, validation des entrées, monitoring et durcissement des parcours critiques.",
+    description_en:
+      "API optimization, cache, permissions, input validation, monitoring and hardening of critical journeys.",
     points: ["Redis", "RBAC", "Monitoring"],
+    points_en: ["Redis", "RBAC", "Monitoring"],
   },
 ];
 

@@ -11,9 +11,14 @@ import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("BlogPage");
-  const locale = await getRequestLocale();
+type LocalePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: LocalePageProps): Promise<Metadata> {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "BlogPage" });
   return {
     title: t("pageTitle"),
     description: t("metaDescription"),
@@ -26,9 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 60;
 
-export default async function BlogPage() {
-  const t = await getTranslations("BlogPage");
-  const locale = await getRequestLocale();
+export default async function BlogPage({ params }: LocalePageProps) {
+  const { locale: routeLocale } = await params;
+  const locale = await getRequestLocale(routeLocale);
+  const t = await getTranslations({ locale, namespace: "BlogPage" });
   const [projects, blogPosts] = await Promise.all([
     loadProjects(locale),
     loadBlogPosts(locale),
@@ -84,7 +90,7 @@ export default async function BlogPage() {
 
         <BlogDirectory posts={blogPosts} locale={locale} />
         <Newsletter />
-        <Footer showProjects={hasProjects} showBlog={hasBlog} />
+        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
       </main>
       <BackToTop />
     </>

@@ -9,16 +9,18 @@ import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import { ExperienceSignal } from "@/components/experience/ExperienceSignal";
 import type { PortfolioExperienceDetail } from "@/services/portfolio/contentLoaders";
 import { site } from "@/lib/portfolio";
+import type { AppLocale } from "@/i18n/config";
 import { getTranslations } from "next-intl/server";
 
 interface ExperienceDetailProps {
   experience: PortfolioExperienceDetail;
+  locale: AppLocale;
 }
 
 const ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
 
-export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
-  const t = await getTranslations("ExperienceDetail");
+export async function ExperienceDetail({ experience, locale }: ExperienceDetailProps) {
+  const t = await getTranslations({ locale, namespace: "ExperienceDetail" });
   const contactSubject = encodeURIComponent(t("contactSubject", { role: experience.role }));
   const contactBody = encodeURIComponent(t("contactBody", { company: experience.company }));
 
@@ -50,9 +52,10 @@ export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
         experience={experience}
         contactSubject={contactSubject}
         contactBody={contactBody}
+        locale={locale}
       />
 
-      <ExperienceSignal experience={experience} />
+      <ExperienceSignal experience={experience} locale={locale} />
 
       <div className="xp-shell">
         <div className="xp-flow">
@@ -122,7 +125,7 @@ export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
               lead={t("impactLead")}
               wide>
               {experience.impactGraph.length >= 4 ? (
-                <ExperienceRadar points={experience.impactGraph} />
+                <ExperienceRadar points={experience.impactGraph} locale={locale} />
               ) : (
                 <ul className="xp-impact-bars">
                   {experience.impactGraph.map((point) => (
@@ -178,6 +181,7 @@ export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
           toc={toc}
           contactSubject={contactSubject}
           contactBody={contactBody}
+          locale={locale}
         />
       </div>
     </main>

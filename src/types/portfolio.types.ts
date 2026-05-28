@@ -1,5 +1,6 @@
 export interface ProjectMetric {
   name: string;
+  name_en?: string | null;
   value: number;
   previousValue: number;
   unit: string;
@@ -7,12 +8,14 @@ export interface ProjectMetric {
 
 export interface ProjectChartPoint {
   name: string;
+  name_en?: string | null;
   value: number;
 }
 
 export interface ProjectDiagramNode {
   id: string;
   label: string;
+  label_en?: string | null;
   type: string;
 }
 
@@ -20,6 +23,7 @@ export interface ProjectDiagramConnection {
   from: string;
   to: string;
   label?: string;
+  label_en?: string | null;
 }
 
 export interface ProjectSolutionDiagram {
@@ -29,11 +33,13 @@ export interface ProjectSolutionDiagram {
 
 export interface ProjectImpactPoint {
   label: string;
+  label_en?: string | null;
   value: number;
 }
 
 export interface ProjectLink {
   label: string;
+  label_en?: string | null;
   href: string;
 }
 
@@ -44,6 +50,7 @@ export interface Project {
   title_en?: string | null;
   name: string;
   category: string;
+  category_en?: string | null;
   image: string;
   description: string;
   description_en?: string | null;
