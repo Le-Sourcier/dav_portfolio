@@ -18,11 +18,13 @@ class Experience extends Model<IExperience, ExperienceCreationAttributes> implem
   declare dates: string;
   declare description: string;
   declare details?: string[];
+  declare details_en?: string[];
   declare links?: ExperienceLink[];
   declare coverImage?: string;
   declare illustrativeImages?: string[];
   declare stack?: string[];
   declare challenges?: string[];
+  declare challenges_en?: string[];
   declare achievements?: ExperienceAchievement[];
   declare solutionDiagram?: SolutionDiagram;
   declare impactGraph?: ImpactData[];
@@ -66,6 +68,11 @@ Experience.init(
       allowNull: true,
       defaultValue: [],
     },
+    details_en: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: [],
+    },
     links: {
       type: DataTypes.JSONB,
       allowNull: true,
@@ -86,6 +93,11 @@ Experience.init(
       defaultValue: [],
     },
     challenges: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: [],
+    },
+    challenges_en: {
       type: DataTypes.JSONB,
       allowNull: true,
       defaultValue: [],
