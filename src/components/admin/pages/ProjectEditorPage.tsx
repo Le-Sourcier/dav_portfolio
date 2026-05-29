@@ -12,13 +12,14 @@ import {
   Cpu,
   FolderKanban,
 } from "lucide-react";
-import { useCreateProject, useUpdateProject } from "@/hooks/queries";
+import { useCreateProject, useTranslateFields, useUpdateProject } from "@/hooks/queries";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "../shared/LangToggle";
 import { PublicationControl } from "../shared/PublicationControl";
 import { AssetUploadField } from "../shared/AssetUploadField";
+import { TranslationPanel } from "../shared/TranslationPanel";
 import type {
   ChartDataPoint,
   DiagramConnection,
@@ -43,6 +44,40 @@ const PROJECT_CATEGORIES = [
   "Web",
   "Software",
 ] as const;
+
+const normalizeText = (value: unknown) =>
+  typeof value === "string"
+    ? value.trim().toLowerCase().replace(/\s+/g, " ")
+    : "";
+
+const isBlank = (value: unknown) =>
+  typeof value !== "string" || value.trim().length === 0;
+
+const isMissingTranslation = (source: unknown, target: unknown) =>
+  isBlank(target) || (!!normalizeText(source) && normalizeText(source) === normalizeText(target));
+
+const toTextArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+
+const hasUsefulTranslations = (
+  fields: Record<string, unknown>,
+  translations: Record<string, unknown>,
+) =>
+  Object.entries(fields).some(([key, source]) => {
+    const translated = translations[key];
+    if (typeof source === "string" && typeof translated === "string") {
+      return normalizeText(translated).length > 0 && normalizeText(source) !== normalizeText(translated);
+    }
+    if (Array.isArray(source) && Array.isArray(translated)) {
+      return translated.some((item, index) => {
+        if (typeof item !== "string") return false;
+        return normalizeText(item).length > 0 && normalizeText(item) !== normalizeText(source[index]);
+      });
+    }
+    return false;
+  });
 
 // ======================== PROPS ========================
 
@@ -96,8 +131,10 @@ export function ProjectEditorPage({
   const isEditing = !!initialData;
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject();
+  const translateMutation = useTranslateFields();
   const [saved, setSaved] = useState(false);
   const [lang, setLang] = useState<"fr" | "en">("fr");
+  const [translationInstructions, setTranslationInstructions] = useState("");
 
   const [form, setForm] = useState<ProjectFormData>(() => {
     if (!initialData) return defaultForm;
@@ -155,6 +192,161 @@ export function ProjectEditorPage({
       });
     }
   }, [handleChange, initialData?.id, isEditing, updateMutation]);
+
+  const buildTranslationFields = useCallback((overwrite: boolean) => {
+    const fields: Record<string, unknown> = {};
+    const add = (target: string, source?: string | null, current?: string | null) => {
+      if (source?.trim() && (overwrite || isMissingTranslation(source, current))) fields[target] = source;
+    };
+    const addArray = (target: string, source?: string[], current?: string[]) => {
+      const values = (source || []).filter((item) => item.trim());
+      const currentValues = current || [];
+      const hasRealTranslation = currentValues.some((item, index) => item.trim() && !isMissingTranslation(values[index], item));
+      if (values.length && (overwrite || !hasRealTranslation)) fields[target] = values;
+    };
+
+    add("title", form.title, form.title_en);
+    add("category", form.category, form.category_en);
+    add("description", form.description, form.description_en);
+    add("headline", form.headline, form.headline_en);
+    add("problem", form.problem, form.problem_en);
+    add("solution", form.solution, form.solution_en);
+    add("result", form.result, form.result_en);
+    add("metric", form.metric, form.metric_en);
+    add("role", form.role, form.role_en);
+    addArray("results", form.results, form.results_en);
+
+    const metrics = (form.metrics || []).map((item) =>
+      item.name?.trim() && (overwrite || isMissingTranslation(item.name, item.name_en)) ? item.name : "",
+    );
+    if (metrics.some(Boolean)) fields.metrics = metrics;
+
+    const chartData = (form.chartData || []).map((item) =>
+      item.name?.trim() && (overwrite || isMissingTranslation(item.name, item.name_en)) ? item.name : "",
+    );
+    if (chartData.some(Boolean)) fields.chartData = chartData;
+
+    const impactGraph = (form.impactGraph || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (impactGraph.some(Boolean)) fields.impactGraph = impactGraph;
+
+    const links = (form.links || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (links.some(Boolean)) fields.links = links;
+
+    const diagramNodes = (form.solutionDiagram?.nodes || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (diagramNodes.some(Boolean)) fields.diagramNodes = diagramNodes;
+
+    const diagramConnections = (form.solutionDiagram?.connections || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (diagramConnections.some(Boolean)) fields.diagramConnections = diagramConnections;
+
+    return fields;
+  }, [form]);
+
+  const applyTranslations = useCallback((translations: Record<string, unknown>) => {
+    setForm((prev) => {
+      const next = { ...prev };
+      const assignString = (sourceKey: string, targetKey: keyof ProjectFormData) => {
+        if (typeof translations[sourceKey] === "string") {
+          (next as any)[targetKey] = translations[sourceKey];
+        }
+      };
+
+      assignString("title", "title_en");
+      assignString("category", "category_en");
+      assignString("description", "description_en");
+      assignString("headline", "headline_en");
+      assignString("problem", "problem_en");
+      assignString("solution", "solution_en");
+      assignString("result", "result_en");
+      assignString("metric", "metric_en");
+      assignString("role", "role_en");
+
+      const resultsEn = toTextArray(translations.results);
+      if (resultsEn.length) next.results_en = resultsEn;
+
+      const metrics = toTextArray(translations.metrics);
+      if (metrics.length) {
+        next.metrics = (prev.metrics || []).map((item, index) => ({
+          ...item,
+          name_en: metrics[index] || item.name_en || "",
+        }));
+      }
+
+      const chartData = toTextArray(translations.chartData);
+      if (chartData.length) {
+        next.chartData = (prev.chartData || []).map((item, index) => ({
+          ...item,
+          name_en: chartData[index] || item.name_en || "",
+        }));
+      }
+
+      const impactGraph = toTextArray(translations.impactGraph);
+      if (impactGraph.length) {
+        next.impactGraph = (prev.impactGraph || []).map((item, index) => ({
+          ...item,
+          label_en: impactGraph[index] || item.label_en || "",
+        }));
+      }
+
+      const links = toTextArray(translations.links);
+      if (links.length) {
+        next.links = (prev.links || []).map((item, index) => ({
+          ...item,
+          label_en: links[index] || item.label_en || "",
+        }));
+      }
+
+      const diagramNodes = toTextArray(translations.diagramNodes);
+      const diagramConnections = toTextArray(translations.diagramConnections);
+      if (diagramNodes.length || diagramConnections.length) {
+        next.solutionDiagram = {
+          nodes: (prev.solutionDiagram?.nodes || []).map((item, index) => ({
+            ...item,
+            label_en: diagramNodes[index] || item.label_en || "",
+          })),
+          connections: (prev.solutionDiagram?.connections || []).map((item, index) => ({
+            ...item,
+            label_en: diagramConnections[index] || item.label_en || "",
+          })),
+        };
+      }
+
+      return next;
+    });
+    setLang("en");
+  }, []);
+
+  const handleTranslate = useCallback(async (overwrite: boolean) => {
+    const fields = buildTranslationFields(overwrite);
+    if (!Object.keys(fields).length) {
+      toast.info("Aucun champ FR disponible a traduire");
+      return;
+    }
+    try {
+      const result = await translateMutation.mutateAsync({
+        entity: "project",
+        sourceLocale: "fr",
+        targetLocale: "en",
+        fields,
+        instructions: translationInstructions,
+      });
+      if (!hasUsefulTranslations(fields, result.translations)) {
+        toast.error("La traduction recue ne modifie aucun champ. Verifiez le provider IA.");
+        return;
+      }
+      applyTranslations(result.translations);
+      toast.success("Traduction EN generee");
+    } catch (error) {
+      toast.error((error as Error).message || "Impossible de generer la traduction");
+    }
+  }, [applyTranslations, buildTranslationFields, translateMutation, translationInstructions]);
 
   const handleArrayChange = useCallback(
     (field: "results" | "results_en" | "tech", index: number, value: string) => {
@@ -856,6 +1048,14 @@ export function ProjectEditorPage({
 
         {/* ======================== RIGHT SIDEBAR ======================== */}
         <div className="xl:w-[280px] shrink-0 space-y-4">
+          <TranslationPanel
+            instructions={translationInstructions}
+            isPending={translateMutation.isPending}
+            onInstructionsChange={setTranslationInstructions}
+            onTranslateMissing={() => handleTranslate(false)}
+            onTranslateAll={() => handleTranslate(true)}
+          />
+
           {/* Technologies */}
           <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">

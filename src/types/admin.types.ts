@@ -47,6 +47,23 @@ export interface UploadedAsset {
   height?: number;
 }
 
+export type TranslationEntity = "project" | "blog" | "experience" | "settings";
+export type TranslationLocale = "fr" | "en";
+
+export interface TranslationRequest {
+  entity: TranslationEntity;
+  sourceLocale: TranslationLocale;
+  targetLocale: TranslationLocale;
+  fields: Record<string, unknown>;
+  instructions?: string;
+}
+
+export interface TranslationResponse {
+  translations: Record<string, unknown>;
+  provider: "openrouter" | "openai";
+  model: string;
+}
+
 export interface TrafficAnalyticsPoint {
   key: string;
   label: string;
@@ -201,12 +218,15 @@ export type ProjectFormData = Omit<Project, "id" | "createdAt" | "updatedAt">;
 // ========================
 export interface ExperienceAchievement {
   title: string;
+  title_en?: string | null;
   description: string;
+  description_en?: string | null;
   icon?: string;
 }
 
 export interface ExperienceLink {
   label: string;
+  label_en?: string | null;
   url: string;
 }
 
@@ -220,11 +240,13 @@ export interface Experience {
   description: string;
   description_en?: string;
   details?: string[];
+  details_en?: string[];
   links?: ExperienceLink[];
   coverImage?: string;
   illustrativeImages?: string[];
   stack?: string[];
   challenges?: string[];
+  challenges_en?: string[];
   achievements?: ExperienceAchievement[];
   solutionDiagram?: SolutionDiagram;
   impactGraph?: ImpactData[];

@@ -19,13 +19,14 @@ import {
   Layers,
   BarChart3,
 } from "lucide-react";
-import { useCreateExperience, useUpdateExperience } from "@/hooks/queries";
+import { useCreateExperience, useTranslateFields, useUpdateExperience } from "@/hooks/queries";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "../shared/MarkdownEditor";
 import { LangToggle } from "@/components/admin/shared/LangToggle";
 import { PublicationControl } from "@/components/admin/shared/PublicationControl";
 import { AssetUploadField } from "@/components/admin/shared/AssetUploadField";
+import { TranslationPanel } from "@/components/admin/shared/TranslationPanel";
 import type {
   DiagramConnection,
   DiagramNode,
@@ -43,6 +44,40 @@ interface ExperienceEditorPageProps {
   onBack: () => void;
 }
 
+const normalizeText = (value: unknown) =>
+  typeof value === "string"
+    ? value.trim().toLowerCase().replace(/\s+/g, " ")
+    : "";
+
+const isBlank = (value: unknown) =>
+  typeof value !== "string" || value.trim().length === 0;
+
+const isMissingTranslation = (source: unknown, target: unknown) =>
+  isBlank(target) || (!!normalizeText(source) && normalizeText(source) === normalizeText(target));
+
+const toTextArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+
+const hasUsefulTranslations = (
+  fields: Record<string, unknown>,
+  translations: Record<string, unknown>,
+) =>
+  Object.entries(fields).some(([key, source]) => {
+    const translated = translations[key];
+    if (typeof source === "string" && typeof translated === "string") {
+      return normalizeText(translated).length > 0 && normalizeText(source) !== normalizeText(translated);
+    }
+    if (Array.isArray(source) && Array.isArray(translated)) {
+      return translated.some((item, index) => {
+        if (typeof item !== "string") return false;
+        return normalizeText(item).length > 0 && normalizeText(item) !== normalizeText(source[index]);
+      });
+    }
+    return false;
+  });
+
 // ======================== DEFAULTS ========================
 
 const defaultForm: ExperienceFormData = {
@@ -52,10 +87,12 @@ const defaultForm: ExperienceFormData = {
   dates: "",
   description: "",
   details: [""],
+  details_en: [""],
   coverImage: "",
   illustrativeImages: [""],
   stack: [""],
   challenges: [""],
+  challenges_en: [""],
   achievements: [{ title: "", description: "" }],
   links: [{ label: "", url: "" }],
   solutionDiagram: { nodes: [], connections: [] },
@@ -73,8 +110,10 @@ export function ExperienceEditorPage({
   const isEditing = !!initialData;
   const createMutation = useCreateExperience();
   const updateMutation = useUpdateExperience();
+  const translateMutation = useTranslateFields();
   const [saved, setSaved] = useState(false);
   const [lang, setLang] = useState<"fr" | "en">("fr");
+  const [translationInstructions, setTranslationInstructions] = useState("");
 
   const [form, setForm] = useState<ExperienceFormData>(() => {
     if (!initialData)
@@ -88,6 +127,7 @@ export function ExperienceEditorPage({
       description: initialData.description || "",
       description_en: initialData.description_en || "",
       details: initialData.details?.length ? initialData.details : [""],
+      details_en: initialData.details_en?.length ? initialData.details_en : [""],
       coverImage: initialData.coverImage || "",
       illustrativeImages: initialData.illustrativeImages?.length
         ? initialData.illustrativeImages
@@ -95,6 +135,9 @@ export function ExperienceEditorPage({
       stack: initialData.stack?.length ? initialData.stack : [""],
       challenges: initialData.challenges?.length
         ? initialData.challenges
+        : [""],
+      challenges_en: initialData.challenges_en?.length
+        ? initialData.challenges_en
         : [""],
       achievements: initialData.achievements?.length
         ? initialData.achievements
@@ -130,9 +173,144 @@ export function ExperienceEditorPage({
     }
   }, [handleChange, initialData?.id, isEditing, updateMutation]);
 
+  const buildTranslationFields = useCallback((overwrite: boolean) => {
+    const fields: Record<string, unknown> = {};
+    const add = (target: string, source?: string | null, current?: string | null) => {
+      if (source?.trim() && (overwrite || isMissingTranslation(source, current))) fields[target] = source;
+    };
+
+    add("title", form.title, form.title_en);
+    add("description", form.description, form.description_en);
+
+    const addArray = (target: string, source?: string[], current?: string[]) => {
+      const values = (source || []).filter((item) => item.trim());
+      const currentValues = current || [];
+      const hasRealTranslation = currentValues.some((item, index) => item.trim() && !isMissingTranslation(values[index], item));
+      if (values.length && (overwrite || !hasRealTranslation)) fields[target] = values;
+    };
+
+    addArray("details", form.details, form.details_en);
+    addArray("challenges", form.challenges, form.challenges_en);
+
+    const achievementTitles = (form.achievements || []).map((item) =>
+      item.title?.trim() && (overwrite || isMissingTranslation(item.title, item.title_en)) ? item.title : "",
+    );
+    if (achievementTitles.some(Boolean)) fields.achievementTitles = achievementTitles;
+
+    const achievementDescriptions = (form.achievements || []).map((item) =>
+      item.description?.trim() && (overwrite || isMissingTranslation(item.description, item.description_en)) ? item.description : "",
+    );
+    if (achievementDescriptions.some(Boolean)) fields.achievementDescriptions = achievementDescriptions;
+
+    const links = (form.links || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (links.some(Boolean)) fields.links = links;
+
+    const impactGraph = (form.impactGraph || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (impactGraph.some(Boolean)) fields.impactGraph = impactGraph;
+
+    const diagramNodes = (form.solutionDiagram?.nodes || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (diagramNodes.some(Boolean)) fields.diagramNodes = diagramNodes;
+
+    const diagramConnections = (form.solutionDiagram?.connections || []).map((item) =>
+      item.label?.trim() && (overwrite || isMissingTranslation(item.label, item.label_en)) ? item.label : "",
+    );
+    if (diagramConnections.some(Boolean)) fields.diagramConnections = diagramConnections;
+
+    return fields;
+  }, [form]);
+
+  const applyTranslations = useCallback((translations: Record<string, unknown>) => {
+    setForm((prev) => {
+      const next = { ...prev };
+      if (typeof translations.title === "string") next.title_en = translations.title;
+      if (typeof translations.description === "string") next.description_en = translations.description;
+
+      const detailsEn = toTextArray(translations.details);
+      if (detailsEn.length) next.details_en = detailsEn;
+
+      const challengesEn = toTextArray(translations.challenges);
+      if (challengesEn.length) next.challenges_en = challengesEn;
+
+      const achievementTitles = toTextArray(translations.achievementTitles);
+      const achievementDescriptions = toTextArray(translations.achievementDescriptions);
+      if (achievementTitles.length || achievementDescriptions.length) {
+        next.achievements = (prev.achievements || []).map((item, index) => ({
+          ...item,
+          title_en: achievementTitles[index] || item.title_en || "",
+          description_en: achievementDescriptions[index] || item.description_en || "",
+        }));
+      }
+
+      const links = toTextArray(translations.links);
+      if (links.length) {
+        next.links = (prev.links || []).map((item, index) => ({
+          ...item,
+          label_en: links[index] || item.label_en || "",
+        }));
+      }
+
+      const impactGraph = toTextArray(translations.impactGraph);
+      if (impactGraph.length) {
+        next.impactGraph = (prev.impactGraph || []).map((item, index) => ({
+          ...item,
+          label_en: impactGraph[index] || item.label_en || "",
+        }));
+      }
+
+      const diagramNodes = toTextArray(translations.diagramNodes);
+      const diagramConnections = toTextArray(translations.diagramConnections);
+      if (diagramNodes.length || diagramConnections.length) {
+        next.solutionDiagram = {
+          nodes: (prev.solutionDiagram?.nodes || []).map((item, index) => ({
+            ...item,
+            label_en: diagramNodes[index] || item.label_en || "",
+          })),
+          connections: (prev.solutionDiagram?.connections || []).map((item, index) => ({
+            ...item,
+            label_en: diagramConnections[index] || item.label_en || "",
+          })),
+        };
+      }
+
+      return next;
+    });
+    setLang("en");
+  }, []);
+
+  const handleTranslate = useCallback(async (overwrite: boolean) => {
+    const fields = buildTranslationFields(overwrite);
+    if (!Object.keys(fields).length) {
+      toast.info("Aucun champ FR disponible a traduire");
+      return;
+    }
+    try {
+      const result = await translateMutation.mutateAsync({
+        entity: "experience",
+        sourceLocale: "fr",
+        targetLocale: "en",
+        fields,
+        instructions: translationInstructions,
+      });
+      if (!hasUsefulTranslations(fields, result.translations)) {
+        toast.error("La traduction recue ne modifie aucun champ. Verifiez le provider IA.");
+        return;
+      }
+      applyTranslations(result.translations);
+      toast.success("Traduction EN generee");
+    } catch (error) {
+      toast.error((error as Error).message || "Impossible de generer la traduction");
+    }
+  }, [applyTranslations, buildTranslationFields, translateMutation, translationInstructions]);
+
   const handleArrayChange = useCallback(
     (
-      field: "stack" | "challenges" | "details" | "illustrativeImages",
+      field: "stack" | "challenges" | "challenges_en" | "details" | "details_en" | "illustrativeImages",
       index: number,
       value: string,
     ) => {
@@ -146,7 +324,7 @@ export function ExperienceEditorPage({
   );
 
   const addArrayItem = useCallback(
-    (field: "stack" | "challenges" | "details" | "illustrativeImages") => {
+    (field: "stack" | "challenges" | "challenges_en" | "details" | "details_en" | "illustrativeImages") => {
       setForm((prev) => ({ ...prev, [field]: [...(prev[field] || []), ""] }));
     },
     [],
@@ -154,7 +332,7 @@ export function ExperienceEditorPage({
 
   const removeArrayItem = useCallback(
     (
-      field: "stack" | "challenges" | "details" | "illustrativeImages",
+      field: "stack" | "challenges" | "challenges_en" | "details" | "details_en" | "illustrativeImages",
       index: number,
     ) => {
       setForm((prev) => ({
@@ -363,6 +541,9 @@ export function ExperienceEditorPage({
     const details = form.details?.filter((d) => d.trim()) || [];
     if (details.length) cleaned.details = details;
 
+    const detailsEn = form.details_en?.filter((d) => d.trim()) || [];
+    if (detailsEn.length) cleaned.details_en = detailsEn;
+
     const illustrativeImages =
       form.illustrativeImages?.filter((img) => img.trim()) || [];
     if (illustrativeImages.length)
@@ -373,6 +554,9 @@ export function ExperienceEditorPage({
 
     const challenges = form.challenges?.filter((c) => c.trim()) || [];
     if (challenges.length) cleaned.challenges = challenges;
+
+    const challengesEn = form.challenges_en?.filter((c) => c.trim()) || [];
+    if (challengesEn.length) cleaned.challenges_en = challengesEn;
 
     const achievements = (form.achievements || []).filter((a) =>
       a.title.trim(),
@@ -608,24 +792,24 @@ api.listen(3000);
 
           {/* Details (bullet points) */}
           <DynamicListSection
-            label="Details / Responsabilites"
+            label={lang === "en" ? "Details / Responsibilities (EN)" : "Details / Responsabilites"}
             icon={<ChevronRight className="w-3 h-3" />}
-            items={form.details || [""]}
-            placeholder="Responsabilite ou detail cle..."
-            onAdd={() => addArrayItem("details")}
-            onChange={(i, v) => handleArrayChange("details", i, v)}
-            onRemove={(i) => removeArrayItem("details", i)}
+            items={(lang === "en" ? form.details_en : form.details) || [""]}
+            placeholder={lang === "en" ? "Responsibility or key detail..." : "Responsabilite ou detail cle..."}
+            onAdd={() => addArrayItem(lang === "en" ? "details_en" : "details")}
+            onChange={(i, v) => handleArrayChange(lang === "en" ? "details_en" : "details", i, v)}
+            onRemove={(i) => removeArrayItem(lang === "en" ? "details_en" : "details", i)}
           />
 
           {/* Challenges */}
           <DynamicListSection
-            label="Defis & Problematiques"
+            label={lang === "en" ? "Challenges & Constraints (EN)" : "Defis & Problematiques"}
             icon={<AlertCircle className="w-3 h-3" />}
-            items={form.challenges || [""]}
-            placeholder="Un defi rencontre..."
-            onAdd={() => addArrayItem("challenges")}
-            onChange={(i, v) => handleArrayChange("challenges", i, v)}
-            onRemove={(i) => removeArrayItem("challenges", i)}
+            items={(lang === "en" ? form.challenges_en : form.challenges) || [""]}
+            placeholder={lang === "en" ? "A challenge or constraint..." : "Un defi rencontre..."}
+            onAdd={() => addArrayItem(lang === "en" ? "challenges_en" : "challenges")}
+            onChange={(i, v) => handleArrayChange(lang === "en" ? "challenges_en" : "challenges", i, v)}
+            onRemove={(i) => removeArrayItem(lang === "en" ? "challenges_en" : "challenges", i)}
           />
 
           {/* Achievements */}
@@ -646,23 +830,23 @@ api.listen(3000);
                 <div key={i} className="flex gap-2">
                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <input
-                      value={ach.title}
+                      value={lang === "en" ? ach.title_en || "" : ach.title}
                       onChange={(e) =>
-                        handleAchievementChange(i, "title", e.target.value)
+                        handleAchievementChange(i, lang === "en" ? "title_en" : "title", e.target.value)
                       }
-                      placeholder="Titre de la realisation"
+                      placeholder={lang === "en" ? "Achievement title" : "Titre de la realisation"}
                       className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] font-semibold outline-none focus:border-zinc-400"
                     />
                     <input
-                      value={ach.description}
+                      value={lang === "en" ? ach.description_en || "" : ach.description}
                       onChange={(e) =>
                         handleAchievementChange(
                           i,
-                          "description",
+                          lang === "en" ? "description_en" : "description",
                           e.target.value,
                         )
                       }
-                      placeholder="Description..."
+                      placeholder={lang === "en" ? "Description..." : "Description..."}
                       className="h-8 px-3 rounded-lg border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                     />
                     <input
@@ -844,6 +1028,14 @@ api.listen(3000);
 
         {/* ======================== RIGHT SIDEBAR ======================== */}
         <div className="xl:w-[280px] shrink-0 space-y-4">
+          <TranslationPanel
+            instructions={translationInstructions}
+            isPending={translateMutation.isPending}
+            onInstructionsChange={setTranslationInstructions}
+            onTranslateMissing={() => handleTranslate(false)}
+            onTranslateAll={() => handleTranslate(true)}
+          />
+
           {/* Stack */}
           <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between mb-3">
@@ -896,11 +1088,11 @@ api.listen(3000);
                 <div key={i} className="flex gap-1.5">
                   <div className="flex-1 space-y-1">
                     <input
-                      value={link.label}
+                      value={lang === "en" ? link.label_en || "" : link.label}
                       onChange={(e) =>
-                        handleLinkChange(i, "label", e.target.value)
+                        handleLinkChange(i, lang === "en" ? "label_en" : "label", e.target.value)
                       }
-                      placeholder="Label"
+                      placeholder={lang === "en" ? "Label (EN)" : "Label"}
                       className="w-full h-7 px-2 rounded-md border border-border/70 bg-transparent text-[12px] outline-none focus:border-zinc-400"
                     />
                     <input

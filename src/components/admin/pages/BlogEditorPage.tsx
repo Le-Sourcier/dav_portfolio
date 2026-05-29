@@ -3,17 +3,32 @@ import {
   ArrowLeft, Loader2, CheckCircle2,
   Plus, Send, Mail,
 } from 'lucide-react';
-import { useBlogTags, useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
+import { useBlogTags, useCreateBlogPost, useTranslateFields, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { MarkdownEditor } from '../shared/MarkdownEditor';
 import { LangToggle } from '@/components/admin/shared/LangToggle';
 import { PublicationControl } from '@/components/admin/shared/PublicationControl';
 import { AssetUploadField } from '@/components/admin/shared/AssetUploadField';
+import { TranslationPanel } from '@/components/admin/shared/TranslationPanel';
 import type { BlogPost, BlogPostFormData } from '@/types/admin.types';
 
 // ======================== BLOG CATEGORIES ========================
 const blogCategories = ['Tech', 'Design', 'Business', 'Tutoriel', 'Actualite', 'Retour d\'experience'];
+const isBlank = (value?: string | null) => !value || value.trim().length === 0;
+const normalizeText = (value?: string | null) =>
+  value ? value.trim().toLowerCase().replace(/\s+/g, ' ') : '';
+const isMissingTranslation = (source?: string | null, target?: string | null) =>
+  isBlank(target) || (!!normalizeText(source) && normalizeText(source) === normalizeText(target));
+const hasUsefulTranslations = (
+  fields: Record<string, unknown>,
+  translations: Record<string, unknown>,
+) =>
+  Object.entries(fields).some(([key, source]) => {
+    const translated = translations[key];
+    if (typeof source !== 'string' || typeof translated !== 'string') return false;
+    return normalizeText(translated).length > 0 && normalizeText(source) !== normalizeText(translated);
+  });
 
 // ======================== MAIN COMPONENT ========================
 
@@ -27,9 +42,11 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
   const createMutation = useCreateBlogPost();
   const updateMutation = useUpdateBlogPost();
   const sendNewsletterMutation = useSendArticleToSubscribers();
+  const translateMutation = useTranslateFields();
   const { data: availableTags = [] } = useBlogTags();
   const [saved, setSaved] = useState(false);
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const [translationInstructions, setTranslationInstructions] = useState('');
 
   const [formData, setFormData] = useState<BlogPostFormData>(() => {
     if (initialData) {
@@ -78,6 +95,45 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
         id: initialData.id,
         data: { imageUrl: url },
       });
+    }
+  };
+
+  const buildTranslationFields = (overwrite: boolean) => {
+    const fields: Record<string, unknown> = {};
+    if (formData.title.trim() && (overwrite || isMissingTranslation(formData.title, formData.title_en))) fields.title = formData.title;
+    if (formData.excerpt.trim() && (overwrite || isMissingTranslation(formData.excerpt, formData.excerpt_en))) fields.excerpt = formData.excerpt;
+    if (formData.content.trim() && (overwrite || isMissingTranslation(formData.content, formData.content_en))) fields.content = formData.content;
+    return fields;
+  };
+
+  const handleTranslate = async (overwrite: boolean) => {
+    const fields = buildTranslationFields(overwrite);
+    if (!Object.keys(fields).length) {
+      toast.info('Aucun champ FR disponible a traduire');
+      return;
+    }
+    try {
+      const result = await translateMutation.mutateAsync({
+        entity: 'blog',
+        sourceLocale: 'fr',
+        targetLocale: 'en',
+        fields,
+        instructions: translationInstructions,
+      });
+      if (!hasUsefulTranslations(fields, result.translations)) {
+        toast.error('La traduction recue ne modifie aucun champ. Verifiez le provider IA.');
+        return;
+      }
+      setFormData((prev) => ({
+        ...prev,
+        ...(typeof result.translations.title === 'string' ? { title_en: result.translations.title } : {}),
+        ...(typeof result.translations.excerpt === 'string' ? { excerpt_en: result.translations.excerpt } : {}),
+        ...(typeof result.translations.content === 'string' ? { content_en: result.translations.content } : {}),
+      }));
+      setLang('en');
+      toast.success('Traduction EN generee');
+    } catch (error) {
+      toast.error((error as Error).message || 'Impossible de generer la traduction');
     }
   };
 
@@ -293,6 +349,14 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
 
         {/* Right: Metadata sidebar */}
         <div className="xl:w-[280px] shrink-0 space-y-4">
+          <TranslationPanel
+            instructions={translationInstructions}
+            isPending={translateMutation.isPending}
+            onInstructionsChange={setTranslationInstructions}
+            onTranslateMissing={() => handleTranslate(false)}
+            onTranslateAll={() => handleTranslate(true)}
+          />
+
           {/* Category */}
           <div className="bg-card/60 rounded-xl border border-border/70 p-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-2">Categorie</label>

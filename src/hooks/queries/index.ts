@@ -27,3 +27,6 @@ export * from './useSettingsQueries';
 
 // Analytics
 export * from './useAnalyticsQueries';
+
+// Translation
+export * from './useTranslationQueries';
