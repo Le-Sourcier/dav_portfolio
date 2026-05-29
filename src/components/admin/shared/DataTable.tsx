@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Edit2, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -44,10 +44,15 @@ export function DataTable<T>({
     ? data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : data;
 
-  // Reset to page 1 if data shrinks below current page
-  if (currentPage > totalPages && totalPages > 0) {
+  useEffect(() => {
     setCurrentPage(1);
-  }
+  }, [data.length, pageSize]);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   if (isLoading) {
     return (

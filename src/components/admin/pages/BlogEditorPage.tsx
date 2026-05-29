@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  ArrowLeft, Save, Loader2, CheckCircle2,
+  ArrowLeft, Loader2, CheckCircle2,
   Plus, Send, Mail,
 } from 'lucide-react';
 import { useBlogTags, useCreateBlogPost, useUpdateBlogPost, useSendArticleToSubscribers } from '@/hooks/queries';
@@ -138,6 +138,14 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
   const isPending = createMutation.isPending || updateMutation.isPending;
   const wordCount = formData.content.split(/\s+/).filter(Boolean).length;
   const readTime = Math.max(1, Math.ceil(wordCount / 200));
+  const canNotifySubscribers = Boolean(isEditing && initialData?.published && initialData?.slug && !formData.newsletterSentAt);
+  const primaryActionLabel = saved
+    ? 'Enregistre'
+    : isEditing
+      ? 'Mettre a jour'
+      : formData.published
+        ? 'Publier'
+        : 'Creer';
 
   return (
     <div className="space-y-0">
@@ -170,30 +178,20 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
             onPublishedAtChange={(value) => handleChange('publishedAt', value || '')}
           />
           <button
-            onClick={() => handleSave(false)}
+            onClick={() => handleSave(Boolean(formData.published))}
             disabled={isPending}
             className={cn(
               'h-8 px-4 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-60',
               saved
                 ? 'bg-emerald-600 text-white'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100'
             )}
           >
-            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : saved ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
-            {saved ? 'Enregistre' : 'Brouillon'}
+            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : saved ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
+            {primaryActionLabel}
           </button>
 
-          <button
-            onClick={() => handleSave(true)}
-            disabled={isPending}
-            className="h-8 px-4 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[11px] font-semibold flex items-center gap-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors disabled:opacity-60"
-          >
-            <Send className="w-3.5 h-3.5" />
-            Publier
-          </button>
-
-          {/* Notify subscribers - only for published articles being edited */}
-          {isEditing && initialData?.published && initialData?.slug && (
+          {canNotifySubscribers && (
             <button
               onClick={() => {
                 sendNewsletterMutation.mutate({
@@ -345,43 +343,6 @@ export function BlogEditorPage({ initialData, onBack }: BlogEditorPageProps) {
               }) : (
                 <p className="text-[11px] text-zinc-400">Creez vos tags depuis la page Tags.</p>
               )}
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="bg-card/60 rounded-xl border border-border/70 p-4">
-            <label className="block text-[11px] font-medium text-zinc-400 mb-3">Statut</label>
-            <div className="space-y-2">
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <button
-                  onClick={() => handleChange('published', false)}
-                  className={cn(
-                    'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors',
-                    !formData.published ? 'border-zinc-900 dark:border-white' : 'border-zinc-300 dark:border-zinc-700'
-                  )}
-                >
-                  {!formData.published && <div className="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white" />}
-                </button>
-                <div>
-                  <p className="text-[12px] font-medium text-zinc-700 dark:text-zinc-300">Brouillon</p>
-                  <p className="text-[10px] text-zinc-400">Non visible publiquement</p>
-                </div>
-              </label>
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <button
-                  onClick={() => handleChange('published', true)}
-                  className={cn(
-                    'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors',
-                    formData.published ? 'border-emerald-600' : 'border-zinc-300 dark:border-zinc-700'
-                  )}
-                >
-                  {formData.published && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
-                </button>
-                <div>
-                  <p className="text-[12px] font-medium text-zinc-700 dark:text-zinc-300">Publie</p>
-                  <p className="text-[10px] text-zinc-400">Visible sur le blog</p>
-                </div>
-              </label>
             </div>
           </div>
 

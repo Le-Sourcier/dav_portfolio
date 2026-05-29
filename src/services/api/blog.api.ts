@@ -13,11 +13,11 @@ import type {
 export const blogApi = {
   async getAll(published?: boolean): Promise<BlogPost[]> {
     const query = published !== undefined ? `?published=${published}` : '';
-    return apiClient.get<BlogPost[]>(`/blog${query}`);
+    return apiClient.get<BlogPost[]>(`/blog/admin/posts${query}`);
   },
 
   async getById(id: string): Promise<BlogPost> {
-    return apiClient.get<BlogPost>(`/blog/${id}`);
+    return apiClient.get<BlogPost>(`/blog/admin/posts/${id}`);
   },
 
   async getBySlug(slug: string): Promise<BlogPost> {

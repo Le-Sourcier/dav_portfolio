@@ -3,11 +3,11 @@ import type { Experience, ExperienceFormData } from '@/types/admin.types';
 
 export const experiencesApi = {
   async getAll(): Promise<Experience[]> {
-    return apiClient.get<Experience[]>('/experiences');
+    return apiClient.get<Experience[]>('/experiences/admin/experiences');
   },
 
   async getById(id: string): Promise<Experience> {
-    return apiClient.get<Experience>(`/experiences/${id}`);
+    return apiClient.get<Experience>(`/experiences/admin/experiences/${id}`);
   },
 
   async create(data: ExperienceFormData): Promise<Experience> {
