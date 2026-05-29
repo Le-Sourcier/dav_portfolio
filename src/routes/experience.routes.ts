@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import {
   getAllExperiences,
+  getAllAdminExperiences,
   getExperienceById,
+  getAdminExperienceById,
   createExperience,
   updateExperience,
   deleteExperience,
@@ -27,6 +29,9 @@ const router = Router();
  *         description: List of experiences
  */
 router.get('/', getAllExperiences);
+
+router.get('/admin/experiences', authMiddleware, adminMiddleware, getAllAdminExperiences);
+router.get('/admin/experiences/:id', authMiddleware, adminMiddleware, validate(experienceIdValidator), getAdminExperienceById);
 
 /**
  * @swagger

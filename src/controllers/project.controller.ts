@@ -25,6 +25,24 @@ export const getAllProjects = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+export const getAllAdminProjects = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const projects = await projectService.findAll(false);
+    sendSuccess(res, projects, 'Projects retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminProjectById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const project = await projectService.findById(req.params.id!, false);
+    sendSuccess(res, project, 'Project retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getProjectById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const project = await projectService.findById(req.params.id!, !isValidAdminToken(req));
@@ -76,6 +94,8 @@ export const deleteProject = async (req: Request, res: Response, next: NextFunct
 
 export default {
   getAllProjects,
+  getAllAdminProjects,
+  getAdminProjectById,
   getProjectById,
   getProjectBySlug,
   createProject,

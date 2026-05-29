@@ -25,6 +25,24 @@ export const getAllExperiences = async (req: Request, res: Response, next: NextF
   }
 };
 
+export const getAllAdminExperiences = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const experiences = await experienceService.findAll(false);
+    sendSuccess(res, experiences, 'Experiences retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminExperienceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const experience = await experienceService.findById(req.params.id!, false);
+    sendSuccess(res, experience, 'Experience retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getExperienceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const experience = await experienceService.findById(req.params.id!, !isValidAdminToken(req));
@@ -65,4 +83,12 @@ export const deleteExperience = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export default { getAllExperiences, getExperienceById, createExperience, updateExperience, deleteExperience };
+export default {
+  getAllExperiences,
+  getAllAdminExperiences,
+  getExperienceById,
+  getAdminExperienceById,
+  createExperience,
+  updateExperience,
+  deleteExperience,
+};

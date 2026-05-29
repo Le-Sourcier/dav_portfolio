@@ -109,6 +109,22 @@ export const config = {
     enabled: !!process.env.OPEN_KEY,
   },
 
+  // Asset uploads
+  assets: {
+    ftpHost: process.env.FTP_HOST || "",
+    ftpPort: parseInt(process.env.FTP_PORT || "21", 10),
+    ftpUser: process.env.FTP_USER || "",
+    ftpPassword: process.env.FTP_PASSWORD || "",
+    ftpSecure: process.env.FTP_SECURE === "true",
+    ftpUploadDir: process.env.FTP_UPLOAD_DIR || "/upload",
+    publicBaseUrl:
+      process.env.FTP_PUBLIC_BASE_URL ||
+      "https://bulk.nexuscorporat.com/upload",
+    maxFileSizeMb: parseInt(process.env.ASSET_MAX_FILE_SIZE_MB || "10", 10),
+    maxWidth: parseInt(process.env.ASSET_MAX_WIDTH || "1800", 10),
+    quality: parseInt(process.env.ASSET_QUALITY || "82", 10),
+  },
+
   // Logging
   logLevel: process.env.LOG_LEVEL || "debug",
 };

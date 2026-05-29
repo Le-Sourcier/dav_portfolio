@@ -108,7 +108,7 @@ class BlogService {
   }
 
   async update(id: string, data: Partial<IBlogPost>): Promise<IBlogPost> {
-    const post = await BlogPost.findOne({ where: { id, ...this.visibleWhere() } });
+    const post = await BlogPost.findByPk(id);
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }
@@ -132,7 +132,7 @@ class BlogService {
   }
 
   async delete(id: string): Promise<void> {
-    const post = await BlogPost.findOne({ where: { id, ...this.visibleWhere() } });
+    const post = await BlogPost.findByPk(id);
     if (!post) {
       throw new AppError('Blog post not found', HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
     }

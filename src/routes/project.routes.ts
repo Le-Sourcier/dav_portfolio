@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
   getAllProjects,
+  getAllAdminProjects,
+  getAdminProjectById,
   getProjectById,
   getProjectBySlug,
   createProject,
@@ -29,6 +31,9 @@ const router = Router();
  *         description: List of projects
  */
 router.get('/', getAllProjects);
+
+router.get('/admin/projects', authMiddleware, adminMiddleware, getAllAdminProjects);
+router.get('/admin/projects/:id', authMiddleware, adminMiddleware, validate(projectIdValidator), getAdminProjectById);
 
 /**
  * @swagger

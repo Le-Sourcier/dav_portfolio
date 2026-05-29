@@ -34,6 +34,29 @@ export const getAllPosts = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+export const getAllAdminPosts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const published = req.query.published === 'true'
+      ? true
+      : req.query.published === 'false'
+        ? false
+        : undefined;
+    const posts = await blogService.findAll(published, false);
+    sendSuccess(res, posts, 'Blog posts retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminPostById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const post = await blogService.findById(req.params.id, false);
+    sendSuccess(res, post, 'Blog post retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getPostById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Public requests only see published posts; admin (with valid JWT) sees all
@@ -245,6 +268,8 @@ export const getBlogStats = async (_req: Request, res: Response, next: NextFunct
 
 export default {
   getAllPosts,
+  getAllAdminPosts,
+  getAdminPostById,
   getPostById,
   getPostBySlug,
   createPost,

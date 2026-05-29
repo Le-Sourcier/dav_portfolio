@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
   getAllPosts,
+  getAllAdminPosts,
+  getAdminPostById,
   getPostById,
   getPostBySlug,
   createPost,
@@ -58,6 +60,10 @@ const router = Router();
  */
 router.get('/', getAllPosts);
 
+// Admin list/detail must include drafts and scheduled posts.
+router.get('/admin/posts', authMiddleware, adminMiddleware, getAllAdminPosts);
+router.get('/admin/posts/:id', authMiddleware, adminMiddleware, validate(blogPostIdValidator), getAdminPostById);
+
 // GET /api/blog/comments -- paginated comment moderation (admin)
 router.get('/comments', authMiddleware, adminMiddleware, getComments);
 
@@ -71,6 +77,7 @@ router.post('/comments/:commentId/replies', authMiddleware, adminMiddleware, val
 router.delete('/comments/:commentId', authMiddleware, adminMiddleware, validate(commentIdValidator), deleteComment);
 
 // Tags taxonomy
+router.get('/stats/overview', authMiddleware, adminMiddleware, getBlogStats);
 router.get('/tags', getTags);
 router.get('/tags/stats', authMiddleware, adminMiddleware, getTagStats);
 router.get('/tags/slug/:slug', validate(blogSlugValidator), getTagBySlug);
@@ -228,8 +235,5 @@ router.post('/:id/view', trackingLimiter, validate(blogPostIdValidator), trackVi
 
 // POST /api/blog/:id/share  -- track a share (public)
 router.post('/:id/share', trackingLimiter, validate(blogPostIdValidator), trackShare);
-
-// GET /api/blog/stats        -- blog analytics (admin)
-router.get('/stats/overview', authMiddleware, adminMiddleware, getBlogStats);
 
 export default router;
