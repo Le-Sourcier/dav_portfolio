@@ -17,7 +17,7 @@
     "db:seed:experiences": "tsx scripts/seed-experiences-only.ts",
     "db:seed:projects": "tsx scripts/seed-projects-only.ts",
     "db:seed:blog": "tsx scripts/seed-blog-only.ts",
-"db:set-views": "tsx scripts/set-view-counts.ts",
+"db:set-views": "node scripts/set-view-counts.mjs",
     "backup": "bash scripts/backup.sh",
     "backup:verbose": "bash scripts/backup.sh --verbose",
     "backup:test": "BACKUP_ENABLED=true bash scripts/backup.sh --verbose"
