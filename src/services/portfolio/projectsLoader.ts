@@ -7,8 +7,8 @@ import type { Project } from '@/types/portfolio.types';
 
 export async function loadProjects(locale: AppLocale = defaultLocale): Promise<Project[]> {
   try {
-    const data = await requestApi<BackendProject[]>('/projects', {
-      tags: ['projects'],
+    const data = await requestApi<BackendProject[]>(`/projects?locale=${locale}`, {
+      tags: ['projects', `projects:${locale}`],
     });
     return Array.isArray(data) ? data.map((item) => normalizeProject(item, locale)) : [];
   } catch {
@@ -18,8 +18,8 @@ export async function loadProjects(locale: AppLocale = defaultLocale): Promise<P
 
 export async function loadProjectBySlug(slug: string, locale: AppLocale = defaultLocale): Promise<Project | null> {
   try {
-    const project = await requestApi<BackendProject>(`/projects/slug/${encodeURIComponent(slug)}`, {
-      tags: ['projects', `project:${slug}`],
+    const project = await requestApi<BackendProject>(`/projects/slug/${encodeURIComponent(slug)}?locale=${locale}`, {
+      tags: ['projects', `projects:${locale}`, `project:${slug}`, `project:${slug}:${locale}`],
     });
     return normalizeProject(project, locale);
   } catch {
