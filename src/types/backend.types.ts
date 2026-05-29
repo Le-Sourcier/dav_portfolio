@@ -121,12 +121,15 @@ export interface BackendProject
 
 export interface ExperienceAchievement {
   title: string;
+  title_en?: string | null;
   description: string;
+  description_en?: string | null;
   icon?: string;
 }
 
 export interface ExperienceLink {
   label: string;
+  label_en?: string | null;
   url: string;
 }
 
@@ -138,11 +141,13 @@ export interface BackendExperience extends LocalizedTextField<"title" | "descrip
   dates: string;
   description: string;
   details?: string[];
+  details_en?: string[];
   links?: ExperienceLink[];
   coverImage?: string | null;
   illustrativeImages?: string[];
   stack?: string[];
   challenges?: string[];
+  challenges_en?: string[];
   achievements?: ExperienceAchievement[];
   solutionDiagram?: SolutionDiagram | null;
   impactGraph?: ImpactData[] | null;

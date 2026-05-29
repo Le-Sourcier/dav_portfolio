@@ -200,7 +200,11 @@ function normalizeExperience(
   const rawSummary = localizeText(locale, item.description, item.description_en);
   const summary = stripContent(rawSummary);
   const points = [
-    ...(Array.isArray(item.challenges) ? item.challenges : []),
+    ...(locale === "en" && Array.isArray(item.challenges_en) && item.challenges_en.length > 0
+      ? item.challenges_en
+      : Array.isArray(item.challenges)
+        ? item.challenges
+        : []),
     ...(Array.isArray(item.stack) ? item.stack : []),
   ]
     .filter(Boolean)
@@ -230,9 +234,18 @@ function normalizeExperienceDetail(
     ...base,
     location: item.location?.trim() || undefined,
     description,
-    details: Array.isArray(item.details) ? item.details.filter(Boolean) : [],
+    details: locale === "en" && Array.isArray(item.details_en) && item.details_en.length > 0
+      ? item.details_en.filter(Boolean)
+      : Array.isArray(item.details)
+        ? item.details.filter(Boolean)
+        : [],
     links: Array.isArray(item.links)
-      ? item.links.filter((l) => l.label && l.url)
+      ? item.links
+          .filter((l) => l.label && l.url)
+          .map((link) => ({
+            ...link,
+            label: localizeText(locale, link.label, link.label_en),
+          }))
       : [],
     coverImage: normalizeMediaUrl(item.coverImage ?? undefined),
     illustrativeImages: Array.isArray(item.illustrativeImages)
@@ -241,9 +254,19 @@ function normalizeExperienceDetail(
           .filter((img): img is string => Boolean(img))
       : [],
     stack: Array.isArray(item.stack) ? item.stack.filter(Boolean) : [],
-    challenges: Array.isArray(item.challenges) ? item.challenges.filter(Boolean) : [],
+    challenges: locale === "en" && Array.isArray(item.challenges_en) && item.challenges_en.length > 0
+      ? item.challenges_en.filter(Boolean)
+      : Array.isArray(item.challenges)
+        ? item.challenges.filter(Boolean)
+        : [],
     achievements: Array.isArray(item.achievements)
-      ? item.achievements.filter((a) => a.title && a.description)
+      ? item.achievements
+          .filter((a) => a.title && a.description)
+          .map((achievement) => ({
+            ...achievement,
+            title: localizeText(locale, achievement.title, achievement.title_en),
+            description: localizeText(locale, achievement.description, achievement.description_en),
+          }))
       : [],
     impactGraph: Array.isArray(item.impactGraph) ? item.impactGraph : [],
     solutionDiagram: item.solutionDiagram ?? undefined,
