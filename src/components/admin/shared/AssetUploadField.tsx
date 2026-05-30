@@ -11,6 +11,7 @@ type AssetUploadFieldProps = {
   scope: AssetScope;
   onChange: (url: string) => void;
   className?: string;
+  variant?: "default" | "compact";
 };
 
 export function AssetUploadField({
@@ -20,9 +21,11 @@ export function AssetUploadField({
   scope,
   onChange,
   className,
+  variant = "default",
 }: AssetUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const isCompact = variant === "compact";
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,43 +61,60 @@ export function AssetUploadField({
 
       {value ? (
         <div className="group relative">
-          <img src={value} alt="" className="h-48 w-full object-cover" />
-          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
+          <img src={value} alt="" className={cn("w-full object-cover", isCompact ? "h-28" : "h-48")} />
+          <div className={cn(
+            "absolute inset-0 flex items-center justify-center gap-2 bg-black/45 opacity-0 transition-opacity group-hover:opacity-100",
+            isCompact && "gap-1.5",
+          )}>
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-semibold text-zinc-950 disabled:opacity-60"
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-lg bg-white text-xs font-semibold text-zinc-950 disabled:opacity-60",
+                isCompact ? "px-2" : "px-3",
+              )}
             >
               {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
-              Upload
+              {!isCompact ? "Upload" : null}
             </button>
             <button
               type="button"
               onClick={handleUrlChange}
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white/90 px-3 text-xs font-semibold text-zinc-950"
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-lg bg-white/90 text-xs font-semibold text-zinc-950",
+                isCompact ? "px-2" : "px-3",
+              )}
             >
               <Link2 className="h-3.5 w-3.5" />
-              URL
+              {!isCompact ? "URL" : null}
             </button>
             <button
               type="button"
               onClick={() => onChange("")}
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-500 px-3 text-xs font-semibold text-white"
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-500 text-xs font-semibold text-white",
+                isCompact ? "px-2" : "px-3",
+              )}
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Retirer
+              {!isCompact ? "Retirer" : null}
             </button>
           </div>
         </div>
       ) : (
-        <div className="flex h-36 flex-col items-center justify-center gap-3 p-4 text-center">
-          <Image className="h-6 w-6 text-zinc-400" />
+        <div className={cn(
+          "flex flex-col items-center justify-center gap-3 p-4 text-center",
+          isCompact ? "h-28" : "h-36",
+        )}>
+          <Image className={cn("text-zinc-400", isCompact ? "h-5 w-5" : "h-6 w-6")} />
           <div>
             <p className="text-[12px] font-semibold text-foreground">{emptyLabel}</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              URL externe ou upload WebP optimise.
-            </p>
+            {!isCompact ? (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                URL externe ou upload WebP optimise.
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <button
