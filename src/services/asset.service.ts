@@ -1,9 +1,10 @@
 import path from "node:path";
 import { Readable } from "node:stream";
 import sharp from "sharp";
-import { Client } from "basic-ftp";
+import { Client, FTPResponse } from "basic-ftp";
 import { v4 as uuidv4 } from "uuid";
 import { config } from "../config/index.js";
+import { logger } from "../utils/logger.js";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -64,11 +65,34 @@ function buildPublicUrl(relativePath: string): string {
   return `${base}/${relativePath.split("/").map(encodeURIComponent).join("/")}`;
 }
 
+/**
+ * Code de réponse FTP signalant un transfert complété avec succès.
+ * Voir RFC 959 § 5.4 : 226 "Closing data connection. Requested file action successful."
+ */
+const FTP_TRANSFER_COMPLETE = 226;
+
+/**
+ * Pousse `buffer` vers le serveur FTP au chemin `relativePath`.
+ *
+ * Le code historique appelait `uploadFrom` puis fermait la connexion sans
+ * inspecter la réponse — ce qui peut masquer des transferts incomplets quand
+ * le serveur accepte le PUT mais ne persiste pas le fichier (jail mal
+ * configurée, quota, mode passif négocié de travers). On vérifie maintenant
+ * que le serveur renvoie bien le code "transfert terminé" et on confirme
+ * l'existence via `size()` avant de considérer l'upload comme réussi.
+ */
 async function uploadBufferToFtp(relativePath: string, buffer: Buffer): Promise<void> {
   assertFtpConfigured();
 
   const client = new Client(30_000);
-  client.ftp.verbose = false;
+  // verbose suivi du logLevel applicatif — précieux pour diagnostiquer les
+  // chroot/jail invisibles côté FileZilla quand un upload "réussit" mais que
+  // le fichier finit dans un répertoire inattendu.
+  client.ftp.verbose = config.logLevel === "debug";
+
+  const uploadRoot = config.assets.ftpUploadDir.replace(/\/+$/, "") || "/";
+  const remoteDir = path.posix.join(uploadRoot, path.posix.dirname(relativePath));
+  const remoteFilename = path.posix.basename(relativePath);
 
   try {
     await client.access({
@@ -79,12 +103,48 @@ async function uploadBufferToFtp(relativePath: string, buffer: Buffer): Promise<
       secure: config.assets.ftpSecure,
     });
 
-    const uploadRoot = config.assets.ftpUploadDir.replace(/\/+$/, "") || "/";
-    const remoteDir = path.posix.join(uploadRoot, path.posix.dirname(relativePath));
-    const remoteFilename = path.posix.basename(relativePath);
-
     await client.ensureDir(remoteDir);
-    await client.uploadFrom(Readable.from(buffer), remoteFilename);
+    const effectiveCwd = await client.pwd();
+    logger.debug("FTP upload — pwd after ensureDir", {
+      requestedDir: remoteDir,
+      effectiveCwd,
+      remoteFilename,
+    });
+
+    const uploadResponse: FTPResponse = await client.uploadFrom(
+      Readable.from(buffer),
+      remoteFilename,
+    );
+
+    if (uploadResponse.code !== FTP_TRANSFER_COMPLETE) {
+      throw new Error(
+        `FTP upload returned unexpected code ${uploadResponse.code}: ${uploadResponse.message}`,
+      );
+    }
+
+    // Vérification post-transfert : certains serveurs FTP acceptent le STOR
+    // sans réellement écrire le fichier (quota, droits, jail). `size()`
+    // échoue avec une 5xx si le fichier n'est pas là, ce qui nous laisse
+    // remonter une vraie erreur au lieu de signaler une fausse réussite.
+    const remoteSize = await client.size(remoteFilename);
+    if (remoteSize !== buffer.length) {
+      throw new Error(
+        `FTP upload size mismatch: expected ${buffer.length} bytes, server reports ${remoteSize}`,
+      );
+    }
+
+    logger.info("FTP upload completed", {
+      remotePath: path.posix.join(effectiveCwd, remoteFilename),
+      bytes: remoteSize,
+    });
+  } catch (error) {
+    logger.error("FTP upload failed", {
+      remoteDir,
+      remoteFilename,
+      host: config.assets.ftpHost,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
   } finally {
     client.close();
   }
