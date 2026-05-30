@@ -4,8 +4,8 @@
  * En-tête de l'assistant — pattern Intercom Fin :
  * avatar à gauche, nom + statut au milieu, actions à droite (toujours en ligne).
  */
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { BrandImage } from "@/components/ui/BrandImage";
 
 interface AssistantHeadProps {
   isOffline: boolean;
@@ -20,12 +20,11 @@ export function AssistantHead({ isOffline, onClose, onReset }: AssistantHeadProp
   return (
     <header className={`assistant-head${isOffline ? " is-offline-ctx" : ""}`}>
       <div className="assistant-head-avatar">
-        <Image
+        <BrandImage
           src="/brand/assistant-avatar-small.png"
           alt=""
           width={30}
           height={30}
-          aria-hidden="true"
         />
         <span
           className={`assistant-head-presence is-${isOffline ? "offline" : "online"}`}

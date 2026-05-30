@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { ExperienceGlobe } from "@/components/experience/ExperienceGlobe";
 import { ExperiencesJourney } from "@/components/experience/ExperiencesJourney";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadExperiences } from "@/services/portfolio/contentLoaders";
 
 type LocalePageProps = {
@@ -35,12 +31,8 @@ export default async function ExperiencesPage({ params }: LocalePageProps) {
   const { locale: routeLocale } = await params;
   const locale = await getRequestLocale(routeLocale);
   const t = await getTranslations({ locale, namespace: "ExperiencesIndex" });
-  const [experiences, blogPosts] = await Promise.all([
-    loadExperiences(locale),
-    loadBlogPosts(locale),
-  ]);
+  const experiences = await loadExperiences(locale);
   const hasExperiences = experiences.length > 0;
-  const hasBlog = blogPosts.length > 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -65,9 +57,7 @@ export default async function ExperiencesPage({ params }: LocalePageProps) {
   // if (process.env.NODE_ENV === "production") return <NotFound />;
 
   return (
-    <>
-      <Header showBlog={hasBlog} />
-      <main>
+    <main>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -159,9 +149,6 @@ export default async function ExperiencesPage({ params }: LocalePageProps) {
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
-        <Footer showBlog={hasBlog} locale={locale} />
-      </main>
-      <BackToTop />
-    </>
+    </main>
   );
 }

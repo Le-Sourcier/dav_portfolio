@@ -10969,6 +10969,250 @@ main {
   line-height: 1.35;
 }
 
+/* ------------------------------------------------------------------
+ * Variante immersive du hero expérience
+ * Activée quand `experience.coverImage` est présent. Calque la mise en
+ * scène d'`article-cover-hero` (image plein écran + overlay + contenu
+ * superposé) tout en gardant les éléments spécifiques aux expériences
+ * (stack tech, period/location chips, links externes).
+ * ------------------------------------------------------------------ */
+.xp-cover-hero {
+  position: relative;
+  display: grid;
+  align-items: end;
+  width: 100vw;
+  min-height: clamp(500px, 64vh, 620px);
+  margin-top: -84px;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  padding: 136px max(20px, calc((100vw - 1180px) / 2)) clamp(38px, 6vw, 64px);
+  background: var(--background);
+}
+
+.xp-cover-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.03);
+  filter: saturate(0.92) contrast(1.04);
+}
+
+.xp-cover-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(9, 10, 9, 0.91), rgba(9, 10, 9, 0.5) 48%, rgba(9, 10, 9, 0.16)),
+    linear-gradient(180deg, rgba(9, 10, 9, 0.58), transparent 30%, rgba(9, 10, 9, 0.86)),
+    radial-gradient(circle at 78% 20%, rgba(213, 176, 91, 0.18), transparent 38%);
+  content: "";
+}
+
+.xp-cover-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  height: 34%;
+  background: linear-gradient(180deg, transparent, var(--background));
+  pointer-events: none;
+}
+
+.xp-cover-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: min(1060px, calc(100vw - 40px));
+  color: #fff7e9;
+}
+
+.xp-cover-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.xp-cover-back-link {
+  display: inline-flex;
+  width: max-content;
+  border: 1px solid rgba(255, 247, 233, 0.24);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(255, 247, 233, 0.08);
+  color: rgba(255, 247, 233, 0.86);
+  backdrop-filter: blur(14px);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.xp-cover-kicker {
+  display: inline-flex;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #111;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.xp-cover-content h1 {
+  max-width: 820px;
+  margin: 0;
+  color: #fff7e9;
+  font-family: var(--font-serif, var(--font-sans));
+  font-size: clamp(36px, 5.25vw, 72px);
+  font-weight: 480;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.xp-cover-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 247, 233, 0.14);
+}
+
+.xp-cover-meta {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.xp-cover-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  border: 1px solid rgba(255, 247, 233, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 247, 233, 0.08);
+  color: rgba(255, 247, 233, 0.82);
+  padding: 6px 13px;
+  font-size: 13px;
+  font-weight: 800;
+  backdrop-filter: blur(12px);
+}
+
+.xp-cover-meta span.is-focus {
+  padding-left: 8px;
+}
+
+.xp-cover-meta span.is-focus small {
+  color: var(--gold);
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-cover-stack {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 18px;
+  color: rgba(255, 247, 233, 0.78);
+  font-family: var(--font-geist-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.xp-cover-stack i {
+  margin: 0 4px;
+  color: var(--gold);
+  font-style: normal;
+}
+
+.xp-cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+  margin-top: 22px;
+}
+
+.xp-cover-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 247, 233, 0.92);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 247, 233, 0.55);
+  padding-bottom: 2px;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.xp-cover-link:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.xp-cover-link span {
+  color: var(--gold);
+}
+
+@media (max-width: 920px) {
+  .xp-cover-hero {
+    min-height: 720px;
+    padding: 140px 24px 64px;
+  }
+}
+
+@media (max-width: 620px) {
+  .xp-cover-hero {
+    min-height: 640px;
+    padding: 126px 20px 56px;
+  }
+
+  .xp-cover-content h1 {
+    font-size: clamp(22px, 7.4vw, 38px);
+    line-height: 1.06;
+  }
+
+  .xp-cover-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .xp-cover-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .xp-cover-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .xp-cover-meta span {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
 /* --- SIGNAL bar --- */
 .xp-signal {
   max-width: 1240px;
@@ -11014,20 +11258,24 @@ main {
   overflow-wrap: anywhere;
 }
 
-/* --- SHELL : flow éditorial + rail --- */
+/* --- SHELL : flow éditorial + rail ---
+   Tightening 2026-05 : l'aération initiale (gap 72→120px) crée un effet
+   "page vide" sur les expériences riches en sections. Resserrée à
+   56→88px : on garde la respiration premium mais le scroll reste dense.
+*/
 .xp-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
   gap: clamp(36px, 5vw, 88px);
   max-width: 1240px;
   margin: 0 auto;
-  padding: clamp(72px, 9vw, 120px) clamp(20px, 6vw, 96px) 0;
+  padding: clamp(48px, 5.5vw, 76px) clamp(20px, 6vw, 96px) 0;
 }
 
 .xp-flow {
   display: flex;
   flex-direction: column;
-  gap: clamp(72px, 9vw, 120px);
+  gap: clamp(56px, 6.5vw, 88px);
   min-width: 0;
 }
 
@@ -11038,9 +11286,9 @@ main {
 
 .xp-section-head {
   max-width: 680px;
-  padding-bottom: 24px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
 
 .xp-section-kicker {
@@ -11065,11 +11313,11 @@ main {
 }
 
 .xp-section-lead {
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   max-width: 580px;
   color: var(--muted);
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .xp-section-body {
@@ -11147,7 +11395,7 @@ main {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
   gap: 22px;
-  padding: 26px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -11774,13 +12022,13 @@ main {
 .xp-closing {
   position: relative;
   max-width: 680px;
-  margin-top: 16px;
-  padding: 44px 0 0;
+  margin-top: 12px;
+  padding: 32px 0 0;
   border-top: 1px solid var(--line);
 }
 
 .xp-closing h2 {
-  margin: 12px 0 16px;
+  margin: 10px 0 14px;
   font-family: var(--font-serif, var(--font-sans));
   font-size: clamp(26px, 3vw, 36px);
   font-weight: 800;
@@ -11789,10 +12037,10 @@ main {
 }
 
 .xp-closing > p {
-  margin: 0 0 24px;
+  margin: 0 0 22px;
   color: var(--muted);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 .xp-closing-actions {
@@ -11814,7 +12062,7 @@ main {
   top: 120px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 22px;
 }
 
 .xp-toc {
@@ -11870,12 +12118,12 @@ main {
 }
 
 .xp-rail-section {
-  padding-top: 24px;
+  padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
 .xp-rail-kicker {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   color: var(--accent-strong);
   font-family: var(--font-geist-mono);
   font-size: 10px;
@@ -11904,9 +12152,14 @@ main {
   font-weight: 700;
 }
 
+/* Look "carte premium" pour les ressources :
+   On présente chaque lien comme une carte cliquable bordée plutôt qu'une
+   liste linéaire — beaucoup plus élégant quand la section ne contient
+   qu'un ou deux liens (cas fréquent).
+*/
 .xp-rail-links {
   display: grid;
-  gap: 2px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -11916,26 +12169,29 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 12px;
+  padding: 12px 14px;
   color: var(--foreground);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.005em;
   text-decoration: none;
-  border-bottom: 1px solid var(--line);
-  transition: color 180ms ease;
-}
-
-.xp-rail-links li:last-child a {
-  border-bottom: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 250, 241, 0.5);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
 .xp-rail-links a:hover {
-  color: var(--accent-strong);
+  border-color: var(--accent-strong);
+  background: rgba(255, 250, 241, 0.85);
+  transform: translateY(-1px);
 }
 
 .xp-rail-links a span {
   color: var(--gold);
+  font-size: 14px;
+  flex: 0 0 auto;
 }
 
 .xp-rail-cta {

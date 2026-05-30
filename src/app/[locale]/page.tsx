@@ -4,11 +4,8 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { ContactSection } from "@/components/ContactSection";
 import { ExpertiseCarousel } from "@/components/ExpertiseCarousel";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { site, stack } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
@@ -72,14 +69,7 @@ export default async function Home({ params }: LocalePageProps) {
   );
 
   return (
-    <>
-      <Header
-        showProjects={hasProjects}
-        showJourney={hasJourney}
-        showBlog={hasBlog}
-      />
-
-      <main>
+    <main>
         <section className="hero-section">
           <div className="hero-grid">
             <div className="hero-copy">
@@ -462,15 +452,6 @@ export default async function Home({ params }: LocalePageProps) {
         <Newsletter />
 
         <ContactSection />
-
-        <Footer
-          showProjects={hasProjects}
-          showJourney={hasJourney}
-          showBlog={hasBlog}
-          locale={locale}
-        />
-      </main>
-      <BackToTop />
-    </>
+    </main>
   );
 }

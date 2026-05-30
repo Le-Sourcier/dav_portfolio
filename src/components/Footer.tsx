@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandImage } from "@/components/ui/BrandImage";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 import { getTranslations } from "next-intl/server";
@@ -27,14 +27,14 @@ export async function Footer({
       <div className="footer-main">
         <div>
           <Link href={localizedPath("/", locale)} className="footer-brand">
-            <Image
+            <BrandImage
               className="brand-logo-light"
               src="/brand/logo-horizontal-clean.png"
               alt=""
               width={220}
               height={81}
             />
-            <Image
+            <BrandImage
               className="brand-logo-dark"
               src="/brand/logo-horizontal-clean-dark.png"
               alt=""

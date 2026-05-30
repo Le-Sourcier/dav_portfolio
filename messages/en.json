@@ -221,7 +221,7 @@
     "formatValue": "Full-time, freelance, long mission",
     "focusLabel": "Focus",
     "focusValue": "SaaS, API, back-office, automation",
-    "ctaButton": "Assign me a mission",
+    "ctaButton": "Work with me",
     "downloadCv": "Download CV",
     "count": "{count} {count, plural, =1 {project} other {projects}}",
     "filterTitle": "Find the right case to evaluate the method.",
@@ -328,7 +328,7 @@
     "formatValue": "Full-time, freelance, long mission",
     "focusLabel": "Focus",
     "focusValue": "SaaS, API, back-office, automation",
-    "ctaButton": "Assign me a mission",
+    "ctaButton": "Discuss a project",
     "downloadCv": "Download CV"
   },
   "ExperienceDetail": {
@@ -361,7 +361,7 @@
     "closingKicker": "Collaboration",
     "closingTitle": "A similar mission to tackle? Let's discuss it.",
     "closingDescription": "Product diagnosis, architecture, delivery. The goal stays the same: turn a fuzzy need into a clear, maintainable platform ready to evolve.",
-    "closingCta": "Assign me a mission",
+    "closingCta": "Hire me",
     "closingCv": "Download CV"
   },
   "ExperienceHero": {

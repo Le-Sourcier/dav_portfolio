@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { BrandImage } from "@/components/ui/BrandImage";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
 
@@ -64,19 +64,23 @@ export function Header({
     <header
       className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
       <Link href={localizedPath("/", locale)} className="brand" aria-label={h("homeAriaLabel")}>
-        <Image
+        <BrandImage
           className="brand-logo-light"
           src="/brand/logo-horizontal-clean.png"
           alt=""
           width={176}
           height={65}
+          loading="eager"
+          fetchPriority="high"
         />
-        <Image
+        <BrandImage
           className="brand-logo-dark"
           src="/brand/logo-horizontal-clean-dark.png"
           alt=""
           width={176}
           height={65}
+          loading="eager"
+          fetchPriority="high"
         />
       </Link>
       <nav className="nav-links" aria-label={h("navAriaLabel")}>

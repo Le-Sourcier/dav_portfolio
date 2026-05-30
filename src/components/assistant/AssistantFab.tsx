@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { BrandImage } from "@/components/ui/BrandImage";
 
 interface AssistantFabProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export function AssistantFab({ isOpen, onToggle }: AssistantFabProps) {
       aria-expanded={isOpen}
     >
       <span className="assistant-fab-avatar" aria-hidden="true">
-        <Image
+        <BrandImage
           src="/brand/assistant-avatar-small.png"
           alt=""
           width={28}

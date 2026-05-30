@@ -58,8 +58,7 @@ export const services = [
     title_en: "Web & mobile product",
     headline:
       "Construire des interfaces rapides, lisibles et pensées pour l'usage réel.",
-    headline_en:
-      "Build fast, readable interfaces designed for real usage.",
+    headline_en: "Build fast, readable interfaces designed for real usage.",
     description:
       "Interfaces React, Next.js et React Native avec hiérarchie claire, performance et finition produit.",
     description_en:
@@ -204,17 +203,24 @@ export const experience = [
 ];
 
 export const stack = [
+  // {
+  //   name: "Go",
+  //   role: "Langage backend",
+  //   category: "Langage",
+  //   icon: "/stack/go.svg",
+  // },
+  // {
+  //   name: "Rust",
+  //   role: "Langage système",
+  //   category: "Langage",
+  //   icon: "/stack/rust.svg",
+  // },
+
   {
-    name: "Go",
-    role: "Langage backend",
-    category: "Langage",
-    icon: "/stack/go.svg",
-  },
-  {
-    name: "Rust",
-    role: "Langage système",
-    category: "Langage",
-    icon: "/stack/rust.svg",
+    name: "Node.js",
+    role: "Runtime backend",
+    category: "Backend",
+    icon: "/stack/nodejs.svg",
   },
   {
     name: "Python",
@@ -241,23 +247,17 @@ export const stack = [
     icon: "/stack/typescript.svg",
   },
   {
-    name: "Node.js",
-    role: "Runtime backend",
-    category: "Backend",
-    icon: "/stack/nodejs.svg",
-  },
-  {
     name: "Fastify",
     role: "APIs rapides",
     category: "Backend",
     icon: "/stack/fastify.svg",
   },
-  {
-    name: ".NET",
-    role: "Framework web",
-    category: "Backend",
-    icon: "/stack/dot-net.svg",
-  },
+  // {
+  //   name: ".NET",
+  //   role: "Framework web",
+  //   category: "Backend",
+  //   icon: "/stack/dot-net.svg",
+  // },
   {
     name: "PostgreSQL",
     role: "Données critiques",

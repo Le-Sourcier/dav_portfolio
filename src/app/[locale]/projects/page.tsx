@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { ProjectsDirectory } from "@/components/ProjectsDirectory";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
-import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
 import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 type LocalePageProps = {
@@ -34,12 +30,7 @@ export default async function ProjectsPage({ params }: LocalePageProps) {
   const { locale: routeLocale } = await params;
   const locale = await getRequestLocale(routeLocale);
   const t = await getTranslations({ locale, namespace: "ProjectsIndex" });
-  const [projects, blogPosts] = await Promise.all([
-    loadProjects(locale),
-    loadBlogPosts(locale),
-  ]);
-  const hasProjects = projects.length > 0;
-  const hasBlog = blogPosts.length > 0;
+  const projects = await loadProjects(locale);
   const categories = Array.from(
     new Set(projects.map((project) => project.category).filter(Boolean)),
   );
@@ -70,9 +61,7 @@ export default async function ProjectsPage({ params }: LocalePageProps) {
   };
 
   return (
-    <>
-      <Header showProjects={hasProjects} showBlog={hasBlog} />
-      <main>
+    <main>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -140,9 +129,6 @@ export default async function ProjectsPage({ params }: LocalePageProps) {
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
-        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
-      </main>
-      <BackToTop />
-    </>
+    </main>
   );
 }

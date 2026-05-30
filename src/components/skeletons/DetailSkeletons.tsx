@@ -1,7 +1,3 @@
-import { BackToTop } from "@/components/blog/BackToTop";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-
 function SkeletonLine({
   width,
   className = "",
@@ -30,9 +26,7 @@ function SkeletonPill({ width }: { width?: string }) {
 
 export function BlogArticleSkeleton() {
   return (
-    <>
-      <Header showBlog showProjects />
-      <main aria-busy="true" aria-label="Chargement de l'article">
+    <main aria-busy="true" aria-label="Chargement de l'article">
         <article className="article-shell article-shell--detail detail-skeleton">
           <section className="article-cover-hero detail-skeleton-hero">
             <div className="article-cover-overlay" />
@@ -86,18 +80,13 @@ export function BlogArticleSkeleton() {
             </div>
           </div>
         </article>
-        <Footer showBlog showProjects />
-      </main>
-      <BackToTop />
-    </>
+    </main>
   );
 }
 
 export function ProjectDetailSkeleton() {
   return (
-    <>
-      <Header showProjects />
-      <main className="case-page detail-skeleton" aria-busy="true" aria-label="Chargement du projet">
+    <main className="case-page detail-skeleton" aria-busy="true" aria-label="Chargement du projet">
         <section className="case-cover-hero detail-skeleton-hero">
           <div className="case-cover-overlay" />
           <div className="case-cover-content">
@@ -166,18 +155,13 @@ export function ProjectDetailSkeleton() {
             </div>
           </aside>
         </section>
-      </main>
-      <Footer showProjects />
-      <BackToTop />
-    </>
+    </main>
   );
 }
 
 export function ExperienceDetailSkeleton() {
   return (
-    <>
-      <Header />
-      <main className="xp-page detail-skeleton" aria-busy="true" aria-label="Chargement du parcours">
+    <main className="xp-page detail-skeleton" aria-busy="true" aria-label="Chargement du parcours">
         <section className="xp-hero">
           <SkeletonPill width="116px" />
           <div className="xp-hero-grid">
@@ -231,9 +215,6 @@ export function ExperienceDetailSkeleton() {
             </div>
           </aside>
         </div>
-      </main>
-      <Footer />
-      <BackToTop />
-    </>
+    </main>
   );
 }

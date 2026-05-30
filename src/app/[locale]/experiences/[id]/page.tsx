@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ExperienceDetail } from "@/components/experience/ExperienceDetail";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
@@ -69,12 +66,5 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
     notFound();
   }
 
-  return (
-    <>
-      <Header />
-      <ExperienceDetail experience={experience} locale={locale} />
-      <Footer locale={locale} />
-      <BackToTop />
-    </>
-  );
+  return <ExperienceDetail experience={experience} locale={locale} />;
 }

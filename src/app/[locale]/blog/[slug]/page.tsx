@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
 import { ArticleHero } from "@/components/blog/ArticleHero";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { BlogEngagementTracker } from "@/components/blog/BlogEngagementTracker";
 import { CommentsSection } from "@/components/blog/comments/CommentsSection";
 import { MarkdownContent } from "@/components/blog/MarkdownContent";
@@ -17,7 +14,6 @@ import { site } from "@/lib/portfolio";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { loadBlogPostBySlug, loadBlogPosts } from "@/services/portfolio/contentLoaders";
-import { loadProjects } from "@/services/portfolio/projectsLoader";
 import type { BlogPost } from "@/types/blog";
 import { sectionId } from "@/utils/sectionId";
 
@@ -155,9 +151,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }));
   const jsonLd = buildJsonLd(post, locale);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(post, { home: t("home"), blog: t("blog") }, locale);
-  const projects = await loadProjects(locale);
-  const hasProjects = projects.length > 0;
-  const hasBlog = allPosts.length > 0;
   const hireSubject = encodeURIComponent(`Discussion autour de l'article : ${post.title}`);
   const hireBody = encodeURIComponent(
     `Bonjour David,\n\nJ'ai lu votre article "${post.title}" et je voudrais discuter d'un besoin proche.\n\nContexte :\nObjectif :\nDelai :\n\nMerci.`,
@@ -173,7 +166,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      <Header showProjects={hasProjects} showBlog={hasBlog} />
       <ReadingProgress />
       <BlogEngagementTracker postId={post.id} />
       <main>
@@ -275,9 +267,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </article>
 
         <Newsletter compact />
-        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
       </main>
-      <BackToTop />
     </>
   );
 }

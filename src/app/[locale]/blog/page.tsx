@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { BlogDirectory } from "@/components/BlogDirectory";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Newsletter } from "@/components/Newsletter";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { site } from "@/lib/portfolio";
 import { getTranslations } from "next-intl/server";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { loadBlogPosts } from "@/services/portfolio/contentLoaders";
-import { loadProjects } from "@/services/portfolio/projectsLoader";
 
 type LocalePageProps = {
   params: Promise<{ locale: string }>;
@@ -35,12 +31,7 @@ export default async function BlogPage({ params }: LocalePageProps) {
   const { locale: routeLocale } = await params;
   const locale = await getRequestLocale(routeLocale);
   const t = await getTranslations({ locale, namespace: "BlogPage" });
-  const [projects, blogPosts] = await Promise.all([
-    loadProjects(locale),
-    loadBlogPosts(locale),
-  ]);
-  const hasProjects = projects.length > 0;
-  const hasBlog = blogPosts.length > 0;
+  const blogPosts = await loadBlogPosts(locale);
   const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -62,9 +53,7 @@ export default async function BlogPage({ params }: LocalePageProps) {
   };
 
   return (
-    <>
-      <Header showProjects={hasProjects} showBlog={hasBlog} />
-      <main>
+    <main>
         <script
           id="blog-index-jsonld"
           type="application/ld+json"
@@ -90,9 +79,6 @@ export default async function BlogPage({ params }: LocalePageProps) {
 
         <BlogDirectory posts={blogPosts} locale={locale} />
         <Newsletter />
-        <Footer showProjects={hasProjects} showBlog={hasBlog} locale={locale} />
-      </main>
-      <BackToTop />
-    </>
+    </main>
   );
 }

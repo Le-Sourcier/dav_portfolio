@@ -3,9 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-import { BackToTop } from "@/components/blog/BackToTop";
 import { getRequestLocale } from "@/i18n/server";
 import { localizedLanguages, localizedPath } from "@/lib/routing/localizedPath";
 import { site } from "@/lib/portfolio";
@@ -155,9 +152,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const hireBody = encodeURIComponent(t("hireBody", { name: project.name }));
 
   return (
-    <>
-      <Header showProjects />
-      <main className="case-page">
+    <main className="case-page">
         <section className="case-cover-hero">
           {project.image ? (
             <Image
@@ -582,9 +577,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <a href="/cv/david-logan-cv.pdf">{t("downloadCv")}</a>
           </div>
         </section>
-      </main>
-      <Footer showProjects locale={locale} />
-      <BackToTop />
-    </>
+    </main>
   );
 }
