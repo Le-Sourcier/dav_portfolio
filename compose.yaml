@@ -1,0 +1,21 @@
+name: portfolio-frontend
+services:
+  website:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?API URL is required}
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3056
+    ports:
+      - "127.0.0.1:3056:3056"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3056').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
