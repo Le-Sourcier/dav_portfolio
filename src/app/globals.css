@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/not-found.css";
 
 @property --readiness-border-angle {
   syntax: "<angle>";

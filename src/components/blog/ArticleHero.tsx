@@ -1,18 +1,12 @@
 import Image from "next/image";
 import type { BlogPost } from "@/types/blog";
+import { formatArticleDate } from "@/utils/date";
 
 type ArticleHeroProps = {
   post: BlogPost;
   authorInitials: string;
   authorName: string;
 };
-
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 
 export function ArticleHero({ post, authorInitials, authorName }: ArticleHeroProps) {
   const chips: { label: string; type?: "author" }[] = [
@@ -22,7 +16,7 @@ export function ArticleHero({ post, authorInitials, authorName }: ArticleHeroPro
   if (post.level) {
     chips.push({ label: post.level });
   }
-  chips.push({ label: formatDate(post.date) });
+  chips.push({ label: formatArticleDate(post.date) });
 
   return (
     <section className="article-hero-cover" aria-label={post.title}>
