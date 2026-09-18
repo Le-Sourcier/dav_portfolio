@@ -1,0 +1,56 @@
+name: Verify and deploy portfolio backend
+on:
+  push:
+    branches: [backend-platform-sync]
+  pull_request:
+    branches: [backend-platform-sync]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-backend-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, lint, and typecheck
+        run: docker build -t portfolio-backend-verify .
+      - name: Audit production dependencies
+        run: docker run --rm portfolio-backend-verify npm audit --omit=dev --audit-level=low
+      - name: Test isolated database and API
+        run: |
+          cat > .env.production <<EOF
+          DB_NAME=portfolio_ci
+          DB_USERNAME=portfolio_ci
+          DB_PASSWORD=$(openssl rand -hex 24)
+          DB_AUTO_SYNC=true
+          JWT_SECRET=$(openssl rand -hex 32)
+          JWT_REFRESH_SECRET=$(openssl rand -hex 32)
+          VISITOR_JWT_SECRET=$(openssl rand -hex 32)
+          ADMIN_PASSWORD=$(openssl rand -hex 24)
+          EOF
+          trap 'docker compose --env-file .env.production down -v; rm -f .env.production' EXIT
+          docker compose --env-file .env.production up -d --build --wait --wait-timeout 180
+          docker compose --env-file .env.production exec -T api node --test tests/deployment.test.mjs
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/backend-platform-sync'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Deploy verified commit over SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.PORTFOLIO_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PORTFOLIO_KNOWN_HOSTS }}
+          REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" | tr -d '\r' > ~/.ssh/portfolio
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/portfolio ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/portfolio' EXIT
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/portfolio azureuser@172.174.244.66 "deploy backend $REVISION"
