@@ -19,3 +19,10 @@ rerunning it preserves existing settings.
 Validation: read content counts, verify the administrator password through the
 existing login API without printing tokens, run the settings seed twice, and
 verify the skills and education values returned by `/api/settings`.
+
+Completed initialization: 10 projects, 4 experiences, 12 blog posts, 2 testimonials,
+and 1 administrator. The admin settings contain 18 skills and 1 education entry.
+The second settings seed run preserved both existing records. Administrator
+login, authenticated profile, CORS, and public settings checks passed.
+The pre-seed backup is stored privately at
+`/home/azureuser/.test/backups/before-initial-seed.dump` with mode 600.
