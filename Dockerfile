@@ -10,7 +10,7 @@ FROM build AS verification
 COPY .eslintrc.cjs ./
 COPY tests ./tests
 COPY scripts ./scripts
-RUN npm run lint && npm run typecheck && node --test tests/security-dependencies.test.mjs tests/proxy.test.mjs tests/settings-seed.test.mjs tests/backup-notification.test.mjs tests/backup-workflow.test.mjs
+RUN npm run lint && npm run typecheck && node --test tests/security-dependencies.test.mjs tests/proxy.test.mjs tests/settings-seed.test.mjs tests/backup-notification.test.mjs tests/backup-workflow.test.mjs tests/deployment-dispatcher.test.mjs
 
 FROM verification AS production-dependencies
 RUN npm prune --omit=dev

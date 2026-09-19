@@ -20,6 +20,11 @@ git fetch origin "$branch"
   exit 65
 }
 previous=$(git rev-parse HEAD)
+if git show-ref --verify --quiet "refs/heads/$branch"; then
+  git switch "$branch"
+else
+  git switch --create "$branch" "$revision"
+fi
 git merge --ff-only "$revision"
 if docker compose --env-file .env.production up -d --build --wait --wait-timeout 180 &&
    docker compose --env-file .env.production exec -T "$service" node --test tests/deployment.test.mjs; then
