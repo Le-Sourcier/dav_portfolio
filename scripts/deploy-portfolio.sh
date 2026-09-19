@@ -4,7 +4,7 @@ set -euo pipefail
 read -r action component revision extra <<< "${SSH_ORIGINAL_COMMAND:-}"
 [[ "$action" == deploy && -z "${extra:-}" && "$revision" =~ ^[a-f0-9]{40}$ ]] || exit 64
 case "$component" in
-  frontend) branch=premium-next-portfolio; service=website ;;
+  frontend) branch=frontend-platform-sync; service=website ;;
   backend) branch=backend-platform-sync; service=api ;;
   admin) branch=admin-platform-sync; service=lesourcier-admin ;;
   *) exit 64 ;;
