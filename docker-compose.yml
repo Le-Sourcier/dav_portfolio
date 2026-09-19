@@ -5,6 +5,8 @@ services:
       context: .
       args:
         VITE_API_URL: ${VITE_API_URL:?API URL is required}
+      secrets:
+        - admin_env
     image: lesourcier-admin:latest
     environment:
       - NODE_ENV=production
@@ -18,3 +20,6 @@ services:
       timeout: 5s
       start_period: 15s
       retries: 3
+secrets:
+  admin_env:
+    file: .env.production

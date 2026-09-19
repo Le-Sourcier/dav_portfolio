@@ -11,7 +11,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG VITE_API_URL=https://server.lesourcier.space/api
 ENV VITE_API_URL=$VITE_API_URL
-RUN npm run lint && npm run typecheck && npm run build && node --test tests/api-client.test.mjs
+RUN --mount=type=secret,id=admin_env,target=/app/.env.production npm run lint && npm run typecheck && npm run build && node --test tests/api-client.test.mjs tests/i18n.test.mjs
 
 FROM base AS runner
 ENV NODE_ENV=production

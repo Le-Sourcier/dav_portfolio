@@ -12,9 +12,10 @@ i18n
       fr: { translation: fr },
       en: { translation: en },
     },
-    fallbackLng: 'en',
+    fallbackLng: 'fr',
+    supportedLngs: ['fr', 'en'],
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       lookupLocalStorage: 'lang',
       caches: ['localStorage'],
     },
