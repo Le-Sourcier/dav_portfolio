@@ -21,6 +21,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3052
+      TRUST_PROXY_HOPS: "1"
       DB_HOST: database
       DB_PORT: 5432
       DB_AUTO_CREATE: "false"

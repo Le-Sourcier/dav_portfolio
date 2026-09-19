@@ -16,6 +16,7 @@ export const config = {
   // Server — default to 'production' (fail-safe)
   nodeEnv: process.env.NODE_ENV || "production",
   port: parseInt(process.env.PORT || "3001", 10),
+  trustProxy: process.env.TRUST_PROXY_HOPS === "1" ? 1 : false,
 
   // Database
   database: {

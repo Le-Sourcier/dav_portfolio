@@ -20,6 +20,7 @@ import { requestLogger } from "./middlewares/logger.middleware.js";
 
 // Initialize Express app
 const app = express();
+app.set("trust proxy", config.trustProxy);
 const server = http.createServer(app);
 
 // Initialize Socket.io

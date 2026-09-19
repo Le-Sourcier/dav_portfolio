@@ -18,11 +18,11 @@ Database initialization or migration must follow the user's selected data source
 - [x] Verify existing backend TypeScript compilation.
 - [x] Restore missing ESLint configuration and validate it (four existing unused-variable warnings).
 - [x] Confirm an isolated empty database; initialize its schema, then disable automatic alteration.
-- [ ] Commit and push deployment configuration; exclude credential archives.
+- [x] Commit and push deployment configuration; exclude credential archives.
 - [x] Clone, provision the isolated database, and start the API.
 - [x] Verify HTTPS health, database-backed reads, and existing Umbaji services.
 - [x] Configure restricted SSH credentials and GitHub Actions workflows.
-- [ ] Verify the first automatic deployment from GitHub Actions.
+- [x] Verify the first automatic deployment from GitHub Actions (run 35381071662).
 
 ## Operations
 
@@ -33,6 +33,12 @@ rollback. Disable automatic schema alteration after first initialization.
 
 Keep `.env.production`, `ENVs.zip`, and database dumps out of Git and images.
 TLS is managed by the server's existing Certbot installation.
+
+The API is published only on loopback behind one Nginx proxy. Set
+`TRUST_PROXY_HOPS=1` in Compose so rate limits identify the client appended by
+Nginx rather than grouping all visitors under the proxy address. The application
+defaults to trusting no proxy when this deployment setting is absent. Additional
+client-supplied forwarding entries must not influence the selected address.
 
 ## CI/CD
 
