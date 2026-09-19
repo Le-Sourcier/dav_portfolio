@@ -26,11 +26,11 @@ code when readiness or HTTP smoke tests fail. Database migrations are not rolled
 - [x] Inspect local changes, branches, server services, DNS, and available ports.
 - [x] Preserve the existing branded 404 implementation.
 - [x] Verify lint, TypeScript, tests, and production build on the Linux server.
-- [ ] Commit and push reviewed changes with an English summary.
+- [x] Commit and push reviewed changes with an English summary.
 - [x] Clone the branch, transfer production environment securely, and build.
 - [x] Configure Nginx and TLS; verify home, blog, and HTTP 404 responses.
 - [x] Configure restricted SSH credentials and GitHub Actions workflows.
-- [ ] Verify the first automatic deployment from GitHub Actions.
+- [x] Verify the first automatic deployment from GitHub Actions (run 35381079197).
 
 ## Operations
 
