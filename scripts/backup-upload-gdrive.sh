@@ -1,42 +1,24 @@
 #!/usr/bin/env bash
-#
-# backup-upload-gdrive.sh — Upload des artefacts vers Google Drive via rclone.
-#
-# Args : <tier> <stamp> <tier_dir>
-# ENV requis : BACKUP_GDRIVE_RCLONE_REMOTE (nom du remote rclone, ex: "gdrive")
-# ENV optionnel : BACKUP_GDRIVE_REMOTE_DIR (default: portfolio-backups)
-#
-# Setup du remote rclone : voir backend/docs/BACKUP.md.
-#
 set -euo pipefail
 set +x
 
-TIER="${1:?tier required}"
-STAMP="${2:?stamp required}"
-TIER_DIR="${3:?tier_dir required}"
-
-: "${BACKUP_GDRIVE_RCLONE_REMOTE:?BACKUP_GDRIVE_RCLONE_REMOTE required (rclone remote name)}"
-GDRIVE_DIR="${BACKUP_GDRIVE_REMOTE_DIR:-portfolio-backups}"
-
-if ! command -v rclone >/dev/null 2>&1; then
-  echo "[gdrive] rclone not found — install from https://rclone.org/install/. Aborting."
-  exit 1
-fi
-
-mapfile -t files < <(find "$TIER_DIR" -maxdepth 1 -type f -name "portfolio-*-${STAMP}.*")
-if [[ ${#files[@]} -eq 0 ]]; then
-  echo "[gdrive] no files matching stamp $STAMP — nothing to upload"
-  exit 0
-fi
-
-remote_path="${BACKUP_GDRIVE_RCLONE_REMOTE}:${GDRIVE_DIR}/${TIER}"
-
-for f in "${files[@]}"; do
-  if ! rclone copy "$f" "$remote_path" --quiet; then
-    echo "[gdrive] upload failed for $(basename "$f")"
-    exit 1
-  fi
-  echo "[gdrive] uploaded → $remote_path/$(basename "$f")"
+[[ "${1:-}" == daily && "${2:-}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$ ]] || exit 64
+STAMP="$2"
+TIER_DIR="${3:?Backup directory is required}"
+REMOTE="${BACKUP_GDRIVE_RCLONE_REMOTE:-}"
+DIRECTORY="${BACKUP_GDRIVE_REMOTE_DIR:-portfolio-backups}"
+[[ "$REMOTE" =~ ^[a-zA-Z0-9_-]+$ && "$DIRECTORY" =~ ^[a-zA-Z0-9_-]+$ ]] || {
+  echo '[gdrive] A dedicated remote and directory must be configured.' >&2; exit 1;
+}
+command -v rclone >/dev/null || { echo '[gdrive] rclone is not installed.' >&2; exit 1; }
+DESTINATION="$REMOTE:$DIRECTORY/daily"
+NAME="portfolio-db-$STAMP.dump"
+for file in "$NAME" "$NAME.sha256"; do
+  [[ -s "$TIER_DIR/$file" ]] || exit 1
+  rclone copyto "$TIER_DIR/$file" "$DESTINATION/$file" --quiet --retries 3 --contimeout 20s --timeout 2m
 done
-
-exit 0
+rclone delete "$DESTINATION" --min-age 7d --max-depth 1 \
+  --include '/portfolio-db-????-??-??-??????.dump' \
+  --include '/portfolio-db-????-??-??-??????.dump.sha256' \
+  --drive-use-trash=false --retries 3 --contimeout 20s --timeout 2m
+echo '[gdrive] Upload and seven-day retention completed.'

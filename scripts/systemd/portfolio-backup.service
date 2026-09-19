@@ -1,0 +1,16 @@
+[Unit]
+Description=Portfolio database backup and delivery
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=azureuser
+Group=azureuser
+WorkingDirectory=/home/azureuser/.test/.backend
+ExecStart=/bin/bash /home/azureuser/.test/.backend/scripts/backup.sh
+TimeoutStartSec=1h
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
