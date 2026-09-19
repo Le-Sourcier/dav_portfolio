@@ -21,9 +21,36 @@ authorization is a partial failure, never reported as success.
 - [x] Add locking, atomic dumps, archive validation and delivery failure reporting.
 - [x] Reuse the branded email template, with French and English content.
 - [x] Test dump failures, retention boundaries, attachments and Drive failures.
-- [ ] Install a persistent midnight systemd timer and test a real backup/restore.
-- [ ] Verify SMTP delivery and authorize/test Google Drive.
-- [ ] Commit, push and verify deployment.
+- [x] Install a persistent midnight systemd timer and test a real backup/restore.
+- [ ] Verify SMTP delivery: blocked by SMTP authentication rejection (535).
+- [ ] Authorize/test Google Drive: owner authorization is still required.
+- [x] Commit, push and verify deployment.
+
+## Production verification (2026-09-19)
+
+Commit `e31050a` passed CI/CD (run `35444337591`): build, lint, typecheck,
+15 unit/integration checks, dependency audit and isolated API smoke tests.
+The persistent timer is enabled; its next execution is 2026-09-20 00:00 UTC.
+Local `.env` and `.env.production`, and the server `.env.production`, have the
+same enabled backup settings, French language and dedicated Drive remote name.
+Secrets remain excluded from Git.
+
+The first production dump, `portfolio-db-2026-09-19-125919.dump`, passed its
+SHA-256 check and a full restore into a temporary PostgreSQL 16 container with
+no network or published ports. Restored counts: 10 projects, 4 experiences,
+12 blog posts, 2 testimonials and 1 administrator. The temporary database was
+removed after verification; the live database was not modified.
+
+Both email attachments validate, but SMTP authentication fails with `EAUTH`,
+command `AUTH PLAIN`, response code 535. The same refusal occurs using the
+normal Docker Compose environment loader. No successful email delivery is
+claimed. Renew the SMTP application password in the local production env and
+synchronize it privately to the server before retrying.
+
+The `portfolio-gdrive` remote has no OAuth authorization yet. Until SMTP and
+Drive are connected, the daily job still writes valid local backups and exits
+2 to report incomplete delivery. The seven-day local retention is active;
+remote retention will execute only after a successful Drive upload.
 
 ## Operations
 
