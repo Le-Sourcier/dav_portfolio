@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import { localizedPath } from "@/lib/routing/localizedPath";
 import type { PortfolioExperienceItem } from "@/services/portfolio/contentLoaders";
+import { createGlobePoints } from "@/utils/globePoints";
 
 function fibonacciSphere(count: number, radius: number): [number, number, number][] {
   if (count === 0) return [];
@@ -33,15 +34,7 @@ const CARD_DISTANCE = 5.2;
 
 function Stars() {
   const geometry = useMemo(() => {
-    const pos: number[] = [];
-    for (let i = 0; i < 800; i++) {
-      const r = 15 + Math.random() * 40;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      pos.push(r * Math.sin(phi) * Math.cos(theta));
-      pos.push(r * Math.cos(phi));
-      pos.push(r * Math.sin(phi) * Math.sin(theta));
-    }
+    const pos = createGlobePoints(800, 15, 55);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
     return geo;
@@ -67,15 +60,7 @@ function Globe() {
   });
 
   const dotGeometry = useMemo(() => {
-    const pos: number[] = [];
-    for (let i = 0; i < 800; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = GLOBE_RADIUS * 1.005;
-      pos.push(r * Math.sin(phi) * Math.cos(theta));
-      pos.push(r * Math.cos(phi));
-      pos.push(r * Math.sin(phi) * Math.sin(theta));
-    }
+    const pos = createGlobePoints(800, GLOBE_RADIUS * 1.005);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
     return geo;

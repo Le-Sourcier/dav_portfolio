@@ -1,11 +1,6 @@
-.next
 node_modules
-npm-debug.log
-Dockerfile
-docker-compose.yml
+.next
 .git
-.gitignore
-README.md
+.env*
 *.tsbuildinfo
-.env.local
-.env.*.local
+*.log

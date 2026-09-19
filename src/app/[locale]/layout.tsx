@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { LocaleHtmlSync } from "@/components/LocaleHtmlSync";
 import { PortfolioAssistant } from "@/components/PortfolioAssistant";
-import { isAppLocale, locales } from "@/i18n/config";
+import { defaultLocale, isAppLocale, locales } from "@/i18n/config";
 import {
   loadBlogPosts,
   loadExperiences,
@@ -21,7 +21,10 @@ type LocaleLayoutProps = Readonly<{
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params;
-  if (!isAppLocale(locale)) notFound();
+  if (!isAppLocale(locale)) {
+    setRequestLocale(defaultLocale);
+    notFound();
+  }
   setRequestLocale(locale);
 
   const messages = (await import(`../../../messages/${locale}.json`)).default;

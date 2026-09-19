@@ -1,25 +1,23 @@
-FROM node:20-alpine AS base
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
 COPY package*.json ./
 RUN npm ci
-
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG NEXT_PUBLIC_API_URL=https://server.lesourcier.space/api
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM base AS runner
-ENV NODE_ENV=production
-ENV PORT=3000
-RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
-USER nextjs
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
-EXPOSE 3000
+FROM build AS verification
+RUN npm run lint && npx tsc --noEmit && node --test tests/date.test.mjs tests/api-request.test.mjs
+
+FROM verification AS production-dependencies
+RUN npm prune --omit=dev
+
+FROM node:22-bookworm-slim
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3056 NEXT_TELEMETRY_DISABLED=1
+WORKDIR /app
+COPY --from=production-dependencies --chown=node:node /app ./
+USER node
+EXPOSE 3056
 CMD ["node", "server.js"]

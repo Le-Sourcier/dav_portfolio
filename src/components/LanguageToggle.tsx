@@ -3,7 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { localeCookieName, locales, normalizeLocale, type AppLocale } from "@/i18n/config";
+import { locales, normalizeLocale, type AppLocale } from "@/i18n/config";
+import { persistLocale } from "@/lib/routing/localeCookie";
 import { switchLocalePath } from "@/lib/routing/localizedPath";
 
 export function LanguageToggle() {
@@ -16,7 +17,7 @@ export function LanguageToggle() {
   const selectLocale = (nextLocale: AppLocale) => {
     if (nextLocale === locale) return;
 
-    document.cookie = `${localeCookieName}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
+    persistLocale(nextLocale);
     startTransition(() => router.push(switchLocalePath(pathname, nextLocale)));
   };
 

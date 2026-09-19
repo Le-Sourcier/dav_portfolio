@@ -1,0 +1,406 @@
+/* 404 — Not Found page. Scoped with the `notfound-` prefix, tokens from globals.css. */
+
+:root {
+  --notfound-code-gradient: linear-gradient(
+    112deg,
+    var(--gold) 0%,
+    #e6cd94 32%,
+    #2f9c92 64%,
+    var(--accent-strong) 100%
+  );
+}
+
+:root[data-theme="dark"] {
+  --notfound-code-gradient: linear-gradient(
+    112deg,
+    var(--gold) 0%,
+    #f7e7c0 30%,
+    #5fd9c9 68%,
+    var(--accent) 100%
+  );
+}
+
+.notfound-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: clamp(30px, 5vw, 76px);
+  align-items: center;
+  padding-top: clamp(44px, 7vw, 92px);
+  padding-bottom: clamp(44px, 6vw, 84px);
+}
+
+.notfound-copy {
+  position: relative;
+  isolation: isolate;
+}
+
+.notfound-code {
+  position: relative;
+  width: fit-content;
+  margin: 0 0 6px;
+  background: var(--notfound-code-gradient);
+  background-size: 135% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: clamp(84px, 13vw, 158px);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.82;
+  animation: notfound-shine 12s ease-in-out infinite;
+}
+
+.notfound-code::after {
+  position: absolute;
+  inset: 18% -14% -22% -12%;
+  z-index: -1;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(15, 118, 110, 0.12), transparent 68%);
+  content: "";
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] .notfound-code::after {
+  background: radial-gradient(circle, rgba(215, 180, 100, 0.14), transparent 68%);
+}
+
+@keyframes notfound-shine {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.notfound-copy h1 {
+  max-width: 660px;
+  margin: 0;
+  font-size: clamp(36px, 5.2vw, 62px);
+  letter-spacing: 0;
+  line-height: 1;
+  overflow-wrap: break-word;
+}
+
+.notfound-lead {
+  max-width: 580px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: clamp(16px, 1.6vw, 19px);
+  line-height: 1.65;
+}
+
+/* Diagnostic panel — extends .hero-visual / .saas-readiness-card */
+
+.notfound-diagnostic {
+  gap: 4px;
+}
+
+.notfound-status {
+  display: grid;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 2px 18px;
+}
+
+.notfound-status > div {
+  display: grid;
+  gap: 4px;
+}
+
+.notfound-status span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.notfound-status strong {
+  font-size: clamp(38px, 4vw, 52px);
+  letter-spacing: -0.02em;
+  line-height: 0.94;
+}
+
+.notfound-status strong span {
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.notfound-status p {
+  max-width: 330px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notfound-check small {
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(15, 118, 110, 0.07);
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.notfound-check.is-failed i {
+  background: var(--gold);
+  box-shadow: 0 0 0 5px rgba(184, 132, 47, 0.12);
+}
+
+.notfound-check.is-failed small {
+  border-color: rgba(184, 132, 47, 0.28);
+  background: rgba(184, 132, 47, 0.1);
+  color: var(--gold);
+}
+
+:root[data-theme="dark"] .notfound-check.is-ok i {
+  background: var(--accent);
+  box-shadow: 0 0 0 5px rgba(45, 212, 191, 0.12);
+}
+
+:root[data-theme="dark"] .notfound-check small {
+  border-color: rgba(45, 212, 191, 0.24);
+  background: rgba(45, 212, 191, 0.1);
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .notfound-check.is-failed small {
+  border-color: rgba(215, 180, 100, 0.3);
+  background: rgba(215, 180, 100, 0.12);
+  color: var(--gold);
+}
+
+.notfound-pipeline {
+  padding-top: 16px;
+}
+
+/* Recovery destinations */
+
+.notfound-routes {
+  padding-top: 0;
+  padding-bottom: clamp(40px, 5vw, 64px);
+}
+
+.notfound-route-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.notfound-route-card,
+.notfound-read-item {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 250, 241, 0.74)),
+    rgba(255, 250, 241, 0.72);
+  box-shadow: 0 18px 46px rgba(75, 61, 35, 0.06);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.notfound-route-card::after {
+  position: absolute;
+  right: -34px;
+  bottom: -44px;
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.07);
+  content: "";
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notfound-route-card:hover,
+.notfound-read-item:hover {
+  border-color: rgba(15, 118, 110, 0.24);
+  box-shadow: 0 30px 74px rgba(75, 61, 35, 0.11);
+  transform: translateY(-3px);
+}
+
+.notfound-route-card:hover::after {
+  transform: scale(1.18);
+}
+
+.notfound-route-card:focus-visible,
+.notfound-read-item:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.2);
+  outline-offset: 3px;
+}
+
+.notfound-route-card > *,
+.notfound-read-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+.notfound-route-card > span {
+  color: var(--accent-strong);
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.notfound-route-card strong {
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.notfound-route-card p,
+.notfound-read-item p {
+  max-width: 340px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.notfound-route-card em {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.notfound-route-card em::after {
+  content: "→";
+  transition: transform 180ms ease;
+}
+
+.notfound-route-card:hover em::after {
+  transform: translateX(4px);
+}
+
+/* Latest reads */
+
+.notfound-reads {
+  padding-top: 0;
+  padding-bottom: clamp(56px, 7vw, 88px);
+}
+
+.notfound-reads-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.notfound-reads-head h2 {
+  margin: 0;
+  max-width: 620px;
+  font-size: clamp(26px, 3.4vw, 40px);
+  letter-spacing: 0;
+  line-height: 1.04;
+}
+
+.notfound-reads-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.notfound-read-item > span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notfound-read-item strong {
+  font-size: 18px;
+  line-height: 1.24;
+}
+
+.notfound-read-item small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+:root[data-theme="dark"] .notfound-route-card,
+:root[data-theme="dark"] .notfound-read-item {
+  border-color: var(--line);
+  background:
+    radial-gradient(circle at top right, rgba(215, 180, 100, 0.07), transparent 36%),
+    var(--surface-soft);
+  box-shadow: 0 24px 70px var(--shadow);
+}
+
+:root[data-theme="dark"] .notfound-route-card::after {
+  background: rgba(215, 180, 100, 0.08);
+}
+
+:root[data-theme="dark"] .notfound-route-card:hover,
+:root[data-theme="dark"] .notfound-read-item:hover {
+  border-color: rgba(215, 180, 100, 0.3);
+}
+
+@media (max-width: 920px) {
+  .notfound-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .notfound-route-grid,
+  .notfound-reads-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .notfound-code {
+    font-size: clamp(72px, 22vw, 108px);
+  }
+
+  .notfound-route-grid,
+  .notfound-reads-list {
+    grid-template-columns: 1fr;
+  }
+
+  .notfound-reads-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .notfound-status {
+    padding-bottom: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notfound-code {
+    animation: none;
+  }
+
+  .notfound-route-card,
+  .notfound-read-item,
+  .notfound-route-card::after,
+  .notfound-route-card em::after {
+    transition: none;
+  }
+
+  .notfound-route-card:hover,
+  .notfound-read-item:hover {
+    transform: none;
+  }
+}

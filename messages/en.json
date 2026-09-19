@@ -586,5 +586,79 @@
     "cancel": "Cancel",
     "publishReply": "Reply",
     "replyPlaceholder": "Reply to @{author}…"
+  },
+  "NotFoundPremium": {
+    "kicker": "Error 404",
+    "title": "This page no longer exists, or never did.",
+    "description": "The link may be outdated, mistyped, or the page may have moved during a site update. Find your way using the links below.",
+    "home": "Back to home",
+    "report": "Report this link",
+    "expired": "Expired link",
+    "mistyped": "Mistyped URL",
+    "moved": "Moved content",
+    "navigation": "Continue browsing",
+    "destinationTitle": "Where would you like to go?",
+    "destinationDescription": "Choose the destination closest to what you were looking for.",
+    "diagnosticAria": "Request diagnostic",
+    "diagnostic": "Diagnostic",
+    "routeMissing": "Route not found",
+    "responseCode": "Response code",
+    "notFound": "not found",
+    "requestExplanation": "Your request reached the server, but no resource matches this address.",
+    "browser": "Browser",
+    "edge": "Server",
+    "routeStep": "Route",
+    "recentReads": "Recent articles",
+    "readsTitle": "Leave with something useful.",
+    "allArticles": "All articles",
+    "checks": {
+      "server": {
+        "label": "Server",
+        "detail": "Your request was received and processed.",
+        "state": "Response received"
+      },
+      "route": {
+        "label": "Requested route",
+        "detail": "No page matches this URL.",
+        "state": "Not found"
+      },
+      "site": {
+        "label": "Navigation",
+        "detail": "Use the links below to continue browsing.",
+        "state": "Recovery available"
+      }
+    },
+    "routes": {
+      "home": {
+        "title": "Home",
+        "description": "The promise, the evidence and how I build SaaS platforms.",
+        "action": "Back to the starting point"
+      },
+      "expertise": {
+        "title": "Expertise",
+        "description": "SaaS architecture, web and mobile products, business automation and dashboards.",
+        "action": "Explore the specialties"
+      },
+      "projects": {
+        "title": "Projects",
+        "description": "Shipped platforms, open source packages and measured results.",
+        "action": "Browse the work"
+      },
+      "journey": {
+        "title": "Experience",
+        "description": "Career milestones, technical contexts and responsibilities.",
+        "action": "Explore the journey"
+      },
+      "blog": {
+        "title": "Blog",
+        "description": "Technical notes on architecture, scalability and execution quality.",
+        "action": "Read the articles"
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Scope a project, improve a platform or start a new engagement.",
+        "action": "Start a conversation"
+      }
+    }
   }
 }

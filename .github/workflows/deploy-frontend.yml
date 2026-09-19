@@ -1,0 +1,50 @@
+name: Verify and deploy portfolio frontend
+on:
+  push:
+    branches: [frontend-platform-sync]
+  pull_request:
+    branches: [frontend-platform-sync]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-frontend-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, lint, typecheck, and test
+        run: docker build -t portfolio-frontend-verify .
+      - name: Audit production dependencies
+        run: docker run --rm portfolio-frontend-verify npm audit --omit=dev --audit-level=low
+      - name: Test production HTTP routes
+        run: |
+          docker run -d --name frontend-test portfolio-frontend-verify
+          trap 'docker rm -f frontend-test' EXIT
+          for attempt in $(seq 1 30); do
+            if docker exec frontend-test node -e "fetch('http://127.0.0.1:3056').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; then break; fi
+            sleep 2
+          done
+          docker exec frontend-test node --test tests/deployment.test.mjs
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/frontend-platform-sync'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Deploy verified commit over SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.PORTFOLIO_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PORTFOLIO_KNOWN_HOSTS }}
+          REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" | tr -d '\r' > ~/.ssh/portfolio
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/portfolio ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/portfolio' EXIT
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/portfolio azureuser@172.174.244.66 "deploy frontend $REVISION"

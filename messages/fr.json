@@ -586,5 +586,79 @@
     "cancel": "Annuler",
     "publishReply": "Répondre",
     "replyPlaceholder": "Répondre à @{author}…"
+  },
+  "NotFoundPremium": {
+    "kicker": "Erreur 404",
+    "title": "Cette page n’existe pas, ou plus.",
+    "description": "Le lien suivi est peut-être obsolète, mal copié, ou la page a été déplacée lors d’une mise à jour du site. Retrouvez votre chemin grâce aux liens ci-dessous.",
+    "home": "Retour à l’accueil",
+    "report": "Signaler le lien",
+    "expired": "Lien expiré",
+    "mistyped": "URL mal copiée",
+    "moved": "Contenu déplacé",
+    "navigation": "Reprendre la navigation",
+    "destinationTitle": "Où souhaitez-vous aller ?",
+    "destinationDescription": "Choisissez la destination la plus proche de ce que vous cherchiez.",
+    "diagnosticAria": "Diagnostic de la requête",
+    "diagnostic": "Diagnostic",
+    "routeMissing": "Route introuvable",
+    "responseCode": "Code retourné",
+    "notFound": "introuvable",
+    "requestExplanation": "La requête est arrivée jusqu’au serveur : aucune ressource ne correspond à cette adresse.",
+    "browser": "Navigateur",
+    "edge": "Serveur",
+    "routeStep": "Route",
+    "recentReads": "Lectures récentes",
+    "readsTitle": "Repartir avec quelque chose d’utile.",
+    "allArticles": "Tous les articles",
+    "checks": {
+      "server": {
+        "label": "Serveur",
+        "detail": "La requête a été reçue et traitée.",
+        "state": "Réponse reçue"
+      },
+      "route": {
+        "label": "Route demandée",
+        "detail": "Aucune page ne correspond à cette URL.",
+        "state": "Introuvable"
+      },
+      "site": {
+        "label": "Navigation",
+        "detail": "Les liens ci-dessous vous permettent de poursuivre.",
+        "state": "Retour possible"
+      }
+    },
+    "routes": {
+      "home": {
+        "title": "Accueil",
+        "description": "La promesse, les preuves et ma manière de construire des plateformes SaaS.",
+        "action": "Revenir au point de départ"
+      },
+      "expertise": {
+        "title": "Expertise",
+        "description": "Architecture SaaS, produit web et mobile, automatisation métier et dashboards.",
+        "action": "Voir les domaines couverts"
+      },
+      "projects": {
+        "title": "Projets",
+        "description": "Plateformes livrées, packages open source et résultats mesurés.",
+        "action": "Parcourir les réalisations"
+      },
+      "journey": {
+        "title": "Parcours",
+        "description": "Les étapes, les contextes techniques et les responsabilités assumées.",
+        "action": "Suivre la trajectoire"
+      },
+      "blog": {
+        "title": "Blog",
+        "description": "Notes techniques sur architecture, scalabilité et qualité d’exécution.",
+        "action": "Lire les articles"
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Un projet à cadrer, une plateforme à reprendre ou une mission à lancer.",
+        "action": "Démarrer la discussion"
+      }
+    }
   }
 }

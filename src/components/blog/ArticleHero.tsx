@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { BlogPost } from "@/types/blog";
+import { formatArticleDate } from "@/utils/date";
 
 type ArticleHeroProps = {
   post: BlogPost;
@@ -11,13 +12,6 @@ type ArticleHeroProps = {
   backLabel?: string;
   actions?: ReactNode;
 };
-
-const formatDate = (iso: string, locale = "fr") =>
-  new Date(iso).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 
 export function ArticleHero({
   post,
@@ -34,7 +28,7 @@ export function ArticleHero({
   if (post.level) {
     chips.push({ label: post.level });
   }
-  chips.push({ label: formatDate(post.date, post.language) });
+  chips.push({ label: formatArticleDate(post.date, post.language) });
 
   return (
     <section className="article-cover-hero" aria-label={post.title}>

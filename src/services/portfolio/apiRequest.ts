@@ -17,6 +17,7 @@ export async function requestApi<T>(
   const cache = options.cache;
   const revalidate = options.revalidate ?? DEFAULT_PUBLIC_REVALIDATE;
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(envConfig.apiTimeout),
     ...(cache ? { cache } : { next: { revalidate, tags: options.tags } }),
     headers: {
       Accept: "application/json",

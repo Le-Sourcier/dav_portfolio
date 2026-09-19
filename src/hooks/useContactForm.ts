@@ -116,11 +116,14 @@ export const useContactForm = ({
   const honeypotRef = useRef<HTMLInputElement | null>(null);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Restaure le brouillon au montage
+  // Restore browser storage after hydration; cancel if the form unmounts.
   useEffect(() => {
-    const draft = readDraft();
-    if (draft) setValues(draft);
-    setCooldownLeft(getCooldownRemaining());
+    const frame = requestAnimationFrame(() => {
+      const draft = readDraft();
+      if (draft) setValues(draft);
+      setCooldownLeft(getCooldownRemaining());
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   // Cooldown tick (1s) tant qu'il reste du temps
