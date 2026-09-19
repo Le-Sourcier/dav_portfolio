@@ -25,8 +25,8 @@ API request fails, with a bounded request timeout.
 - [x] Test response envelopes, API errors, timeouts and cache behavior.
 - [x] Verify rendered pages contain actual published backend project/article data.
 - [x] Run lint, typecheck, tests and production build.
-- [ ] Switch the deployment dispatcher and server checkout to the integrated branch.
-- [ ] Verify HTTPS routes, translations, 404 responses and cache revalidation.
+- [x] Switch the deployment dispatcher and server checkout to the integrated branch.
+- [x] Verify HTTPS routes, translations, 404 responses and cache revalidation.
 
 Secrets stay in ignored local and server environment files. Pass only public API
 settings to the Docker build. The revalidation secret is runtime-only. No new
@@ -45,3 +45,16 @@ The obsolete `nexus-blogs` Compose configuration was removed. The active service
 is `portfolio-frontend` / `website`. The existing backend dispatcher also gained
 tested branch migration and rollback support so a failed switch can restore the
 previous static application revision.
+
+## Production result
+
+Commit `600811d` passed GitHub Actions run `35463537459` and was deployed on
+2026-09-19. The server checkout and the primary local `frontend/` directory now
+use `frontend-platform-sync`; the former branch remains available in Git.
+Public HTTPS smoke tests verified French and English project/article content
+against the backend, localized homepage redirects, and the premium HTTP 404.
+The frontend container is healthy. Frontend/backend revalidation secrets match,
+and an authenticated request to `/api/revalidate` returned HTTP 200.
+
+The temporary candidate container used no published ports and was removed after
+verification. Existing application upstreams and unrelated services were preserved.
