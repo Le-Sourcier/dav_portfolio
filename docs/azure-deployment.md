@@ -38,3 +38,10 @@ Run `docker compose --env-file .env.production up -d --build` from the checkout.
 Validate Nginx with `sudo nginx -t` before reloading. Check `/` and a nonexistent
 route after deployment. For rollback, check out the previously verified commit
 and rebuild the service. Never remove database volumes during rollback.
+
+## Google ownership verification
+
+The requested TXT record
+`google-site-verification=33K23IWdaIGCD4UXTPapfeppP-maXnUF9THGDOCBmww`
+was already present and was confirmed against the authoritative DNS server on
+September 19, 2026. No HTML verification tag or DNS modification was required.
