@@ -51,7 +51,7 @@ export function useCreateBlogPost() {
 
   return useMutation({
     mutationFn: (data: BlogPostFormData) => blogApi.create(data),
-    onSuccess: (newPost) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
       toast.success('Article cree avec succes');
     },

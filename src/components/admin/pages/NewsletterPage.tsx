@@ -1,4 +1,4 @@
-import { Mail, Users, UserCheck, TrendingUp } from 'lucide-react';
+import { Mail, Users, UserCheck } from 'lucide-react';
 import { useNewsletterSubscribers, useNewsletterStats } from '@/hooks/queries';
 import { DataTable, type Column } from '../shared/DataTable';
 import { StatsCard } from '../shared/StatsCard';
@@ -9,7 +9,7 @@ export function NewsletterPage() {
   const { data: subscribers = [], isLoading } = useNewsletterSubscribers();
   const { data: stats } = useNewsletterStats();
 
-  const nlStats = stats as any;
+  const nlStats = stats;
   const statsCards = [
     {
       label: 'Total abonnes',

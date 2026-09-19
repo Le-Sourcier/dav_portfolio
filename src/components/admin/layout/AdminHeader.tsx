@@ -1,6 +1,6 @@
-import { Plus, Menu, Bell, Search, Command } from 'lucide-react';
+import { Plus, Menu, Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useUIStore } from '@/stores/uiStore';
+import { useUIStore, type ModalType } from '@/stores/uiStore';
 
 interface AdminHeaderProps {
   unreadCount?: number;
@@ -29,14 +29,14 @@ export function AdminHeader({ unreadCount = 0, onSearchClick }: AdminHeaderProps
   const showCreate = pagesWithCreateButton.includes(activeTab);
 
   const handleCreate = () => {
-    const map: Record<string, string> = {
+    const map: Record<string, ModalType> = {
       projects: 'project',
       experiences: 'experience',
       blog: 'blog',
       testimonials: 'testimonial',
     };
     const type = map[activeTab];
-    if (type) openModal(type as any);
+    if (type) openModal(type);
   };
 
   const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().includes('MAC');

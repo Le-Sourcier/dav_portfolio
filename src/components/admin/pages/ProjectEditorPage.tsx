@@ -252,9 +252,9 @@ export function ProjectEditorPage({
   const applyTranslations = useCallback((translations: Record<string, unknown>) => {
     setForm((prev) => {
       const next = { ...prev };
-      const assignString = (sourceKey: string, targetKey: keyof ProjectFormData) => {
+      const assignString = (sourceKey: string, targetKey: "title_en" | "category_en" | "description_en" | "headline_en" | "problem_en" | "solution_en" | "result_en" | "metric_en" | "role_en") => {
         if (typeof translations[sourceKey] === "string") {
-          (next as any)[targetKey] = translations[sourceKey];
+          next[targetKey] = translations[sourceKey];
         }
       };
 
@@ -351,7 +351,7 @@ export function ProjectEditorPage({
   const handleArrayChange = useCallback(
     (field: "results" | "results_en" | "tech", index: number, value: string) => {
       setForm((prev) => {
-        const arr = [...((prev as any)[field] || [])];
+        const arr = [...(prev[field] || [])];
         arr[index] = value;
         return { ...prev, [field]: arr };
       });
@@ -362,7 +362,7 @@ export function ProjectEditorPage({
   const addArrayItem = useCallback((field: "results" | "results_en" | "tech") => {
     setForm((prev) => ({
       ...prev,
-      [field]: [...((prev as any)[field] || []), ""],
+      [field]: [...(prev[field] || []), ""],
     }));
   }, []);
 
@@ -370,7 +370,7 @@ export function ProjectEditorPage({
     (field: "results" | "results_en" | "tech", index: number) => {
       setForm((prev) => ({
         ...prev,
-        [field]: ((prev as any)[field] || []).filter(
+        [field]: (prev[field] || []).filter(
           (_: string, i: number) => i !== index,
         ),
       }));
@@ -415,7 +415,7 @@ export function ProjectEditorPage({
       value: string | number,
     ) => {
       setForm((prev) => {
-        const items = [...(((prev as any)[field] || []) as T[])];
+        const items = [...((prev[field] || []) as T[])];
         items[index] = { ...items[index], [key]: value };
         return { ...prev, [field]: items };
       });
@@ -432,7 +432,7 @@ export function ProjectEditorPage({
       };
       setForm((prev) => ({
         ...prev,
-        [field]: [...(((prev as any)[field] || []) as unknown[]), defaults[field]],
+        [field]: [...((prev[field] || [])), defaults[field]],
       }));
     },
     [],
@@ -442,7 +442,7 @@ export function ProjectEditorPage({
     (field: "links" | "chartData" | "impactGraph", index: number) => {
       setForm((prev) => ({
         ...prev,
-        [field]: (((prev as any)[field] || []) as unknown[]).filter(
+        [field]: ((prev[field] || [])).filter(
           (_, i) => i !== index,
         ),
       }));

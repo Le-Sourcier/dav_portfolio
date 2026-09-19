@@ -4,7 +4,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { DataTable, type Column } from '../shared/DataTable';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { StatusBadge } from '../shared/StatusBadge';
-import { Star, Eye, EyeOff } from 'lucide-react';
+import { Star } from 'lucide-react';
 import type { Testimonial } from '@/types/admin.types';
 
 export function TestimonialsPage() {

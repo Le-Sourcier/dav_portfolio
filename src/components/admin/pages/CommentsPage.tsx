@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  ArrowLeft,
-  ArrowRight,
   AtSign,
   ChevronLeft,
   ChevronRight,

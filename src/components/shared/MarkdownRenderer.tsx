@@ -127,10 +127,6 @@ function normalizeLanguage(lang: string): string {
 
 // ======================== MARKDOWN -> HTML ========================
 
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 function markdownToHtml(md: string): string {
   let html = md
     // Inline code (single backtick, NO newline inside)

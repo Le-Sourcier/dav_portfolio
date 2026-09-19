@@ -21,7 +21,7 @@ export function useProjects() {
     try {
       const data = await api.projects.getAll();
       setProjects(data);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des projets');
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ export function useExperiences() {
     try {
       const data = await api.experiences.getAll();
       setExperiences(data);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des experiences');
     } finally {
       setLoading(false);
@@ -143,7 +143,7 @@ export function useBlog() {
     try {
       const data = await api.blog.getAll();
       setPosts(data);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des articles');
     } finally {
       setLoading(false);
@@ -206,7 +206,7 @@ export function useContacts() {
       const data = await api.contacts.getAll();
       setContacts(data);
       setUnreadCount(data.filter((c) => !c.read).length);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des messages');
     } finally {
       setLoading(false);
@@ -218,7 +218,7 @@ export function useContacts() {
       const updated = await api.contacts.markAsRead(id);
       setContacts((prev) => prev.map((c) => (c.id === id ? updated : c)));
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du marquage');
     }
   }, []);
@@ -232,7 +232,7 @@ export function useContacts() {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
       toast.success('Message supprime');
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de la suppression');
     }
   }, [contacts]);
@@ -256,7 +256,7 @@ export function useAppointments() {
     try {
       const data = await api.appointments.getAll();
       setAppointments(data);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des RDV');
     } finally {
       setLoading(false);
@@ -268,7 +268,7 @@ export function useAppointments() {
       const updated = await api.appointments.updateStatus(id, status);
       setAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
       toast.success('Statut mis a jour');
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de la mise a jour');
     }
   }, []);
@@ -278,7 +278,7 @@ export function useAppointments() {
       await api.appointments.delete(id);
       setAppointments((prev) => prev.filter((a) => a.id !== id));
       toast.success('RDV supprime');
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de la suppression');
     }
   }, []);
@@ -306,7 +306,7 @@ export function useNewsletter() {
       ]);
       setSubscribers(subs);
       setStats(statsData);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des abonnes');
     } finally {
       setLoading(false);
@@ -330,7 +330,7 @@ export function useTestimonials() {
     try {
       const data = await api.testimonials.getAll();
       setTestimonials(data);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des temoignages');
     } finally {
       setLoading(false);
@@ -354,7 +354,7 @@ export function useTestimonials() {
       const updated = await api.testimonials.toggleVisibility(id);
       setTestimonials((prev) => prev.map((t) => (t.id === id ? updated : t)));
       toast.success('Visibilite modifiee');
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de la modification');
     }
   }, []);
@@ -364,7 +364,7 @@ export function useTestimonials() {
       await api.testimonials.delete(id);
       setTestimonials((prev) => prev.filter((t) => t.id !== id));
       toast.success('Temoignage supprime');
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de la suppression');
     }
   }, []);
@@ -406,7 +406,7 @@ export function useDashboardStats() {
         unreadMessages: contacts.filter((c) => !c.read).length,
         upcomingAppointments: appointments.filter((a) => a.status === 'pending').length,
       });
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors du chargement des statistiques');
     } finally {
       setLoading(false);

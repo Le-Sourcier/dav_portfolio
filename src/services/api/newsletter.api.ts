@@ -18,8 +18,8 @@ export const newsletterApi = {
     return apiClient.get<NewsletterSubscriber[]>('/newsletter/subscribers/active');
   },
 
-  async getStats(): Promise<{ total: number; active: number }> {
-    return apiClient.get<{ total: number; active: number }>('/newsletter/stats');
+  async getStats(): Promise<{ total: number; active: number; totalActive?: number }> {
+    return apiClient.get<{ total: number; active: number; totalActive?: number }>('/newsletter/stats');
   },
 
   async sendArticle(data: {

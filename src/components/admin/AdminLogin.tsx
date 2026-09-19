@@ -19,7 +19,7 @@ export function AdminLogin() {
   const token = useAuthStore((s) => s.token);
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const from = (location.state as any)?.from?.pathname || '/admin/dashboard';
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/admin/dashboard';
 
   // Redirect if already authenticated — only if a real token exists
   useEffect(() => {
@@ -44,7 +44,8 @@ export function AdminLogin() {
       setAuth(data.user, data.token, data.refreshToken);
       toast.success('Connexion reussie. Bienvenue !');
       navigate(from, { replace: true });
-    } catch (error: any) {
+    } catch (cause) {
+      const error = cause instanceof Error ? cause : new Error();
       // If the error is a network error (backend down), show specific message
       if (error.message?.includes('indisponible') || error.message?.includes('timeout')) {
         toast.error('Serveur indisponible. Verifiez que le backend est demarre.');

@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, X, LayoutDashboard, FolderKanban, Briefcase,
   Newspaper, MessageSquare, CalendarDays, Star, Mail, Tags,
-  Settings, Plus, ArrowRight, Hash, FileText, User, MessageSquareText,
+  Settings, Plus, FileText, User, MessageSquareText,
   Lock, Palette, Globe, CornerDownLeft,
 } from 'lucide-react';
-import { useUIStore } from '@/stores/uiStore';
+import { useUIStore, type ModalType } from '@/stores/uiStore';
 import {
   useProjects, useExperiences, useBlogPosts,
   useContacts, useTestimonials,
@@ -44,7 +44,7 @@ function getNavigationItems(setActiveTab: (tab: string) => void): SearchResult[]
   ];
 }
 
-function getQuickActions(setActiveTab: (tab: string) => void, openModal: (type: string) => void): SearchResult[] {
+function getQuickActions(setActiveTab: (tab: string) => void, openModal: (type: ModalType) => void): SearchResult[] {
   return [
     { id: 'action-new-project', label: 'Nouveau projet', description: 'Creer un projet', icon: Plus, category: 'Actions', action: () => { setActiveTab('projects'); setTimeout(() => openModal('project'), 100); } },
     { id: 'action-new-article', label: 'Nouvel article', description: 'Ecrire un article', icon: Plus, category: 'Actions', action: () => { setActiveTab('blog'); setTimeout(() => openModal('blog'), 100); } },
@@ -78,7 +78,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   // Build searchable items
   const allItems = useMemo(() => {
     const nav = getNavigationItems(setActiveTab);
-    const actions = getQuickActions(setActiveTab, openModal as any);
+    const actions = getQuickActions(setActiveTab, openModal);
 
     const contentItems: SearchResult[] = [
       ...projects.map((p) => ({

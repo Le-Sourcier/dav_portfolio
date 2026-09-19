@@ -203,9 +203,9 @@ class ApiClient {
     try {
       const response = await doRequest();
       return await this.handleResponse<T>(response);
-    } catch (error: any) {
+    } catch (error) {
       // On 401 and we have a refresh token, attempt refresh then retry once
-      if (error.status === 401 && !options.skipAuth && getRefreshToken()) {
+      if (error instanceof Error && 'status' in error && error.status === 401 && !options.skipAuth && getRefreshToken()) {
         const refreshed = await this.tryRefreshToken();
         if (refreshed) {
           const retryResponse = await doRequest();
@@ -213,7 +213,7 @@ class ApiClient {
         }
       }
       // If no refresh token or refresh failed, clear tokens and throw
-      if (error.status === 401) {
+      if (error instanceof Error && 'status' in error && error.status === 401) {
         clearTokens();
       }
       throw error;
@@ -256,15 +256,15 @@ class ApiClient {
     try {
       const response = await doRequest();
       return await this.handleResponse<T>(response);
-    } catch (error: any) {
-      if (error.status === 401 && !options.skipAuth && getRefreshToken()) {
+    } catch (error) {
+      if (error instanceof Error && 'status' in error && error.status === 401 && !options.skipAuth && getRefreshToken()) {
         const refreshed = await this.tryRefreshToken();
         if (refreshed) {
           const retryResponse = await doRequest();
           return this.handleResponse<T>(retryResponse);
         }
       }
-      if (error.status === 401) {
+      if (error instanceof Error && 'status' in error && error.status === 401) {
         clearTokens();
       }
       throw error;

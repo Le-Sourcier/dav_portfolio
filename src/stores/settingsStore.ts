@@ -289,8 +289,8 @@ export function applyTheme(mode: ThemeMode) {
   }
 
   // Strategy A: View Transitions API (Chrome 111+)
-  if (typeof (document as any).startViewTransition === 'function') {
-    const transition = (document as any).startViewTransition(doSwitch);
+  if (typeof document.startViewTransition === 'function') {
+    const transition = document.startViewTransition(doSwitch);
     transition.ready.then(() => {
       root.animate(
         {
@@ -311,7 +311,6 @@ export function applyTheme(mode: ThemeMode) {
   }
 
   // Strategy B: Overlay fallback (Firefox, Safari)
-  const oldBg = getComputedStyle(root).backgroundColor;
   doSwitch();
   const newBg = getComputedStyle(root).backgroundColor;
 

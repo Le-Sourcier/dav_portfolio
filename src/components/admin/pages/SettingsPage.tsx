@@ -3,12 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { User, Lock, Palette, Globe, Sun, Moon, Monitor, Check, Camera, Shield, Eye, EyeOff, Loader2, CheckCircle2, Bot, Plus, Trash2, GripVertical, Code2, GraduationCap, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuthStore } from '@/stores/authStore';
 import { useSettingsStore, applyTheme, setThemeClickOrigin, type ThemeMode, type ProfileData, type SocialLinks, type SeoData, type ChatbotSettings, type ChatbotQuickAction, type SkillsData, type EducationEntry } from '@/stores/settingsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useUpdateSettings, useApiSettings } from '@/hooks/queries';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import type { ApiSettings } from '@/services/api/settings.api';
 import { cvData } from '@/data/cvData';
 import { useTranslation } from 'react-i18next';
 import { LangToggle } from '../shared/LangToggle';
@@ -93,7 +93,6 @@ const VALID_SECTIONS: Section[] = ['profile', 'expertise', 'security', 'appearan
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { user } = useAuthStore();
   const settings = useSettingsStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
@@ -165,10 +164,10 @@ export function SettingsPage() {
     const needsSkills = !apiSettings.skills || !((apiSettings.skills as SkillsData).frontend?.length > 0);
     const needsEducation = !apiSettings.education || !(apiSettings.education as { items?: unknown[] }).items?.length;
     if (needsSkills || needsEducation) {
-      const seedData: Record<string, unknown> = {};
+      const seedData: ApiSettings = {};
       if (needsSkills) seedData.skills = fallbackSkills;
       if (needsEducation) seedData.education = { items: fallbackEducation };
-      updateSettingsMutation.mutate(seedData as any);
+      updateSettingsMutation.mutate(seedData);
       if (needsSkills) settings.updateSkills(fallbackSkills);
       if (needsEducation) settings.updateEducation({ items: fallbackEducation });
     }

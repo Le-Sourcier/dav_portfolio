@@ -5,11 +5,10 @@ import {
 } from 'recharts';
 import {
   FolderKanban, Briefcase, Newspaper, MessageSquare,
-  CalendarDays, Star, Mail, Clock, ArrowUpRight,
-  TrendingUp, Eye, Users, Activity, Zap, Globe,
+  CalendarDays, Star, ArrowUpRight,
+  TrendingUp, Eye, Users, Activity, Zap,
   CheckCircle2, AlertCircle, FileText,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { StatsCard } from '../shared/StatsCard';
 import { StatusBadge } from '../shared/StatusBadge';
 import {
@@ -17,10 +16,9 @@ import {
   useUnreadCount, useUpcomingAppointments,
   useVisibleTestimonials, useNewsletterStats,
   useContacts, useAppointments, useTestimonials,
-  useNewsletterSubscribers,
   useTrafficAnalytics, useWeeklyActivityAnalytics,
 } from '@/hooks/queries';
-import { useUIStore } from '@/stores/uiStore';
+import { useUIStore, type ModalType } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { cn } from '@/lib/utils';
 
@@ -72,7 +70,6 @@ export function DashboardPage() {
   const { data: newsletterStats } = useNewsletterStats();
   const { data: contacts = [] } = useContacts();
   const { data: appointments = [] } = useAppointments();
-  const { data: subscribers = [] } = useNewsletterSubscribers();
   const setActiveTab = useUIStore((s) => s.setActiveTab);
   const { profile } = useSettingsStore();
 
@@ -81,9 +78,9 @@ export function DashboardPage() {
   const { data: trafficAnalytics = [] } = useTrafficAnalytics(trafficPeriod);
   const { data: weeklyActivity = [] } = useWeeklyActivityAnalytics();
 
-  const unread = typeof unreadCount === 'object' ? (unreadCount as any)?.count ?? 0 : unreadCount;
+  const unread = unreadCount;
   const nlActive = typeof newsletterStats === 'object'
-    ? (newsletterStats as any)?.active ?? (newsletterStats as any)?.totalActive ?? (newsletterStats as any)?.total ?? 0
+    ? newsletterStats?.active ?? newsletterStats?.totalActive ?? newsletterStats?.total ?? 0
     : 0;
 
   const totalContent = projects.length + experiences.length + blogPosts.length;
@@ -453,7 +450,7 @@ export function DashboardPage() {
               key={action.label}
               onClick={() => {
                 setActiveTab(action.tab);
-                setTimeout(() => useUIStore.getState().openModal(action.modal as any), 100);
+                setTimeout(() => useUIStore.getState().openModal(action.modal as ModalType), 100);
               }}
               className="flex items-center gap-2.5 p-3 rounded-lg border border-border/70 hover:border-zinc-200 dark:hover:border-zinc-700 hover:bg-accent/60 transition-all group"
             >

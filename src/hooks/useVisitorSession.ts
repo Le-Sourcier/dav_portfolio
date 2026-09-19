@@ -27,10 +27,6 @@ function isPersisted(): boolean {
   }
 }
 
-function getStorage(): Storage {
-  return isPersisted() ? localStorage : sessionStorage;
-}
-
 function getStoredSession(): VisitorSession | null {
   try {
     if (!hasConsented()) return null;
@@ -96,7 +92,8 @@ export function useVisitorSession() {
       // Store name/email locally (not verified yet)
       setSession({ name, email, token: null, verified: false });
       setOtpStatus('sent');
-    } catch (err: any) {
+    } catch (cause) {
+      const err = cause instanceof Error ? cause : new Error();
       setOtpError(err.message || "Impossible d'envoyer le code");
       setOtpStatus('error');
     }
@@ -112,7 +109,8 @@ export function useVisitorSession() {
       storeSession({ name: session.name, email: session.email }, token, remember);
       setSession({ ...session, token, verified: true });
       setOtpStatus('idle');
-    } catch (err: any) {
+    } catch (cause) {
+      const err = cause instanceof Error ? cause : new Error();
       setOtpError(err.message || 'Code invalide ou expire');
       setOtpStatus('error');
     }

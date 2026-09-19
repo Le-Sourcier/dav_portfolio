@@ -3,7 +3,7 @@ import { useAppointments, useDeleteAppointment, useUpdateAppointmentStatus } fro
 import { DataTable, type Column } from '../shared/DataTable';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { StatusBadge } from '../shared/StatusBadge';
-import { Calendar, Clock, User, Mail, MessageSquare, AlertCircle, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, ExternalLink } from 'lucide-react';
 import type { Appointment, AppointmentStatus } from '@/types/admin.types';
 
 const statusLabels: Record<AppointmentStatus, string> = {

@@ -1,3 +1,4 @@
+import type { Testimonial } from '@/types/admin.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUIStore, selectModal } from '@/stores/uiStore';
 import { TestimonialForm } from '../forms/TestimonialForm';
@@ -12,7 +13,7 @@ export function AdminModal() {
   const renderForm = () => {
     switch (modal.type) {
       case 'testimonial':
-        return <TestimonialForm initialData={modal.data as any} onClose={closeModal} />;
+        return <TestimonialForm initialData={modal.data as Testimonial | null} onClose={closeModal} />;
       default:
         return null;
     }
