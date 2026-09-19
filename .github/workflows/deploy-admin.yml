@@ -1,0 +1,50 @@
+name: Verify and deploy portfolio admin
+on:
+  push:
+    branches: [admin-platform-sync]
+  pull_request:
+    branches: [admin-platform-sync]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-admin-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, lint, typecheck, and test
+        run: docker build -t portfolio-admin-verify .
+      - name: Audit all dependencies
+        run: docker build --target deps -t portfolio-admin-deps . && docker run --rm portfolio-admin-deps npm audit --audit-level=low
+      - name: Test production routes and assets
+        run: |
+          docker run -d --name admin-test portfolio-admin-verify
+          trap 'docker rm -f admin-test' EXIT
+          for attempt in $(seq 1 30); do
+            if docker exec admin-test node -e "fetch('http://127.0.0.1:3051/admin/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; then break; fi
+            sleep 2
+          done
+          docker exec admin-test node --test tests/deployment.test.mjs
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/admin-platform-sync'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Deploy verified commit over SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.PORTFOLIO_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PORTFOLIO_KNOWN_HOSTS }}
+          REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" | tr -d '\r' > ~/.ssh/portfolio
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/portfolio ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/portfolio' EXIT
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/portfolio azureuser@172.174.244.66 "deploy admin $REVISION"

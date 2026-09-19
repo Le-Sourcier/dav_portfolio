@@ -9,3 +9,6 @@ README.md
 *.tsbuildinfo
 .env.local
 .env.*.local
+.env
+.env.*
+dist

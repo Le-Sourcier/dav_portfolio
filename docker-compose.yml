@@ -1,12 +1,20 @@
+name: portfolio-admin
 services:
   lesourcier-admin:
     build:
       context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:?API URL is required}
     image: lesourcier-admin:latest
-    container_name: lesourcier-admin
     environment:
       - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3051
     ports:
-      - "3042:3000"
+      - "127.0.0.1:3051:3051"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3051/admin/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
