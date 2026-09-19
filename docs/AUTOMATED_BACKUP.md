@@ -22,7 +22,7 @@ authorization is a partial failure, never reported as success.
 - [x] Reuse the branded email template, with French and English content.
 - [x] Test dump failures, retention boundaries, attachments and Drive failures.
 - [x] Install a persistent midnight systemd timer and test a real backup/restore.
-- [ ] Verify SMTP delivery: blocked by SMTP authentication rejection (535).
+- [x] Verify SMTP delivery with the replacement credentials supplied by the owner.
 - [ ] Authorize/test Google Drive: owner authorization is still required.
 - [x] Commit, push and verify deployment.
 
@@ -41,15 +41,16 @@ no network or published ports. Restored counts: 10 projects, 4 experiences,
 12 blog posts, 2 testimonials and 1 administrator. The temporary database was
 removed after verification; the live database was not modified.
 
-Both email attachments validate, but SMTP authentication fails with `EAUTH`,
-command `AUTH PLAIN`, response code 535. The same refusal occurs using the
-normal Docker Compose environment loader. No successful email delivery is
-claimed. Renew the SMTP application password in the local production env and
-synchronize it privately to the server before retrying.
+The original SMTP credentials were rejected with response code 535. The owner
+supplied replacement credentials, which were applied to both local environment
+files and the server production environment. The API container was recreated
+and remained healthy. At 13:04:31 UTC, SMTP accepted the email containing
+`portfolio-db-2026-09-19-130429.dump` and its SHA-256 manifest. Inbox placement
+is not independently verified.
 
-The `portfolio-gdrive` remote has no OAuth authorization yet. Until SMTP and
-Drive are connected, the daily job still writes valid local backups and exits
-2 to report incomplete delivery. The seven-day local retention is active;
+The `portfolio-gdrive` remote has no OAuth authorization yet. Until Drive is
+connected, the daily job writes valid local backups, emails them and exits
+2 to report incomplete Drive delivery. The seven-day local retention is active;
 remote retention will execute only after a successful Drive upload.
 
 ## Operations
